@@ -153,7 +153,8 @@ class BookingsCalendar {
 
 		$roomAtts = array(
 			'fields'		 => 'all',
-			'posts_per_page' => -1
+			'posts_per_page' => -1,
+			'orderby' => 'title'
 		);
 
 		if ( $this->isUseSearch ) {
