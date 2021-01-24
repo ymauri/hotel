@@ -1,0 +1,9 @@
+.mphb-date-pending.mphb-date-pending-admin,
+.mphb-date-check-out-pending.mphb-date-check-out-pending-admin {
+    background-color: #a9a9a9 !important;
+}
+
+.mphb-status.mphb-status-pending {
+    background-color: #a9a9a9 !important;
+    color: white !important;
+}

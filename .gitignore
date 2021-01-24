@@ -1,14 +1,17 @@
-# ignore everything in the root except the "wp-content" directory.
+
 /*
 !wp-content/
 
 !.gitignore
 !.readme.md
-# ignore everything in the "wp-content" directory, except:
-# "mu-plugins", "plugins", "themes" directory
+!.editorconfig
+
+
 wp-content/*
-!wp-content/plugins/motopress-hotel-booking
-!wp-content/plugins/thepenthouse
+!wp-content/plugins/
+wp-content/plugins/*
+!wp-content/plugins/motopress-hotel-booking/
+!wp-content/plugins/thepenthouse/
 
 # ignore log files and databases
 *.log
