@@ -1,0 +1,37 @@
+# ignore everything in the root except the "wp-content" directory.
+/*
+!wp-content/
+
+!.gitignore
+!.readme.md
+# ignore everything in the "wp-content" directory, except:
+# "mu-plugins", "plugins", "themes" directory
+wp-content/*
+!wp-content/plugins/motopress-hotel-booking
+!wp-content/plugins/thepenthouse
+
+# ignore log files and databases
+*.log
+*.sql
+*.sqlite
+
+# ignore compiled files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# ignore packaged files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# ignore node/grunt dependency directories
+node_modules/
