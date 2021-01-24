@@ -52,12 +52,12 @@ class Statuses extends AbstractCPT\Statuses {
 		switch ( $statusName ) {
 			case self::STATUS_PENDING_USER:
 				$args	 = array(
-					'label'						 => _x( 'Pending User Confirmation', 'Booking status', 'motopress-hotel-booking' ),
+					'label'						 => _x( 'Pending User', 'Booking status', 'motopress-hotel-booking' ),
 					'public'					 => true,
 					'exclude_from_search'		 => false,
 					'show_in_admin_all_list'	 => true,
 					'show_in_admin_status_list'	 => true,
-					'label_count'				 => _n_noop( 'Pending User Confirmation <span class="count">(%s)</span>', 'Pending User Confirmation <span class="count">(%s)</span>', 'motopress-hotel-booking' )
+					'label_count'				 => _n_noop( 'Pending User <span class="count">(%s)</span>', 'Pending User <span class="count">(%s)</span>', 'motopress-hotel-booking' )
 				);
 				break;
 			case self::STATUS_PENDING_PAYMENT:
@@ -72,12 +72,12 @@ class Statuses extends AbstractCPT\Statuses {
 				break;
 			case self::STATUS_PENDING:
 				$args	 = array(
-					'label'						 => _x( 'Pending Admin', 'Booking status', 'motopress-hotel-booking' ),
+					'label'						 => _x( 'Locked', 'Booking status', 'motopress-hotel-booking' ),
 					'public'					 => true,
 					'exclude_from_search'		 => false,
 					'show_in_admin_all_list'	 => true,
 					'show_in_admin_status_list'	 => true,
-					'label_count'				 => _n_noop( 'Pending Admin <span class="count">(%s)</span>', 'Pending Admin <span class="count">(%s)</span>', 'motopress-hotel-booking' )
+					'label_count'				 => _n_noop( 'Locked <span class="count">(%s)</span>', 'Locked <span class="count">(%s)</span>', 'motopress-hotel-booking' )
 				);
 				break;
 			case self::STATUS_ABANDONED:
