@@ -318,7 +318,7 @@ class CheckoutView {
                 <?php _e('Choose Additional Services', 'motopress-hotel-booking'); ?>
             </h4>
 
-            <ul class="mphb_sc_checkout-services-list mphb_checkout-services-list">
+            <div class="mphb_sc_checkout-services-list mphb_checkout-services-list">
                 <?php foreach ($services as $index => $service) {
                     $serviceId = $service->getOriginalId();
                     $presetAdults = apply_filters('mphb_sc_checkout_preset_service_adults', $roomType->getAdultsCapacity(), $service, $reservedRoom, $roomType);
@@ -330,48 +330,68 @@ class CheckoutView {
                     $isSelected = apply_filters('mphb_sc_checkout_is_selected_service', false, $service, $reservedRoom, $roomType);
 
                     ?>
-                    <li>
-                        <label for="<?php echo $idPrefix; ?>-id" class="mphb-checkbox-label">
-                            <input type="checkbox" id="<?php echo $idPrefix; ?>-id" name="<?php echo $namePrefix; ?>[id]" class="mphb_sc_checkout-service mphb_checkout-service" value="<?php echo $serviceId; ?>" <?php checked($isSelected); ?>>
-                            <?php echo $service->getTitle(); ?>
-                            <em>(<?php echo $service->getPriceWithConditions(false); ?>)</em>
-                        </label>
+                    <!--<li>-->
+						<div class="row mphb-custom-service-item"  style="background-color: #f7f5f5; min-height: 80px; padding: 10px 0; margin: 10px 0; border: solid 1px #e2e2e2;">
+							<?php if (has_post_thumbnail( $service->getId()) ) :?>
+								<div class="col-md-4">
+								<?php echo get_the_post_thumbnail( $service->getId(), 'post-thumbnail')?>
+								</div>
+								<div class="col-md-8">
+							<?php else:?>
+								<div class="col-md-12">
+							<?php endif;?>							
+							
+								<label for="<?php echo $idPrefix; ?>-id" class="mphb-checkbox-label">
+									<input type="checkbox" id="<?php echo $idPrefix; ?>-id" name="<?php echo $namePrefix; ?>[id]" class="mphb_sc_checkout-service mphb_checkout-service" value="<?php echo $serviceId; ?>" <?php checked($isSelected); ?>>
+									<?php echo $service->getTitle(); ?>
+									<em>(<?php echo $service->getPriceWithConditions(false); ?>)</em>
+								</label>
 
-                        <?php if ($service->isPayPerAdult() && $roomType->getAdultsCapacity() > 1) { ?>
-                            <label for="<?php echo $idPrefix; ?>-adults">
-                                <?php _e('for ', 'motopress-hotel-booking'); ?>
-                                <select name="<?php echo $namePrefix; ?>[adults]" id="<?php echo $idPrefix; ?>-adults" class="mphb_sc_checkout-service-adults mphb_checkout-service-adults">
-                                    <?php for ($i = 1; $i <= $roomType->getAdultsCapacity(); $i++) { ?>
-                                        <option value="<?php echo $i; ?>" <?php selected($presetAdults, $i); ?>>
-                                            <?php echo $i; ?>
-                                        </option>
-                                    <?php } ?>
-                                </select>
-                                <?php echo _x(' guest(s)', 'Example: Breakfast for X guest(s)', 'motopress-hotel-booking'); ?>
-                            </label>
-                        <?php } else { ?>
-                            <input type="hidden" name="<?php echo $namePrefix; ?>[adults]" value="1">
-                        <?php } ?>
+								<?php if ($service->isPayPerAdult() && $roomType->getAdultsCapacity() > 1) { ?>
+									<label for="<?php echo $idPrefix; ?>-adults">
+										<?php _e('for ', 'motopress-hotel-booking'); ?>
+										<select name="<?php echo $namePrefix; ?>[adults]" id="<?php echo $idPrefix; ?>-adults" class="mphb_sc_checkout-service-adults mphb_checkout-service-adults">
+											<?php for ($i = 1; $i <= $roomType->getAdultsCapacity(); $i++) { ?>
+												<option value="<?php echo $i; ?>" <?php selected($presetAdults, $i); ?>>
+													<?php echo $i; ?>
+												</option>
+											<?php } ?>
+										</select>
+										<?php echo _x(' guest(s)', 'Example: Breakfast for X guest(s)', 'motopress-hotel-booking'); ?>
+									</label>
+								<?php } else { ?>
+									<input type="hidden" name="<?php echo $namePrefix; ?>[adults]" value="1">
+								<?php } ?>
 
-                        <?php if ($service->isFlexiblePay()) { ?>
-                            <?php
-                                $minQuantity = $service->getMinQuantity();
-                                $maxQuantity = $service->getMaxQuantityNumber();
+								<?php if ($service->isFlexiblePay()) { ?>
+									<?php
+										$minQuantity = $service->getMinQuantity();
+										$maxQuantity = $service->getMaxQuantityNumber();
 
-                                if ($service->isAutoLimit()) {
-                                    $maxQuantity = DateUtils::calcNights($booking->getCheckInDate(), $booking->getCheckOutDate());
-                                }
+										if ($service->isAutoLimit()) {
+											$maxQuantity = DateUtils::calcNights($booking->getCheckInDate(), $booking->getCheckOutDate());
+										}
 
-                                $maxQuantity = max($minQuantity, $maxQuantity);
+										$maxQuantity = max($minQuantity, $maxQuantity);
 
-                                $presetQuantity = apply_filters('mphb_sc_checkout_preset_service_quantity', $minQuantity, $service, $reservedRoom, $roomType);
-                                $presetQuantity = mphb_limit($presetQuantity, $minQuantity, $maxQuantity);
-                            ?>
-                            &#215; <input type="number" name="<?php echo $namePrefix; ?>[quantity]" class="mphb_sc_checkout-service-quantity mphb_checkout-service-quantity" value="<?php echo esc_attr($presetQuantity); ?>" min="<?php echo esc_attr($minQuantity); ?>" <?php echo !$service->isUnlimited() ? 'max="' . esc_attr($maxQuantity) . '"' : ''; ?> step="1"> <?php _e('time(s)', 'motopress-hotel-booking'); ?>
-                        <?php } // Is flexible pay? ?>
-                    </li>
+										$presetQuantity = apply_filters('mphb_sc_checkout_preset_service_quantity', $minQuantity, $service, $reservedRoom, $roomType);
+										$presetQuantity = mphb_limit($presetQuantity, $minQuantity, $maxQuantity);
+									?>
+									&#215; <input type="number" name="<?php echo $namePrefix; ?>[quantity]" class="mphb_sc_checkout-service-quantity mphb_checkout-service-quantity" value="<?php echo esc_attr($presetQuantity); ?>" min="<?php echo esc_attr($minQuantity); ?>" <?php echo !$service->isUnlimited() ? 'max="' . esc_attr($maxQuantity) . '"' : ''; ?> step="1"> <label><?php _e('time(s)', 'motopress-hotel-booking'); ?></label>
+								<?php } // Is flexible pay? ?>
+								<p></p>
+								<div style="font-size: 12px;">
+									<?php echo get_post_field('post_content',  $service->getId() );?>
+								</div>
+								
+							</div>
+						</div>
+						
+                        
+					<!--</li>-->
+
                 <?php } ?>
-            </ul>
+            </div>
         </section>
         <?php
     }
