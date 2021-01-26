@@ -353,11 +353,11 @@ class CheckoutView {
 										<select name="<?php echo $namePrefix; ?>[adults]" id="<?php echo $idPrefix; ?>-adults" class="mphb_sc_checkout-service-adults mphb_checkout-service-adults">
 											<?php for ($i = 1; $i <= $roomType->getAdultsCapacity(); $i++) { ?>
 												<option value="<?php echo $i; ?>" <?php selected($presetAdults, $i); ?>>
-													<?php echo $i; ?>
+													<?php echo $i ; ?>
+													<?php echo $i == 1 ? 'Guest' : 'Guests' ; ?>
 												</option>
 											<?php } ?>
 										</select>
-										<?php echo _x(' guest(s)', 'Example: Breakfast for X guest(s)', 'motopress-hotel-booking'); ?>
 									</label>
 								<?php } else { ?>
 									<input type="hidden" name="<?php echo $namePrefix; ?>[adults]" value="1">
@@ -377,7 +377,8 @@ class CheckoutView {
 										$presetQuantity = apply_filters('mphb_sc_checkout_preset_service_quantity', $minQuantity, $service, $reservedRoom, $roomType);
 										$presetQuantity = mphb_limit($presetQuantity, $minQuantity, $maxQuantity);
 									?>
-									&#215; <input type="number" name="<?php echo $namePrefix; ?>[quantity]" class="mphb_sc_checkout-service-quantity mphb_checkout-service-quantity" value="<?php echo esc_attr($presetQuantity); ?>" min="<?php echo esc_attr($minQuantity); ?>" <?php echo !$service->isUnlimited() ? 'max="' . esc_attr($maxQuantity) . '"' : ''; ?> step="1"> <label><?php _e('time(s)', 'motopress-hotel-booking'); ?></label>
+									<br/>
+									<?php _e('Quantity:', 'motopress-hotel-booking'); ?><input type="number" name="<?php echo $namePrefix; ?>[quantity]" class="mphb_sc_checkout-service-quantity mphb_checkout-service-quantity" value="<?php echo esc_attr($presetQuantity); ?>" min="<?php echo esc_attr($minQuantity); ?>" <?php echo !$service->isUnlimited() ? 'max="' . esc_attr($maxQuantity) . '"' : ''; ?> step="1"> <label></label>
 								<?php } // Is flexible pay? ?>
 								<p></p>
 								<div style="font-size: 12px;">
