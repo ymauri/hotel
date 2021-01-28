@@ -53,6 +53,7 @@ function datatbase_structure()
 include(plugin_dir_path(__FILE__) . 'scripts/sync_reservations.php');
 include(plugin_dir_path(__FILE__) . 'scripts/accommodation_custom_field_guesty_id.php');
 include(plugin_dir_path(__FILE__) . 'scripts/sync_calendar.php');
+include(plugin_dir_path(__FILE__) . 'scripts/scripts_hotelchamp.php');
 
 add_action('admin_enqueue_scripts', "register_css_and_js");
 function register_css_and_js()

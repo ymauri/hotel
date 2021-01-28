@@ -33,7 +33,7 @@ function save_guesty_id_meta($post_id)
         return $post_id;
     }
     // check permissions
-    if ('page' === $_POST['post_type']) {
+    if (!empty($_POST['post_type']) && 'page' === $_POST['post_type']) {
         if (!current_user_can('edit_page', $post_id)) {
             return $post_id;
         } elseif (!current_user_can('edit_post', $post_id)) {
