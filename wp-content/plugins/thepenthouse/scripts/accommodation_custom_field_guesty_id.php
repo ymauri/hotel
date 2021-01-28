@@ -42,7 +42,7 @@ function save_guesty_id_meta($post_id)
     }
 
     $old = get_post_meta($post_id, 'guesty_id', true);
-    $new = $_POST['guesty_id'];
+    $new = $_POST['guesty_id'] ?? null;
 
     if ($new && $new !== $old) {
         update_post_meta($post_id, 'guesty_id', $new);
