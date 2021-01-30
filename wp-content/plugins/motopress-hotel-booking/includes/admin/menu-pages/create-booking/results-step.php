@@ -35,7 +35,7 @@ class ResultsStep extends Step {
 		add_action( 'mphb_cb_reserve_rooms_form_before_submit_button', array( $this, 'printDateHiddenFields' ) );
 
 		if ( $this->isValidStep ) {
-			$rooms = MPHB()->getRoomRepository()->getAvailableRooms( $this->checkInDate, $this->checkOutDate, $this->roomTypeId );
+			$rooms = MPHB()->getRoomRepository()->getAvailableRooms( $this->checkInDate, $this->checkOutDate, $this->roomTypeId, array( 'skip_buffer_rules' => false ) );
 			$rooms = $this->filterRoomsByRates( $rooms );
 			$rooms = $this->filterRoomsByCapacity( $rooms );
 			$rooms = $this->filterRoomsByRules( $rooms );

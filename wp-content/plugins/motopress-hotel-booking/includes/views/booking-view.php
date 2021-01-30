@@ -230,7 +230,7 @@ class BookingView {
 				<tfoot>
 					<?php if ( !empty( $priceBreakdown['coupon'] ) ) : ?>
 						<tr class="mphb-price-breakdown-coupon">
-							<th colspan="<?php echo ( $useThreeColumns ? 2 : 1 ); ?>"><?php printf( __( 'Coupon: %s' ), $priceBreakdown['coupon']['code'] ); ?></th>
+							<th colspan="<?php echo ( $useThreeColumns ? 2 : 1 ); ?>"><?php printf( __( 'Coupon: %s', 'motopress-hotel-booking' ), $priceBreakdown['coupon']['code'] ); ?></th>
 							<td class="mphb-table-price-column">
 								<?php echo mphb_format_price( -1 * $priceBreakdown['coupon']['discount'] ); ?>
                                 <?php if ($atts['coupon_removable']) { ?>

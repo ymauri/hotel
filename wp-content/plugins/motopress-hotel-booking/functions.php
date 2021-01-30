@@ -1,5 +1,7 @@
 <?php
 
+use MPHB\Utils\DateUtils;
+
 /**
  * Get template part.
  *
@@ -1166,6 +1168,18 @@ function mphb_get_room_type($roomTypeId, $force = false)
 }
 
 /**
+ * @param int $seasonId
+ * @param bool $force Optional. False by default.
+ * @return \MPHB\Entities\Season|null
+ *
+ * @since 3.9
+ */
+function mphb_get_season($seasonId, $force = false)
+{
+    return MPHB()->getSeasonRepository()->findById($seasonId, $force);
+}
+
+/**
  * Determine if the current view is the "All" view.
  *
  * @see \WP_Posts_List_Table::is_base_request()
@@ -1259,14 +1273,16 @@ function mphb_is_failed_booking($booking)
  */
 function mphb_get_available_rooms($from, $to, $atts = array())
 {
-    $roomTypeId = isset($atts['room_type_id']) ? $atts['room_type_id'] : 0;
-    $searchAtts = array();
+		$roomTypeId = isset($atts['room_type_id']) ? $atts['room_type_id'] : 0;
+		$searchAtts = array();
 
-    if (isset($atts['exclude_bookings'])) {
-        $searchAtts['exclude_bookings'] = $atts['exclude_bookings'];
-    }
+		if (isset($atts['exclude_bookings'])) {
+				$searchAtts['exclude_bookings'] = $atts['exclude_bookings'];
+		}
 
-    return MPHB()->getRoomRepository()->getAvailableRooms($from, $to, $roomTypeId, $searchAtts);
+		$searchAtts['skip_buffer_rules'] = false;
+
+		return MPHB()->getRoomRepository()->getAvailableRooms($from, $to, $roomTypeId, $searchAtts);
 }
 
 /**
@@ -1369,7 +1385,7 @@ function mphb_get_room_type_base_price($roomType = null)
 
     if (!empty($rates)) {
         $startDate = new \DateTime();
-        $endDate = \MPHB\Utils\DateUtils::cloneModify($startDate, sprintf('+%d days', MPHB()->settings()->main()->getAveragePricePeriod()));
+        $endDate = DateUtils::cloneModify($startDate, sprintf('+%d days', MPHB()->settings()->main()->getAveragePricePeriod()));
 
         $prices = array_map(
             function ($rate) use ($startDate, $endDate) {
@@ -1453,6 +1469,197 @@ function mphb_get_room_type_period_price($startDate, $endDate, $roomType = null,
 }
 
 /**
+ * @param 'any'|'original' $language Optional. 'any' by default.
+ * @param array $atts Additional atts.
+ * @return int[]
+ *
+ * @since 3.9
+ */
+function mphb_get_room_type_ids($language = 'any', $atts = array())
+{
+    if ($language == 'original') {
+        // Multilingual support
+        $atts['mphb_language'] = 'original';
+    }
+
+    $atts['fields'] = 'ids'; // Force IDs
+
+    return MPHB()->getRoomTypePersistence()->getPosts($atts);
+}
+
+/**
+ * @param string $modifier Optional. Modifier like '+1 day'. Empty by default.
+ * @return DateTime
+ *
+ * @since 3.9
+ */
+function mphb_today($modifier = '')
+{
+    $date = new DateTime('today');
+
+    if (!empty($modifier)) {
+        $date->modify($modifier);
+    }
+
+    return $date;
+}
+
+/**
+ * @return bool
+ *
+ * @since 3.9
+ */
+function mphb_has_buffer_days()
+{
+    return MPHB()->getRulesChecker()->bufferRules()->hasRules();
+}
+
+/**
+ * @param DateTime $date
+ * @param int $roomTypeId
+ * @return int Buffer days amount.
+ *
+ * @since 3.9
+ */
+function mphb_get_buffer_days($date, $roomTypeId = 0)
+{
+    $actualRule = MPHB()->getRulesChecker()->bufferRules()->findActualRule($date, $roomTypeId);
+
+    return $actualRule->getBufferDays();
+}
+
+/**
+ * @param DateTime $startDate
+ * @param DateTime $endDate
+ * @param int $bufferDays
+ * @return DateTime[] [0 => Modified start date, 1 => Modified end date]
+ *
+ * @since 3.9
+ */
+function mphb_modify_buffer_period( $startDate, $endDate, $bufferDays = 0 )
+{
+		if( $bufferDays > 0 ) {
+			$beforeStart = DateUtils::cloneModify($startDate, "-{$bufferDays} days");
+	    $afterEnd    = DateUtils::cloneModify($endDate, "+{$bufferDays} days");
+
+			return array( $beforeStart, $afterEnd );
+		}
+
+    return array( $startDate, $endDate );
+}
+
+/**
+ * @param MPHB\Entities\Booking $booking
+ * @param int $bufferDays
+ * @param bool $extendDates Optional. Extend the final result with check-in and
+ *     next to the check-out dates. Useful for Booking Calendar, for example.
+ *     False by default.
+ * @return DateTime[] [Date string ('Y-m-d') => Date object] - only the dates of
+ *     the buffer.
+ *
+ * @since 3.9
+ */
+function mphb_modify_booking_buffer_period($booking, $bufferDays, $extendDates = false)
+{
+    $checkInDate = $booking->getCheckInDate();
+    $checkOutDate = $booking->getCheckOutDate();
+
+    $offsetDays = $extendDates ? $bufferDays + 1 : $bufferDays;
+
+    // Find the buffer range
+    list($beforeCheckIn, $afterCheckOut) = mphb_modify_buffer_period($checkInDate, $checkOutDate, $bufferDays);
+
+    if ($extendDates) {
+        $afterCheckOut->modify('+1 day');
+    }
+
+    // Build the full period
+    $fullPeriod = DateUtils::createDatePeriod($beforeCheckIn, $afterCheckOut);
+
+    // Split period to dates
+    $bufferDates = iterator_to_array($fullPeriod);
+    array_splice($bufferDates, $offsetDays, -$offsetDays); // Remove booking inner dates
+
+    $dateFormat  = MPHB()->settings()->dateTime()->getDateTransferFormat();
+    $dateStrings = array_map(function ($date) use ($dateFormat) { return $date->format($dateFormat); }, $bufferDates);
+
+    return array_combine($dateStrings, $bufferDates);
+}
+
+/**
+ * @param array $bookingPeriod
+ * @param int $roomTypeId
+ *
+ * @return DateTime[] [0 => Modified start date, 1 => Modified end date]
+ *
+ * @since 3.9
+ */
+function mphb_modify_booking_period_with_booking_buffer( $bookingPeriod, $roomTypeId ) {
+		$bufferDays = mphb_get_buffer_days( $bookingPeriod[0], $roomTypeId );
+
+		return mphb_modify_buffer_period( $bookingPeriod[0], $bookingPeriod[1], $bufferDays );
+}
+add_filter( 'mphb_modify_booking_period', 'mphb_modify_booking_period_with_booking_buffer', 10, 2 );
+
+/**
+ * @param array $atts
+ *
+ * @return array
+ *
+ * @since 3.9
+ */
+function mphb_is_rooms_free_query_atts_with_buffer( $atts ) {
+		$atts['skip_buffer_rules'] = false;
+
+		return $atts;
+}
+add_filter( 'mphb_is_rooms_free_query_atts', 'mphb_is_rooms_free_query_atts_with_buffer' );
+
+/**
+ * @param array $datesArray
+ * @param int $roomsTotal
+ *
+ * @return array [Date string ('Y-m-d') => int]
+ *
+ * @since 3.9
+ */
+function mphb_filter_checkin_checkout_dates( $datesArray, $roomsTotal ) {
+
+	$checkIns = array();
+	$checkOuts = array();
+
+	foreach( $datesArray as $date => $roomsCount ) {
+
+		if( $roomsCount >= $roomsTotal ) {
+
+			$dateObj = \DateTime::createFromFormat( 'Y-m-d', $date );
+			$dateYesterday = MPHB\Utils\DateUtils::cloneModify( \DateTime::createFromFormat( 'Y-m-d', $date ), "-1 day" )->format( "Y-m-d" );
+			$dateTomorrow = MPHB\Utils\DateUtils::cloneModify( \DateTime::createFromFormat( 'Y-m-d', $date ), "+1 day" )->format( "Y-m-d" );
+
+			if( empty( $checkIns ) ) {
+				$checkIns[$date] = $roomsCount;
+				$checkOuts[$dateTomorrow] = $roomsCount;
+			} else {
+				if( !isset( $datesArray[$dateYesterday] ) || $datesArray[$dateYesterday] < $roomsCount ) {
+					$checkIns[$date] = $roomsCount;
+					$checkOuts[$dateTomorrow] = $roomsCount;
+				} else {
+					if( !empty( $checkOuts ) ) {
+						$lastCheckOutDate = array_keys( $checkOuts )[count( $checkOuts ) - 1];
+						unset( $checkOuts[$lastCheckOutDate] );
+						$checkOuts[$dateTomorrow] = $roomsCount;
+					}
+				}
+			}
+		}
+
+	}
+
+	return array( $checkIns, $checkOuts );
+
+}
+
+/*
  * @return boolean
  *
  * @since 3.8.4

@@ -39,180 +39,239 @@ class RoomPersistence extends RoomTypeDependencedPersistence {
 	}
 
     /**
-     * @param array $atts
-     *     @param string $atts['availability'] Optional. Accepts "free", "locked",
-     *         "booked" or "pending". Default is "free".
-     *         "free" - has no bookings with status complete or pending for this days.
-     *         "locked" - has bookings with status complete or pending for this days.
-     *         "booked" - has bookings with status complete for this days.
-     *         "pending" - has bookings with status pending for this days.
-     *     @param \DateTime $atts['from_date'] Optional. Default is today.
-     *     @param \DateTime $atts['to_date'] Optional. Default is today.
-     *     @param int $atts['count'] Optional. Count of rooms to search.
-     *     @param int $atts['room_type_id'] Optional. Type of rooms to search.
-     *     @param int $atts['exclude_booking'] Deprecated. Use "exclude_bookings" instead.
-     *     @param int|int[] $atts['exclude_bookings'] Optional. One or more IDs
-     *         of booking to exclude from locked rooms list.
-     *     @param array $atts['exclude_rooms'] Optional. IDs of rooms to exclude
-     *         from locked rooms list.
-     * @return string[] Array of room IDs. Will always return original IDs because
-     *     of direct query to the DB.
+     * @param array $atts Optional.
+     *     @param string $atts['availability'] free|locked|booked|pending. 'free'
+     *         by default.
+     *         'free' - has no bookings with status complete or pending for this days.
+     *         'locked' - has bookings with status complete or pending for this days.
+     *         'booked' - has bookings with status complete for this days.
+     *         'pending' - has bookings with status pending for this days.
+     *     @param \DateTime $atts['from_date'] Today by default.
+     *     @param \DateTime $atts['to_date'] Tomorrow by default.
+     *     @param int $atts['count'] The number of rooms to search. All by default.
+     *     @param int|int[] $atts['room_type_id'] Type of rooms to search. All
+     *         by default.
+     *     @param int|int[] $atts['exclude_bookings'] One or more booking IDs to
+     *         exclude from the search results.
+     *     @param int[] $atts['exclude_rooms'] Room IDs to exclude from the
+     *         search results.
+     *     @param bool $atts['skip_buffer_rules'] True by default.
+     *     @param int $atts['exclude_booking'] Deprecated. Use "exclude_bookings"
+     *         instead.
+     * @return int[] Room IDs.
      *
-     * @global \WPDB $wpdb
-     *
-     * @since 3.7.0 added new filters: "mphb_search_rooms_query_atts", "mphb_search_rooms_query" and "mphb_search_rooms_second_query_atts".
+     * @since 3.9
      */
     public function searchRooms($atts = array())
     {
+        $defaults = array(
+            'availability'      => 'free',
+            'from_date'         => mphb_today(),
+            'to_date'           => mphb_today('+1 day'),
+            'count'             => 0, // Previously was null by default
+            'room_type_id'      => 0, // Previously was null by default
+            'exclude_bookings'  => array(),
+            'exclude_rooms'     => array(),
+            'skip_buffer_rules' => true // Don't rewrite the old logic by default
+        );
+
+        // Get rid of deprecated parameters
+        if (isset($atts['exclude_booking']) && !isset($atts['exclude_bookings'])) {
+            $atts['exclude_bookings'] = $atts['exclude_booking'];
+        }
+
+        /** @since 3.9 */
+        $atts = apply_filters('mphb_search_rooms_atts', array_merge($defaults, $atts), $defaults);
+
+        // Reset the "count" parameter if searching for free rooms - find all
+        // locked rooms instead of min($count, %all%)
+        $count = $atts['count'];
+
+        if ($atts['availability'] == 'free') {
+            $atts['count'] = 0;
+        }
+
+        // Find locked rooms
+        if ($atts['skip_buffer_rules'] || !mphb_has_buffer_days()) {
+            $roomIds = $this->findLockedRooms($atts);
+
+        } else {
+            $roomIds = array();
+            $roomTypeIds = !empty($atts['room_type_id']) ? (array)$atts['room_type_id'] : mphb_get_room_type_ids('original');
+
+            // Search rooms for each room type separately (each room type may
+            // have different buffer range)
+            foreach ($roomTypeIds as $roomTypeId) {
+                $modifiedAtts = $atts;
+
+                // Force room type ID
+                $modifiedAtts['room_type_id'] = $roomTypeId;
+                //$modifiedAtts['availability'] = 'locked';
+
+                // Expand searched period
+                $bufferDays = mphb_get_buffer_days($atts['from_date'], $roomTypeId);
+
+                if ($bufferDays > 0) {
+                    list($fromDate, $toDate) = mphb_modify_buffer_period($atts['from_date'], $atts['to_date'], $bufferDays);
+
+                    $modifiedAtts['from_date'] = $fromDate;
+                    $modifiedAtts['to_date'] = $toDate;
+                }
+
+                // Find rooms
+                $roomsPack = $this->findLockedRooms($modifiedAtts);
+                $roomIds = array_merge($roomIds, $roomsPack);
+
+
+
+            }
+        } // If search with buffer rules
+
+        // Get the list of free room
+        if ($atts['availability'] == 'free') {
+            // Restore the real count
+            $atts['count'] = $count;
+
+            // Find free rooms
+            $roomIds = $this->findFreeRooms($roomIds, $atts);
+        }
+
+        return $roomIds;
+    }
+
+    /**
+     * @param array $atts Optional.
+     * @return int[]
+     *
+     * @global \wpdb $wpdb
+     *
+     * @since 3.9
+     */
+    protected function findLockedRooms($atts)
+    {
         global $wpdb;
 
-        $defaultAtts = array(
-            'availability'		 => 'free',
-            'from_date'			 => new \DateTime(current_time('mysql')),
-            'to_date'			 => new \DateTime(current_time('mysql')),
-            'count'				 => null,
-            'room_type_id'		 => null,
-            'exclude_bookings'	 => array(),
-            'exclude_rooms'		 => null
-        );
-
-        $atts = array_merge($defaultAtts, $atts);
-        $atts = apply_filters('mphb_search_rooms_query_atts', $atts, $defaultAtts);
-
-        if (isset($atts['exclude_bookings'])) $excludeBookings = $atts['exclude_bookings'];
-        else if (isset($atts['exclude_booking'])) $excludeBookings = $atts['exclude_booking'];
-        else $excludeBookings = array();
-
-        if (!is_array($excludeBookings)) $excludeBookings = (array)$excludeBookings;
-
         switch ($atts['availability']) {
-            case 'free':
-                $bookingStatuses = MPHB()->postTypes()->booking()->statuses()->getLockedRoomStatuses();
-                break;
-            case 'booked':
-                $bookingStatuses = MPHB()->postTypes()->booking()->statuses()->getBookedRoomStatuses();
-                break;
-            case 'pending':
-                $bookingStatuses = MPHB()->postTypes()->booking()->statuses()->getPendingRoomStatuses();
-                break;
-            case 'locked':
-                $bookingStatuses = MPHB()->postTypes()->booking()->statuses()->getLockedRoomStatuses();
-                break;
+            // For 'free' find locked rooms and then find all others (free)
+            case 'free'   : $bookingStatuses = MPHB()->postTypes()->booking()->statuses()->getLockedRoomStatuses();  break;
+            case 'booked' : $bookingStatuses = MPHB()->postTypes()->booking()->statuses()->getBookedRoomStatuses();  break;
+            case 'pending': $bookingStatuses = MPHB()->postTypes()->booking()->statuses()->getPendingRoomStatuses(); break;
+            case 'locked' : $bookingStatuses = MPHB()->postTypes()->booking()->statuses()->getLockedRoomStatuses();  break;
         }
 
-        $bookingStatuses = "'" . join("','", $bookingStatuses) . "'";
+        $bookingStatusesStr = "'" . implode("', '", $bookingStatuses) . "'";
 
-        $select  = array('ID' => "DISTINCT room_id.meta_value AS ID");
-        $from    = array('reserved_rooms' => "{$wpdb->posts} AS reserved_rooms");
-        $joins   = array(
-            'room_id'   => "INNER JOIN {$wpdb->postmeta} AS room_id ON room_id.post_id = reserved_rooms.ID AND room_id.meta_key = '_mphb_room_id'",
-            'bookings'  => "INNER JOIN {$wpdb->posts} AS bookings ON bookings.ID = reserved_rooms.post_parent",
-            'check_in'  => "INNER JOIN {$wpdb->postmeta} AS check_in ON check_in.post_id = bookings.ID AND check_in.meta_key = 'mphb_check_in_date'",
-            'check_out' => "INNER JOIN {$wpdb->postmeta} AS check_out ON check_out.post_id = bookings.ID AND check_out.meta_key = 'mphb_check_out_date'"
+        $sql = "SELECT DISTINCT room_id.meta_value AS ID"
+            . " FROM {$wpdb->posts} AS reserved_rooms"
+            . " INNER JOIN {$wpdb->postmeta} AS room_id ON room_id.post_id = reserved_rooms.ID AND room_id.meta_key = '_mphb_room_id'"
+            . " INNER JOIN {$wpdb->posts} AS bookings ON bookings.ID = reserved_rooms.post_parent"
+            . " INNER JOIN {$wpdb->postmeta} AS check_in_date ON check_in_date.post_id = bookings.ID AND check_in_date.meta_key = 'mphb_check_in_date'"
+            . " INNER JOIN {$wpdb->postmeta} AS check_out_date ON check_out_date.post_id = bookings.ID AND check_out_date.meta_key = 'mphb_check_out_date'"
+            . " WHERE reserved_rooms.post_type = %s"
+                . " AND reserved_rooms.post_status = 'publish'"
+                . " AND bookings.post_status IN ({$bookingStatusesStr})"
+                . " AND check_in_date.meta_value < %s"   // check_in_date  < $atts['to_date']
+                . " AND check_out_date.meta_value > %s"; // check_out_date > $atts['from_date']
+
+        if (!empty($atts['exclude_bookings'])) {
+            $bookingIds = implode(', ', (array)$atts['exclude_bookings']);
+
+            $sql .= " AND bookings.ID NOT IN ({$bookingIds})";
+        }
+
+        if (!empty($atts['room_type_id'])) {
+            $roomTypeIds = implode(', ', (array)$atts['room_type_id']);
+
+            $sql .= " AND EXISTS(SELECT 1 FROM {$wpdb->postmeta} AS room_type_id WHERE room_type_id.post_id = room_id.meta_value AND room_type_id.meta_key = 'mphb_room_type_id' AND room_type_id.meta_value IN ({$roomTypeIds}) LIMIT 1)";
+        }
+
+        if (!empty($atts['count'])) {
+          $sql .= " LIMIT " . absint($atts['count']);
+        }
+
+        // Prepare SQL
+        $dateFormat = MPHB()->settings()->dateTime()->getDateTransferFormat();
+
+        $sql = $wpdb->prepare(
+            $sql,
+            MPHB()->postTypes()->reservedRoom()->getPostType(),
+            $atts['to_date']->format($dateFormat),
+            $atts['from_date']->format($dateFormat)
         );
-        $where   = array(
-            $wpdb->prepare("reserved_rooms.post_type = %s", MPHB()->postTypes()->reservedRoom()->getPostType()),
-            "reserved_rooms.post_status = 'publish'",
-            "bookings.post_status IN ({$bookingStatuses})",
-            $wpdb->prepare("check_out.meta_value > %s", $atts['from_date']->format('Y-m-d')),
-            $wpdb->prepare("check_in.meta_value < %s", $atts['to_date']->format('Y-m-d'))
+
+        // Find rooms
+        $roomIds = $wpdb->get_col($sql);
+        $roomIds = array_map('absint', $roomIds);
+
+        return $roomIds;
+    }
+
+    /**
+     * @param int[] $lockedRooms Results of findLockedRooms().
+     * @param array $atts
+     * @return int[]
+     *
+     * @since 3.9
+     */
+    protected function findFreeRooms($lockedRooms, $atts)
+    {
+        $postAtts = array(
+            'fields' => 'ids'
         );
-        $orderBy = array();
 
-        if (!empty($excludeBookings)) {
-            $where[] = $wpdb->prepare("bookings.ID NOT IN (%s)", implode(', ', $excludeBookings));
+        if (!empty($lockedRooms)) {
+            $postAtts['post__not_in'] = $lockedRooms;
         }
 
-        // For "free" we'll handle "room_type_id" and "count" is second query
-        if ($atts['availability'] != 'free') {
-            if (!is_null($atts['room_type_id'])) {
-                $where[] = $wpdb->prepare("EXISTS(SELECT 1 FROM {$wpdb->postmeta} AS room_meta WHERE room_meta.post_id = room_id.meta_value AND room_meta.meta_value = %d LIMIT 1)", $atts['room_type_id']);
-            }
-            if (!is_null($atts['count'])) {
-                $orderBy[] = $wpdb->prepare("LIMIT %d", $atts['count']);
+        if (!empty($atts['exclude_rooms'])) {
+            if (isset($postAtts['post__not_in'])) {
+                $postAtts['post__not_in'] = array_merge($postAtts['post__not_in'], $atts['exclude_rooms']);
+            } else {
+                $postAtts['post__not_in'] = $atts['exclude_rooms'];
             }
         }
 
-        $query = apply_filters('mphb_search_rooms_query', array(
-            'select'   => $select,
-            'from'     => $from,
-            'joins'    => $joins,
-            'where'    => $where,
-            'order_by' => $orderBy
-        ), $atts);
-
-        $selectStr = implode(', ', $query['select']);
-        $table     = reset($query['from']);
-        $joinsStr  = implode(' ', $query['joins']);
-        $whereStr  = implode(' AND ', $query['where']);
-        $orderStr  = implode(' ', $query['order_by']);
-
-        $querySql = "SELECT {$selectStr} FROM {$table} {$joinsStr} WHERE {$whereStr} {$orderStr}";
-
-        $rooms = $wpdb->get_col($querySql);
-
-        if ($atts['availability'] === 'free') {
-            $bookedRooms = $rooms;
-
-            $roomAtts = array(
-                'fields' => 'ids',
-            );
-
-            if ( !empty( $bookedRooms ) ) {
-                $roomAtts['post__not_in'] = $bookedRooms;
-            }
-
-            if ( !empty( $atts['exclude_rooms'] ) ) {
-                if ( isset( $roomAtts['post__not_in'] ) ) {
-                    $roomAtts['post__not_in'] = array_merge( $roomAtts['post__not_in'], $atts['exclude_rooms'] );
-                } else {
-                    $roomAtts['post__not_in'] = $atts['exclude_rooms'];
-                }
-            }
-
-            if ( !is_null( $atts['room_type_id'] ) ) {
-                $roomAtts['room_type_id'] = $atts['room_type_id'];
-            }
-
-            if ( !is_null( $atts['count'] ) ) {
-                $roomAtts['posts_per_page'] = $atts['count'];
-            }
-
-            // @todo Needs order? "ORDER BY rooms.menu_order"?
-
-            $roomAtts = apply_filters('mphb_search_rooms_second_query_atts', $roomAtts, $atts);
-
-            $rooms = $this->getPosts( $roomAtts );
+        if (!empty($atts['room_type_id'])) {
+            $postAtts['room_type_id'] = $atts['room_type_id'];
         }
 
-        return $rooms;
+        if (!empty($atts['count'])) {
+            $postAtts['posts_per_page'] = $atts['count'];
+        }
+
+        /** @since 3.9 */
+        $postAtts = apply_filters('mphb_search_free_rooms_atts', $postAtts, $atts);
+
+        $roomIds = $this->getPosts($postAtts);
+
+        return $roomIds;
     }
 
     /**
      * @param \DateTime $checkInDate
      * @param \DateTime $checkOutDate
-     * @param int|string $count
-     * @param int|null $roomTypeId
+     * @param array $atts Optional. Additional attributes for searchRooms().
+     *     @param int $atts['count']
+     *     @param int|int[] $atts['room_type_id']
+     *     @param bool $atts['skip_buffer_rules'] True by default.
      * @return bool
      *
      * @since 3.7.0 added new filter - "mphb_is_rooms_exist_query_atts".
+     * @since 3.9 arguments $count and $roomTypeId was replaced with $atts.
      */
-	public function isExistsRooms( \DateTime $checkInDate, \DateTime $checkOutDate, $count, $roomTypeId = null ){
-		$searchAtts = array(
-			'availability'	 => 'free',
-			'from_date'		 => $checkInDate,
-			'to_date'		 => $checkOutDate,
-			'count'			 => (int) $count
-		);
-		if ( !is_null( $roomTypeId ) ) {
-			$searchAtts['room_type_id'] = (int) $roomTypeId;
-		}
+	public function isExistsRooms( \DateTime $checkInDate, \DateTime $checkOutDate, $atts = array() ){
+        $searchAtts = array_merge( array(
+            'availability' => 'free',
+            'from_date'    => $checkInDate,
+            'to_date'      => $checkOutDate,
+            'count'        => 1
+        ), $atts );
 
         $searchAtts = apply_filters('mphb_is_rooms_exist_query_atts', $searchAtts);
 
 		$rooms = $this->searchRooms( $searchAtts );
 
-		return count( $rooms ) >= $count;
+        return count( $rooms ) >= $searchAtts['count'];
 	}
 
 	/**

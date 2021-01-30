@@ -291,16 +291,17 @@ class StepBooking extends Step {
 				$lockedRooms = MPHB()->getRulesChecker()->customRules()->getUnavailableRooms( $this->checkInDate, $this->checkOutDate, $roomTypeId );
 
 				$searchAtts = apply_filters('mphb_search_available_rooms', array(
-                    'availability'   => 'free',
-					'from_date'		 => $this->checkInDate,
-					'to_date'		 => $this->checkOutDate,
-					'count'			 => $roomsCount - $alreadyHave,
-					'room_type_id'	 => $roomTypeId,
-					'exclude_rooms'	 => $lockedRooms
+                    'availability'      => 'free',
+                    'from_date'         => $this->checkInDate,
+                    'to_date'           => $this->checkOutDate,
+                    'count'             => $roomsCount - $alreadyHave,
+                    'room_type_id'      => $roomTypeId,
+                    'exclude_rooms'     => $lockedRooms,
+                    'skip_buffer_rules' => false
 				));
 
 				$foundRooms = MPHB()->getRoomPersistence()->searchRooms( $searchAtts );
-
+				
 				if ( $alreadyHave == 0 ) {
 					$availableRooms[$roomTypeId] = $foundRooms;
 				} else {

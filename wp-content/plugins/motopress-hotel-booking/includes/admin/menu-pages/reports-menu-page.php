@@ -31,7 +31,7 @@ class ReportsMenuPage extends AbstractMenuPage
         }
 
         // Init tabs list
-        $this->tabs['bookings'] = __('Bookings', 'motopress-hotel-booking');
+        $this->tabs['bookings'] = __('Reports', 'motopress-hotel-booking');
     }
 
     protected function getCurrentTab()
@@ -115,19 +115,21 @@ class ReportsMenuPage extends AbstractMenuPage
             <h3><?php _e('Export Bookings', 'motopress-hotel-booking'); ?></h3>
             <div class="inside">
                 <form id="mphb-export-bookings-form" class="mphb-export-form" method="POST">
-                    <fieldset>
-                        <?php mphb_tmpl_select_html(array('name' => 'room'), $roomTypes, -1); ?>
-                        <?php mphb_tmpl_select_html(array('name' => 'status'), $bookingStatuses, 'all'); ?>
-                    </fieldset>
-
-                    <fieldset>
-                        <?php mphb_tmpl_select_html(array('name' => 'search_by'), $searchBy, 'reserved-rooms'); ?>
-                        <input name="start_date" class="mphb-datepick mphb-export-start-date" type="text" value="" placeholder="<?php echo esc_attr(__('Choose start date', 'motopress-hotel-booking')); ?>" autocomplete="off" />
-                        <input name="end_date" class="mphb-datepick mphb-export-end-date" type="text" value="" placeholder="<?php echo esc_attr(__('Choose end date', 'motopress-hotel-booking')); ?>" autocomplete="off" />
-                    </fieldset>
-
                     <p>
-                        <button class="mphb-toggle-export-columns button button-link"><?php _e('Select columns to export', 'motopress-hotel-booking'); ?></button>
+						<fieldset>
+							<?php mphb_tmpl_select_html(array('name' => 'room'), $roomTypes, -1); ?>
+							<?php mphb_tmpl_select_html(array('name' => 'status'), $bookingStatuses, 'all'); ?>
+						</fieldset>
+					</p>
+					<p>
+						<fieldset>
+							<?php mphb_tmpl_select_html(array('name' => 'search_by'), $searchBy, 'reserved-rooms'); ?>
+							<input name="start_date" class="mphb-datepick mphb-export-start-date" type="text" value="" placeholder="<?php echo esc_attr(__('Choose start date', 'motopress-hotel-booking')); ?>" autocomplete="off" />
+							<input name="end_date" class="mphb-datepick mphb-export-end-date" type="text" value="" placeholder="<?php echo esc_attr(__('Choose end date', 'motopress-hotel-booking')); ?>" autocomplete="off" />
+						</fieldset>
+					</p>
+                    <p>
+                        <button class="mphb-toggle-export-columns button-link"><?php _e('Select columns to export', 'motopress-hotel-booking'); ?></button>
                     </p>
 
                     <fieldset class="mphb-export-columns mphb-hide">

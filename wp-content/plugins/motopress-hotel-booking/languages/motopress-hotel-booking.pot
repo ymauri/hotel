@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Hotel Booking plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Hotel Booking 3.8.7\n"
+"Project-Id-Version: Hotel Booking 3.9.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/motopress-hotel-booking\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-10-30T18:59:59+03:00\n"
+"POT-Creation-Date: 2020-12-10T17:43:26+03:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.3.0\n"
 "X-Domain: motopress-hotel-booking\n"
@@ -36,22 +36,22 @@ msgstr ""
 msgid "https://motopress.com/"
 msgstr ""
 
-#: functions.php:63
+#: functions.php:65
 msgctxt "Post Status"
 msgid "New"
 msgstr ""
 
-#: functions.php:66
+#: functions.php:68
 msgctxt "Post Status"
 msgid "Auto Draft"
 msgstr ""
 
-#: functions.php:174
+#: functions.php:176
 msgctxt "Zero price"
 msgid "Free"
 msgstr ""
 
-#: functions.php:195
+#: functions.php:197
 msgctxt "Ex: $99 for 2 nights"
 msgid "per night"
 msgid_plural "for %d nights"
@@ -59,11 +59,11 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: URL to plugins.php page
-#: functions.php:548
+#: functions.php:550
 msgid "You are using two instances of Hotel Booking plugin at the same time, please <a href=\"%s\">deactivate one of them</a>."
 msgstr ""
 
-#: functions.php:566
+#: functions.php:568
 msgid "<a href=\"%s\">Upgrade to Premium</a> to enable this feature."
 msgstr ""
 
@@ -300,7 +300,8 @@ msgstr ""
 
 #: includes/admin/fields/complex-vertical-field.php:17
 #: includes/admin/menu-pages/settings-menu-page.php:290
-#: includes/settings/main-settings.php:20
+#: includes/settings/main-settings.php:25
+#: includes/settings/main-settings.php:43
 msgid "Default"
 msgstr ""
 
@@ -352,7 +353,7 @@ msgstr ""
 
 #: includes/admin/fields/rules-list-field.php:36
 #: includes/admin/room-list-table.php:159
-#: includes/bookings-calendar.php:491
+#: includes/bookings-calendar.php:530
 #: includes/script-managers/admin-script-manager.php:88
 msgid "Edit"
 msgstr ""
@@ -366,13 +367,13 @@ msgstr ""
 
 #: includes/admin/fields/rules-list-field.php:41
 #: includes/admin/manage-cpt-pages/season-manage-cpt-page.php:48
-#: includes/admin/menu-pages/booking-rules-menu-page.php:131
-#: includes/admin/menu-pages/booking-rules-menu-page.php:134
-#: includes/admin/menu-pages/booking-rules-menu-page.php:291
+#: includes/admin/menu-pages/booking-rules-menu-page.php:143
+#: includes/admin/menu-pages/booking-rules-menu-page.php:146
+#: includes/admin/menu-pages/booking-rules-menu-page.php:303
 #: includes/admin/menu-pages/taxes-and-fees-menu-page.php:140
 #: includes/admin/menu-pages/taxes-and-fees-menu-page.php:194
-#: includes/bookings-calendar.php:557
-#: includes/bookings-calendar.php:609
+#: includes/bookings-calendar.php:596
+#: includes/bookings-calendar.php:648
 #: includes/script-managers/admin-script-manager.php:86
 msgid "All"
 msgstr ""
@@ -399,7 +400,7 @@ msgstr ""
 #: includes/admin/fields/variable-pricing-field.php:67
 #: includes/admin/menu-pages/edit-booking/edit-control.php:86
 #: includes/script-managers/admin-script-manager.php:92
-#: includes/shortcodes/search-results-shortcode.php:830
+#: includes/shortcodes/search-results-shortcode.php:832
 #: includes/views/booking-view.php:237
 #: templates/edit-booking/edit-reserved-rooms.php:69
 msgid "Remove"
@@ -585,11 +586,11 @@ msgid "Price"
 msgstr ""
 
 #: includes/admin/manage-cpt-pages/booking-manage-cpt-page.php:67
-#: includes/admin/menu-pages/booking-rules-menu-page.php:286
+#: includes/admin/menu-pages/booking-rules-menu-page.php:298
 #: includes/admin/room-list-table.php:98
 #: includes/admin/sync-rooms-list-table.php:119
-#: includes/bookings-calendar.php:670
-#: includes/bookings-calendar.php:688
+#: includes/bookings-calendar.php:709
+#: includes/bookings-calendar.php:727
 #: includes/bundles/export-bundle.php:24
 #: includes/post-types/room-cpt.php:22
 #: includes/post-types/room-cpt.php:57
@@ -610,7 +611,7 @@ msgstr ""
 #: includes/admin/manage-cpt-pages/booking-manage-cpt-page.php:95
 #: includes/admin/manage-cpt-pages/payment-manage-cpt-page.php:91
 #: includes/admin/menu-pages/create-booking/booking-step.php:55
-#: includes/bookings-calendar.php:484
+#: includes/bookings-calendar.php:523
 #: includes/script-managers/admin-script-manager.php:93
 msgid "Booking #%s"
 msgstr ""
@@ -637,7 +638,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/admin/manage-cpt-pages/booking-manage-cpt-page.php:174
-#: includes/bookings-calendar.php:930
+#: includes/bookings-calendar.php:995
 msgid "Summary: %s."
 msgstr ""
 
@@ -721,7 +722,7 @@ msgstr ""
 
 #: includes/admin/manage-cpt-pages/rate-manage-cpt-page.php:21
 #: includes/admin/manage-cpt-pages/room-manage-cpt-page.php:32
-#: includes/admin/menu-pages/booking-rules-menu-page.php:280
+#: includes/admin/menu-pages/booking-rules-menu-page.php:292
 #: includes/admin/menu-pages/rooms-generator-menu-page.php:33
 #: includes/bundles/export-bundle.php:22
 #: includes/post-types/rate-cpt.php:28
@@ -770,10 +771,13 @@ msgid "Bed Type"
 msgstr ""
 
 #: includes/admin/manage-cpt-pages/room-type-manage-cpt-page.php:37
-#: includes/admin/menu-pages/booking-rules-menu-page.php:161
-#: includes/admin/menu-pages/booking-rules-menu-page.php:192
-#: includes/admin/menu-pages/booking-rules-menu-page.php:224
-#: includes/admin/menu-pages/booking-rules-menu-page.php:256
+#: includes/admin/menu-pages/booking-rules-menu-page.php:173
+#: includes/admin/menu-pages/booking-rules-menu-page.php:204
+#: includes/admin/menu-pages/booking-rules-menu-page.php:236
+#: includes/admin/menu-pages/booking-rules-menu-page.php:268
+#: includes/admin/menu-pages/booking-rules-menu-page.php:353
+#: includes/admin/menu-pages/booking-rules-menu-page.php:385
+#: includes/admin/menu-pages/booking-rules-menu-page.php:417
 #: includes/admin/menu-pages/taxes-and-fees-menu-page.php:137
 #: includes/admin/menu-pages/taxes-and-fees-menu-page.php:191
 #: includes/admin/menu-pages/taxes-and-fees-menu-page.php:242
@@ -788,8 +792,8 @@ msgstr ""
 #: includes/admin/manage-cpt-pages/room-type-manage-cpt-page.php:107
 #: includes/shortcodes/booking-confirmation-shortcode.php:359
 #: includes/shortcodes/booking-confirmation-shortcode.php:409
-#: includes/shortcodes/search-results-shortcode.php:663
-#: includes/shortcodes/search-results-shortcode.php:777
+#: includes/shortcodes/search-results-shortcode.php:665
+#: includes/shortcodes/search-results-shortcode.php:779
 msgid "Total:"
 msgstr ""
 
@@ -837,8 +841,8 @@ msgid "End"
 msgstr ""
 
 #: includes/admin/manage-cpt-pages/season-manage-cpt-page.php:18
-#: includes/admin/menu-pages/booking-rules-menu-page.php:155
-#: includes/admin/menu-pages/booking-rules-menu-page.php:186
+#: includes/admin/menu-pages/booking-rules-menu-page.php:167
+#: includes/admin/menu-pages/booking-rules-menu-page.php:198
 msgid "Days"
 msgstr ""
 
@@ -894,119 +898,155 @@ msgid "Booking rules saved."
 msgstr ""
 
 #: includes/admin/menu-pages/booking-rules-menu-page.php:34
-#: includes/admin/menu-pages/booking-rules-menu-page.php:326
-#: includes/admin/menu-pages/booking-rules-menu-page.php:330
+#: includes/admin/menu-pages/booking-rules-menu-page.php:434
+#: includes/admin/menu-pages/booking-rules-menu-page.php:438
 msgid "Booking Rules"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:54
+#: includes/admin/menu-pages/booking-rules-menu-page.php:63
 #: includes/admin/menu-pages/taxes-and-fees-menu-page.php:51
 msgid "Save Changes"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:147
+#: includes/admin/menu-pages/booking-rules-menu-page.php:159
 msgid "Check-in days"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:148
+#: includes/admin/menu-pages/booking-rules-menu-page.php:160
 msgid "Guests can check in any day."
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:149
+#: includes/admin/menu-pages/booking-rules-menu-page.php:161
+#: includes/admin/menu-pages/booking-rules-menu-page.php:192
+#: includes/admin/menu-pages/booking-rules-menu-page.php:223
+#: includes/admin/menu-pages/booking-rules-menu-page.php:255
+#: includes/admin/menu-pages/booking-rules-menu-page.php:287
+#: includes/admin/menu-pages/booking-rules-menu-page.php:340
+#: includes/admin/menu-pages/booking-rules-menu-page.php:372
+#: includes/admin/menu-pages/booking-rules-menu-page.php:404
+msgid "Add rule"
+msgstr ""
+
 #: includes/admin/menu-pages/booking-rules-menu-page.php:180
 #: includes/admin/menu-pages/booking-rules-menu-page.php:211
 #: includes/admin/menu-pages/booking-rules-menu-page.php:243
 #: includes/admin/menu-pages/booking-rules-menu-page.php:275
-msgid "Add rule"
-msgstr ""
-
-#: includes/admin/menu-pages/booking-rules-menu-page.php:168
-#: includes/admin/menu-pages/booking-rules-menu-page.php:199
-#: includes/admin/menu-pages/booking-rules-menu-page.php:231
-#: includes/admin/menu-pages/booking-rules-menu-page.php:263
+#: includes/admin/menu-pages/booking-rules-menu-page.php:360
+#: includes/admin/menu-pages/booking-rules-menu-page.php:392
+#: includes/admin/menu-pages/booking-rules-menu-page.php:424
 #: includes/post-types/season-cpt.php:54
 #: includes/post-types/season-cpt.php:64
 msgid "Seasons"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:178
+#: includes/admin/menu-pages/booking-rules-menu-page.php:190
 msgid "Check-out days"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:179
+#: includes/admin/menu-pages/booking-rules-menu-page.php:191
 msgid "Guests can check out any day."
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:209
-#: includes/admin/menu-pages/booking-rules-menu-page.php:217
+#: includes/admin/menu-pages/booking-rules-menu-page.php:221
+#: includes/admin/menu-pages/booking-rules-menu-page.php:229
 msgid "Minimum stay"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:210
+#: includes/admin/menu-pages/booking-rules-menu-page.php:222
 msgid "There are no minimum stay rules."
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:218
-#: includes/admin/menu-pages/booking-rules-menu-page.php:250
+#: includes/admin/menu-pages/booking-rules-menu-page.php:230
+#: includes/admin/menu-pages/booking-rules-menu-page.php:262
+#: includes/admin/menu-pages/booking-rules-menu-page.php:347
+#: includes/admin/menu-pages/booking-rules-menu-page.php:379
+#: includes/admin/menu-pages/booking-rules-menu-page.php:411
 msgid "nights"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:241
-#: includes/admin/menu-pages/booking-rules-menu-page.php:249
+#: includes/admin/menu-pages/booking-rules-menu-page.php:253
+#: includes/admin/menu-pages/booking-rules-menu-page.php:261
 msgid "Maximum stay"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:242
+#: includes/admin/menu-pages/booking-rules-menu-page.php:254
 msgid "There are no maximum stay rules."
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:273
+#: includes/admin/menu-pages/booking-rules-menu-page.php:285
 msgid "Block accommodation"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:274
+#: includes/admin/menu-pages/booking-rules-menu-page.php:286
 msgid "There are no blocking accommodation rules."
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:295
-#: includes/bookings-calendar.php:587
-#: includes/bookings-calendar.php:659
+#: includes/admin/menu-pages/booking-rules-menu-page.php:307
+#: includes/bookings-calendar.php:626
+#: includes/bookings-calendar.php:698
 msgid "From"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:302
+#: includes/admin/menu-pages/booking-rules-menu-page.php:314
 msgid "Till"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:309
+#: includes/admin/menu-pages/booking-rules-menu-page.php:321
 msgid "Restriction"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:312
-#: includes/script-managers/public-script-manager.php:215
+#: includes/admin/menu-pages/booking-rules-menu-page.php:324
+#: includes/script-managers/public-script-manager.php:218
 msgid "Not check-in"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:313
-#: includes/script-managers/public-script-manager.php:216
+#: includes/admin/menu-pages/booking-rules-menu-page.php:325
+#: includes/script-managers/public-script-manager.php:219
 msgid "Not check-out"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:314
-#: includes/script-managers/public-script-manager.php:214
+#: includes/admin/menu-pages/booking-rules-menu-page.php:326
+#: includes/script-managers/public-script-manager.php:217
 msgid "Not stay-in"
 msgstr ""
 
-#: includes/admin/menu-pages/booking-rules-menu-page.php:319
+#: includes/admin/menu-pages/booking-rules-menu-page.php:331
 msgid "Comment"
 msgstr ""
 
+#: includes/admin/menu-pages/booking-rules-menu-page.php:338
+#: includes/admin/menu-pages/booking-rules-menu-page.php:346
+msgid "Minimum advance reservation"
+msgstr ""
+
+#: includes/admin/menu-pages/booking-rules-menu-page.php:339
+msgid "There are no minimum advance reservation rules."
+msgstr ""
+
+#: includes/admin/menu-pages/booking-rules-menu-page.php:370
+#: includes/admin/menu-pages/booking-rules-menu-page.php:378
+msgid "Maximum advance reservation"
+msgstr ""
+
+#: includes/admin/menu-pages/booking-rules-menu-page.php:371
+msgid "There are no maximum advance reservation rules."
+msgstr ""
+
+#: includes/admin/menu-pages/booking-rules-menu-page.php:402
+#: includes/admin/menu-pages/booking-rules-menu-page.php:410
+msgid "Booking buffer"
+msgstr ""
+
+#: includes/admin/menu-pages/booking-rules-menu-page.php:403
+msgid "There are no booking buffer rules."
+msgstr ""
+
 #: includes/admin/menu-pages/calendar-menu-page.php:34
-#: includes/admin/menu-pages/calendar-menu-page.php:51
+#: includes/admin/menu-pages/calendar-menu-page.php:67
 msgid "Booking Calendar"
 msgstr ""
 
-#: includes/admin/menu-pages/calendar-menu-page.php:47
+#: includes/admin/menu-pages/calendar-menu-page.php:63
 msgid "Calendar"
 msgstr ""
 
@@ -1021,7 +1061,7 @@ msgid "Clear Search Results"
 msgstr ""
 
 #: includes/admin/menu-pages/create-booking/booking-step.php:39
-#: includes/shortcodes/checkout-shortcode/step-booking.php:467
+#: includes/shortcodes/checkout-shortcode/step-booking.php:468
 msgid "Unable to create booking. Please try again."
 msgstr ""
 
@@ -1037,7 +1077,7 @@ msgstr ""
 #: includes/admin/menu-pages/edit-booking/checkout-control.php:48
 #: includes/admin/menu-pages/edit-booking/summary-control.php:43
 #: includes/shortcodes/checkout-shortcode/step-booking.php:175
-#: includes/shortcodes/checkout-shortcode/step-booking.php:331
+#: includes/shortcodes/checkout-shortcode/step-booking.php:332
 #: includes/shortcodes/checkout-shortcode/step-checkout.php:131
 #: includes/utils/parse-utils.php:191
 msgid "There are no accommodations selected for reservation."
@@ -1071,8 +1111,8 @@ msgstr ""
 #: includes/ajax.php:595
 #: includes/shortcodes/checkout-shortcode/step-booking.php:199
 #: includes/shortcodes/checkout-shortcode/step-booking.php:215
-#: includes/shortcodes/checkout-shortcode/step-booking.php:370
-#: includes/shortcodes/checkout-shortcode/step-booking.php:382
+#: includes/shortcodes/checkout-shortcode/step-booking.php:371
+#: includes/shortcodes/checkout-shortcode/step-booking.php:383
 #: includes/utils/parse-utils.php:253
 msgid "Rate is not valid."
 msgstr ""
@@ -1082,7 +1122,7 @@ msgstr ""
 #: includes/admin/menu-pages/create-booking/step.php:169
 #: includes/ajax.php:468
 #: includes/shortcodes/checkout-shortcode/step-booking.php:221
-#: includes/shortcodes/search-results-shortcode.php:537
+#: includes/shortcodes/search-results-shortcode.php:539
 #: includes/utils/parse-utils.php:102
 #: includes/utils/parse-utils.php:257
 msgid "Adults number is not valid."
@@ -1093,7 +1133,7 @@ msgstr ""
 #: includes/admin/menu-pages/create-booking/step.php:191
 #: includes/ajax.php:484
 #: includes/shortcodes/checkout-shortcode/step-booking.php:227
-#: includes/shortcodes/search-results-shortcode.php:553
+#: includes/shortcodes/search-results-shortcode.php:555
 #: includes/utils/parse-utils.php:127
 #: includes/utils/parse-utils.php:261
 msgid "Children number is not valid."
@@ -1109,7 +1149,7 @@ msgstr ""
 #: includes/admin/menu-pages/create-booking/booking-step.php:181
 #: includes/admin/menu-pages/create-booking/checkout-step.php:136
 #: includes/shortcodes/checkout-shortcode/step-booking.php:237
-#: includes/shortcodes/checkout-shortcode/step-checkout.php:178
+#: includes/shortcodes/checkout-shortcode/step-checkout.php:187
 #: includes/utils/parse-utils.php:269
 msgid "Selected dates do not meet booking rules for type %s"
 msgstr ""
@@ -1121,7 +1161,7 @@ msgid "Accommodations are not available."
 msgstr ""
 
 #: includes/admin/menu-pages/create-booking/checkout-step.php:131
-#: includes/shortcodes/checkout-shortcode/step-checkout.php:173
+#: includes/shortcodes/checkout-shortcode/step-checkout.php:182
 msgid "There are no rates for requested dates."
 msgstr ""
 
@@ -1141,25 +1181,25 @@ msgstr ""
 
 #: includes/admin/menu-pages/create-booking/step.php:106
 #: includes/ajax.php:435
-#: includes/script-managers/public-script-manager.php:230
+#: includes/script-managers/public-script-manager.php:233
 #: includes/shortcodes/checkout-shortcode/step.php:42
-#: includes/shortcodes/search-results-shortcode.php:568
+#: includes/shortcodes/search-results-shortcode.php:570
 #: includes/utils/parse-utils.php:38
 msgid "Check-in date is not valid."
 msgstr ""
 
 #: includes/admin/menu-pages/create-booking/step.php:108
 #: includes/shortcodes/checkout-shortcode/step.php:45
-#: includes/shortcodes/search-results-shortcode.php:571
+#: includes/shortcodes/search-results-shortcode.php:573
 #: includes/utils/parse-utils.php:40
 msgid "Check-in date cannot be earlier than today."
 msgstr ""
 
 #: includes/admin/menu-pages/create-booking/step.php:127
 #: includes/ajax.php:452
-#: includes/script-managers/public-script-manager.php:231
+#: includes/script-managers/public-script-manager.php:234
 #: includes/shortcodes/checkout-shortcode/step.php:69
-#: includes/shortcodes/search-results-shortcode.php:589
+#: includes/shortcodes/search-results-shortcode.php:591
 #: includes/utils/parse-utils.php:71
 msgid "Check-out date is not valid."
 msgstr ""
@@ -1167,9 +1207,9 @@ msgstr ""
 #: includes/admin/menu-pages/create-booking/step.php:129
 #: includes/ajax.php:1135
 #: includes/ajax.php:1142
-#: includes/ajax.php:1184
+#: includes/ajax.php:1185
 #: includes/shortcodes/checkout-shortcode/step.php:72
-#: includes/shortcodes/search-results-shortcode.php:596
+#: includes/shortcodes/search-results-shortcode.php:598
 #: includes/utils/parse-utils.php:73
 msgid "Nothing found. Please try again with different search parameters."
 msgstr ""
@@ -1188,7 +1228,7 @@ msgid "Edit Booking #%d"
 msgstr ""
 
 #: includes/admin/menu-pages/edit-booking-menu-page.php:106
-#: includes/admin/menu-pages/reports-menu-page.php:156
+#: includes/admin/menu-pages/reports-menu-page.php:158
 msgid "Cancel"
 msgstr ""
 
@@ -1239,7 +1279,7 @@ msgid "Booking was edited."
 msgstr ""
 
 #: includes/admin/menu-pages/edit-booking/edit-control.php:85
-#: includes/script-managers/public-script-manager.php:212
+#: includes/script-managers/public-script-manager.php:213
 #: templates/edit-booking/edit-reserved-rooms.php:66
 msgid "Available"
 msgstr ""
@@ -1427,10 +1467,9 @@ msgid "Language"
 msgstr ""
 
 #: includes/admin/menu-pages/reports-menu-page.php:34
-#: includes/admin/menus.php:71
-#: includes/admin/menus.php:72
-#: includes/post-types/booking-cpt.php:174
-msgid "Bookings"
+#: includes/admin/menu-pages/reports-menu-page.php:169
+#: includes/admin/menu-pages/reports-menu-page.php:174
+msgid "Reports"
 msgstr ""
 
 #: includes/admin/menu-pages/reports-menu-page.php:98
@@ -1461,25 +1500,20 @@ msgstr ""
 msgid "Export Bookings"
 msgstr ""
 
-#: includes/admin/menu-pages/reports-menu-page.php:125
+#: includes/admin/menu-pages/reports-menu-page.php:127
 msgid "Choose start date"
 msgstr ""
 
-#: includes/admin/menu-pages/reports-menu-page.php:126
+#: includes/admin/menu-pages/reports-menu-page.php:128
 msgid "Choose end date"
 msgstr ""
 
-#: includes/admin/menu-pages/reports-menu-page.php:130
+#: includes/admin/menu-pages/reports-menu-page.php:132
 msgid "Select columns to export"
 msgstr ""
 
-#: includes/admin/menu-pages/reports-menu-page.php:140
+#: includes/admin/menu-pages/reports-menu-page.php:142
 msgid "Generate CSV"
-msgstr ""
-
-#: includes/admin/menu-pages/reports-menu-page.php:167
-#: includes/admin/menu-pages/reports-menu-page.php:172
-msgid "Reports"
 msgstr ""
 
 #: includes/admin/menu-pages/rooms-generator-menu-page.php:24
@@ -1903,12 +1937,12 @@ msgid "Week"
 msgstr ""
 
 #: includes/admin/menu-pages/settings-menu-page.php:425
-#: includes/bookings-calendar.php:456
+#: includes/bookings-calendar.php:495
 msgid "Month"
 msgstr ""
 
 #: includes/admin/menu-pages/settings-menu-page.php:426
-#: includes/bookings-calendar.php:457
+#: includes/bookings-calendar.php:496
 msgid "Quarter"
 msgstr ""
 
@@ -2691,6 +2725,12 @@ msgstr ""
 msgid "Fee Taxes"
 msgstr ""
 
+#: includes/admin/menus.php:71
+#: includes/admin/menus.php:72
+#: includes/post-types/booking-cpt.php:174
+msgid "Bookings"
+msgstr ""
+
 #: includes/admin/room-list-table.php:99
 msgid "Export"
 msgstr ""
@@ -2958,7 +2998,7 @@ msgstr ""
 msgid "Total Booking Price"
 msgstr ""
 
-#: includes/ajax.php:1173
+#: includes/ajax.php:1174
 #: template-functions.php:53
 msgid "Based on your search parameters"
 msgstr ""
@@ -2970,137 +3010,143 @@ msgctxt "Not selected value in the search form."
 msgid "&mdash;"
 msgstr ""
 
-#: includes/bookings-calendar.php:458
+#: includes/bookings-calendar.php:497
 msgid "Year"
 msgstr ""
 
-#: includes/bookings-calendar.php:459
+#: includes/bookings-calendar.php:498
 #: includes/post-types/attributes-cpt.php:276
 msgid "Custom"
 msgstr ""
 
-#: includes/bookings-calendar.php:486
+#: includes/bookings-calendar.php:525
 #: includes/post-types/booking-cpt/statuses.php:95
 msgctxt "Booking status"
 msgid "Confirmed"
 msgstr ""
 
-#: includes/bookings-calendar.php:523
+#: includes/bookings-calendar.php:562
 msgid "Show"
 msgstr ""
 
-#: includes/bookings-calendar.php:527
+#: includes/bookings-calendar.php:566
 #: templates/create-booking/search/search-form.php:125
 #: templates/shortcodes/search/search-form.php:130
 #: templates/widgets/search-availability/search-form.php:135
 msgid "Search"
 msgstr ""
 
-#: includes/bookings-calendar.php:530
+#: includes/bookings-calendar.php:569
 msgid "Legend:"
 msgstr ""
 
-#: includes/bookings-calendar.php:531
-#: includes/bookings-calendar.php:559
+#: includes/bookings-calendar.php:570
+#: includes/bookings-calendar.php:598
 #: includes/script-managers/public-script-manager.php:210
 msgid "Booked"
 msgstr ""
 
-#: includes/bookings-calendar.php:532
-#: includes/bookings-calendar.php:560
-#: includes/script-managers/public-script-manager.php:211
+#: includes/bookings-calendar.php:571
+#: includes/bookings-calendar.php:599
+#: includes/script-managers/public-script-manager.php:212
 msgid "Pending"
 msgstr ""
 
-#: includes/bookings-calendar.php:533
-#: includes/bookings-calendar.php:885
+#: includes/bookings-calendar.php:572
+#: includes/bookings-calendar.php:940
 msgid "Blocked"
 msgstr ""
 
-#: includes/bookings-calendar.php:549
+#: includes/bookings-calendar.php:588
 msgid "Search results for accommodations that have bookings with status \"%s\" from %s until %s"
 msgstr ""
 
-#: includes/bookings-calendar.php:558
+#: includes/bookings-calendar.php:597
 msgid "Free"
 msgstr ""
 
-#: includes/bookings-calendar.php:561
+#: includes/bookings-calendar.php:600
 msgid "Locked (Booked or Pending)"
 msgstr ""
 
-#: includes/bookings-calendar.php:571
+#: includes/bookings-calendar.php:610
 #: includes/shortcodes/booking-confirmation-shortcode.php:363
 #: includes/shortcodes/booking-confirmation-shortcode.php:413
 msgid "Status:"
 msgstr ""
 
-#: includes/bookings-calendar.php:592
-#: includes/bookings-calendar.php:660
+#: includes/bookings-calendar.php:631
+#: includes/bookings-calendar.php:699
 msgid "Until"
 msgstr ""
 
-#: includes/bookings-calendar.php:605
+#: includes/bookings-calendar.php:644
 #: includes/views/shortcodes/checkout-view.php:116
 msgid "Accommodation Type:"
 msgstr ""
 
-#: includes/bookings-calendar.php:638
+#: includes/bookings-calendar.php:677
 msgid "Period:"
 msgstr ""
 
-#: includes/bookings-calendar.php:639
+#: includes/bookings-calendar.php:678
 msgid "&lt; Prev"
 msgstr ""
 
-#: includes/bookings-calendar.php:648
+#: includes/bookings-calendar.php:687
 msgid "Next &gt;"
 msgstr ""
 
-#: includes/bookings-calendar.php:715
+#: includes/bookings-calendar.php:754
 msgid "No accommodations found."
 msgstr ""
 
-#: includes/bookings-calendar.php:874
+#: includes/bookings-calendar.php:930
 msgid "Check-out #%d"
 msgstr ""
 
-#: includes/bookings-calendar.php:878
+#: includes/bookings-calendar.php:934
 msgid "Check-in #%d"
 msgstr ""
 
-#: includes/bookings-calendar.php:880
+#: includes/bookings-calendar.php:938
 msgid "Booking #%d"
 msgstr ""
 
-#: includes/bookings-calendar.php:888
+#: includes/bookings-calendar.php:943
+#: includes/bookings-calendar.php:947
+#: includes/script-managers/public-script-manager.php:211
+msgid "Buffer time."
+msgstr ""
+
+#: includes/bookings-calendar.php:950
 msgctxt "Availability"
 msgid "Free"
 msgstr ""
 
-#: includes/bookings-calendar.php:913
+#: includes/bookings-calendar.php:978
 #: templates/emails/reserved-room-details.php:15
 msgid "Adults: %s"
 msgstr ""
 
-#: includes/bookings-calendar.php:917
+#: includes/bookings-calendar.php:982
 #: templates/emails/reserved-room-details.php:17
 msgid "Children: %s"
 msgstr ""
 
-#: includes/bookings-calendar.php:924
+#: includes/bookings-calendar.php:989
 msgid "Booking imported with UID %s."
 msgstr ""
 
-#: includes/bookings-calendar.php:926
+#: includes/bookings-calendar.php:991
 msgid "Imported booking."
 msgstr ""
 
-#: includes/bookings-calendar.php:934
+#: includes/bookings-calendar.php:999
 msgid "Description: %s."
 msgstr ""
 
-#: includes/bookings-calendar.php:938
+#: includes/bookings-calendar.php:1003
 msgid "Source: %s."
 msgstr ""
 
@@ -3793,7 +3839,7 @@ msgid "Paraguay"
 msgstr ""
 
 #: includes/bundles/countries-bundle.php:187
-#: includes/settings/main-settings.php:32
+#: includes/settings/main-settings.php:37
 msgid "Peru"
 msgstr ""
 
@@ -7121,109 +7167,117 @@ msgstr ""
 msgid "Cancelling..."
 msgstr ""
 
-#: includes/script-managers/public-script-manager.php:213
+#: includes/script-managers/public-script-manager.php:214
 msgid "Not available"
 msgstr ""
 
-#: includes/script-managers/public-script-manager.php:217
-msgid "Day in the past"
+#: includes/script-managers/public-script-manager.php:215
+msgid "This is earlier than allowed by our advance reservation rules."
 msgstr ""
 
-#: includes/script-managers/public-script-manager.php:218
-msgid "Check-in date"
-msgstr ""
-
-#: includes/script-managers/public-script-manager.php:219
-msgid "Less than min days stay"
+#: includes/script-managers/public-script-manager.php:216
+msgid "This is later than allowed by our advance reservation rules."
 msgstr ""
 
 #: includes/script-managers/public-script-manager.php:220
-msgid "More than max days stay"
+msgid "Day in the past"
+msgstr ""
+
+#: includes/script-managers/public-script-manager.php:221
+msgid "Check-in date"
 msgstr ""
 
 #: includes/script-managers/public-script-manager.php:222
-msgid "Later than max date for current check-in date"
+msgid "Less than min days stay"
 msgstr ""
 
 #: includes/script-managers/public-script-manager.php:223
-msgid "Rules:"
-msgstr ""
-
-#: includes/script-managers/public-script-manager.php:224
-msgid "Tokenisation failed: %s"
+msgid "More than max days stay"
 msgstr ""
 
 #: includes/script-managers/public-script-manager.php:225
+msgid "Later than max date for current check-in date"
+msgstr ""
+
 #: includes/script-managers/public-script-manager.php:226
+msgid "Rules:"
+msgstr ""
+
+#: includes/script-managers/public-script-manager.php:227
+msgid "Tokenisation failed: %s"
+msgstr ""
+
+#: includes/script-managers/public-script-manager.php:228
+#: includes/script-managers/public-script-manager.php:229
 msgid "%1$d &times; &ldquo;%2$s&rdquo; has been added to your reservation."
 msgid_plural "%1$d &times; &ldquo;%2$s&rdquo; have been added to your reservation."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/script-managers/public-script-manager.php:227
-#: includes/script-managers/public-script-manager.php:228
+#: includes/script-managers/public-script-manager.php:230
+#: includes/script-managers/public-script-manager.php:231
 msgid "%s accommodation selected."
 msgid_plural "%s accommodations selected."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/script-managers/public-script-manager.php:229
+#: includes/script-managers/public-script-manager.php:232
 msgid "Coupon code is empty."
 msgstr ""
 
-#: includes/settings/main-settings.php:21
+#: includes/settings/main-settings.php:26
 msgid "Dark Blue"
 msgstr ""
 
-#: includes/settings/main-settings.php:22
+#: includes/settings/main-settings.php:27
 msgid "Dark Green"
 msgstr ""
 
-#: includes/settings/main-settings.php:23
+#: includes/settings/main-settings.php:28
 msgid "Dark Red"
 msgstr ""
 
-#: includes/settings/main-settings.php:24
+#: includes/settings/main-settings.php:29
 msgid "Grayscale"
 msgstr ""
 
-#: includes/settings/main-settings.php:25
+#: includes/settings/main-settings.php:30
 msgid "Light Blue"
 msgstr ""
 
-#: includes/settings/main-settings.php:26
+#: includes/settings/main-settings.php:31
 msgid "Light Coral"
 msgstr ""
 
-#: includes/settings/main-settings.php:27
+#: includes/settings/main-settings.php:32
 msgid "Light Green"
 msgstr ""
 
-#: includes/settings/main-settings.php:28
+#: includes/settings/main-settings.php:33
 msgid "Light Yellow"
 msgstr ""
 
-#: includes/settings/main-settings.php:29
+#: includes/settings/main-settings.php:34
 msgid "Minimal Blue"
 msgstr ""
 
-#: includes/settings/main-settings.php:30
+#: includes/settings/main-settings.php:35
 msgid "Minimal Orange"
 msgstr ""
 
-#: includes/settings/main-settings.php:31
+#: includes/settings/main-settings.php:36
 msgid "Minimal"
 msgstr ""
 
-#: includes/settings/main-settings.php:33
+#: includes/settings/main-settings.php:38
 msgid "Sky Blue"
 msgstr ""
 
-#: includes/settings/main-settings.php:34
+#: includes/settings/main-settings.php:39
 msgid "Slate Blue"
 msgstr ""
 
-#: includes/settings/main-settings.php:35
+#: includes/settings/main-settings.php:40
 msgid "Turquoise"
 msgstr ""
 
@@ -7259,7 +7313,7 @@ msgstr ""
 msgid "Checkout data is not valid."
 msgstr ""
 
-#: includes/shortcodes/checkout-shortcode/step-booking.php:438
+#: includes/shortcodes/checkout-shortcode/step-booking.php:439
 msgid "Payment method is not valid."
 msgstr ""
 
@@ -7291,69 +7345,69 @@ msgstr ""
 msgid "Choose dates to see relevant prices"
 msgstr ""
 
-#: includes/shortcodes/search-results-shortcode.php:659
+#: includes/shortcodes/search-results-shortcode.php:661
 msgid "Select from available accommodations."
 msgstr ""
 
-#: includes/shortcodes/search-results-shortcode.php:668
-#: includes/shortcodes/search-results-shortcode.php:834
+#: includes/shortcodes/search-results-shortcode.php:670
+#: includes/shortcodes/search-results-shortcode.php:836
 #: template-functions.php:649
 msgid "Confirm Reservation"
 msgstr ""
 
-#: includes/shortcodes/search-results-shortcode.php:700
+#: includes/shortcodes/search-results-shortcode.php:702
 msgid "Recommended for %d adult"
 msgid_plural "Recommended for %d adults"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/search-results-shortcode.php:702
+#: includes/shortcodes/search-results-shortcode.php:704
 msgid " and %d child"
 msgid_plural " and %d children"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/search-results-shortcode.php:705
+#: includes/shortcodes/search-results-shortcode.php:707
 msgid "Recommended for %d guest"
 msgid_plural "Recommended for %d guests"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/search-results-shortcode.php:747
+#: includes/shortcodes/search-results-shortcode.php:749
 msgid "Max occupancy:"
 msgstr ""
 
-#: includes/shortcodes/search-results-shortcode.php:752
-#: includes/shortcodes/search-results-shortcode.php:756
+#: includes/shortcodes/search-results-shortcode.php:754
+#: includes/shortcodes/search-results-shortcode.php:758
 msgid "%d guest"
 msgid_plural "%d guests"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/search-results-shortcode.php:760
+#: includes/shortcodes/search-results-shortcode.php:762
 msgid "%d adult"
 msgid_plural "%d adults"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/search-results-shortcode.php:766
+#: includes/shortcodes/search-results-shortcode.php:768
 msgid "%d child"
 msgid_plural "%d children"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/search-results-shortcode.php:781
+#: includes/shortcodes/search-results-shortcode.php:783
 #: templates/create-booking/results/reserve-rooms.php:74
 msgid "Reserve"
 msgstr ""
 
-#: includes/shortcodes/search-results-shortcode.php:826
+#: includes/shortcodes/search-results-shortcode.php:828
 msgid "of %d accommodation available."
 msgid_plural "of %d accommodations available."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/shortcodes/search-results-shortcode.php:833
+#: includes/shortcodes/search-results-shortcode.php:835
 #: template-functions.php:474
 #: template-functions.php:485
 msgid "Book"
@@ -7461,6 +7515,10 @@ msgstr ""
 
 #: includes/views/booking-view.php:225
 msgid "Subtotal"
+msgstr ""
+
+#: includes/views/booking-view.php:233
+msgid "Coupon: %s"
 msgstr ""
 
 #: includes/views/create-booking/checkout-view.php:55
@@ -7741,7 +7799,7 @@ msgstr ""
 msgid "Unfortunately, your transaction cannot be completed at this time. Please try again or contact us."
 msgstr ""
 
-#: plugin.php:913
+#: plugin.php:916
 msgid "Prices start at: %s"
 msgstr ""
 

@@ -64,9 +64,11 @@ abstract class ScriptManager {
 	protected function locateDatepickFile( $theme ){
 		if (
 			$theme === '' // Default theme selected
-			|| !array_key_exists( $theme, MPHB()->settings()->main()->getDatepickerThemesList() )
+			|| !array_key_exists( $theme, MPHB()->settings()->main()->getDatepickerThemesList() ) && !array_key_exists( $theme, MPHB()->settings()->main()->getAdminDatepickerThemesList() )
 		) {
 			return false;
+		} else if( $theme == 'admin' ) {
+			return $datepickerThemeFile = $this->scriptUrl( "assets/css/admin-datepick-themes/mphb-datepicker-admin.css" );
 		}
 
 		$datepickerThemeFile = $this->scriptUrl( "assets/css/datepick-themes/mphb-datepicker-{$theme}.css" );

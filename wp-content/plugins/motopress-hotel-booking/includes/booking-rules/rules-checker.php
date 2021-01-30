@@ -2,10 +2,11 @@
 
 namespace MPHB\BookingRules;
 
-use \MPHB\BookingRules\Custom\CustomRules;
-use \MPHB\BookingRules\Reservation\ReservationRules;
+use MPHB\BookingRules\Buffer\BufferRulesList;
+use MPHB\BookingRules\Custom\CustomRules;
+use MPHB\BookingRules\Reservation\ReservationRules;
 
-class RulesChecker implements RuleVerifiable {
+class RulesChecker implements RuleVerifyInterface {
 
 	/**
 	 *
@@ -19,9 +20,24 @@ class RulesChecker implements RuleVerifiable {
 	 */
 	protected $customRules;
 
-	public function __construct( ReservationRules $reservationRules, CustomRules $customRules ){
+    /**
+     * @var BufferRulesList
+     *
+     * @since 3.9
+     */
+    protected $bufferRules;
+
+    /**
+     * @param ReservationRules $reservationRules
+     * @param CustomRules $customRules
+     * @param BufferRulesList $bufferRules
+     *
+     * @since 3.9 added new argument: $bufferRules.
+     */
+    public function __construct( $reservationRules, $customRules, $bufferRules ){
 		$this->reservationRules	 = $reservationRules;
 		$this->customRules		 = $customRules;
+        $this->bufferRules       = $bufferRules;
 	}
 
 	/**
@@ -56,6 +72,15 @@ class RulesChecker implements RuleVerifiable {
 		return $this->customRules;
 	}
 
+    /**
+     * @return Buffer\BufferRulesList
+     *
+     * @since 3.9
+     */
+    public function bufferRules(){
+        return $this->bufferRules;
+    }
+
 	/**
 	 *
 	 * @return array
@@ -63,8 +88,10 @@ class RulesChecker implements RuleVerifiable {
 	public function getData(){
 		return array(
 			'reservationRules' => $this->reservationRules->getData(),
-			'dates'			 => $this->customRules->getGlobalRestrictions(),
-			'blockedTypes'	 => $this->customRules->getGlobalTypeRestrictions()
+			'dates'            => $this->customRules->getGlobalRestrictions(),
+			'blockedTypes'     => $this->customRules->getGlobalTypeRestrictions(),
+            // Array of [buffer_days, season_ids, room_type_ids]
+            'bufferRules'      => $this->bufferRules->toArray()
 		);
 	}
 

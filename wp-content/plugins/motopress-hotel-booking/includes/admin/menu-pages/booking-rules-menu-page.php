@@ -49,6 +49,15 @@ class BookingRulesMenuPage extends AbstractMenuPage {
 				<br/><hr/>
 
 				<?php echo $this->fields['mphb_booking_rules_custom']->render(); ?>
+				<br/><hr/>
+
+				<?php echo $this->fields['mphb_min_advance_reservation']->render(); ?>
+				<br/><hr/>
+
+				<?php echo $this->fields['mphb_max_advance_reservation']->render(); ?>
+                <br/><hr/>
+
+                <?php echo $this->fields['mphb_buffer_days']->render(); ?>
 
 				<p class="submit">
 					<input name="save" type="submit" class="button button-primary" id="publish" value="<?php _e( 'Save Changes', 'motopress-hotel-booking' ); ?>" />
@@ -86,7 +95,10 @@ class BookingRulesMenuPage extends AbstractMenuPage {
 			'mphb_check_in_days',
 			'mphb_check_out_days',
 			'mphb_min_stay_length',
-			'mphb_max_stay_length'
+			'mphb_max_stay_length',
+			'mphb_min_advance_reservation',
+			'mphb_max_advance_reservation',
+            'mphb_buffer_days'
 		);
 
 		foreach( $postFields as $postField ) {
@@ -320,6 +332,102 @@ class BookingRulesMenuPage extends AbstractMenuPage {
 				) )
 			)
 		), get_option( 'mphb_booking_rules_custom', array() ) );
+
+		$this->fields['mphb_min_advance_reservation'] = FieldFactory::create( 'mphb_min_advance_reservation', array(
+			'type'			 => 'rules-list',
+			'label'			 => __( 'Minimum advance reservation', 'motopress-hotel-booking' ),
+			'empty_label'	 => __( 'There are no minimum advance reservation rules.', 'motopress-hotel-booking' ),
+			'add_label'		 => __( 'Add rule', 'motopress-hotel-booking' ),
+			'sortable' => true,
+			'default'		 => array(),
+			'fields'		 => array(
+				FieldFactory::create( 'min_advance_reservation', array(
+					'type'			 => 'number',
+					'label'			 => __( 'Minimum advance reservation', 'motopress-hotel-booking' ),
+					'inner_label'	 => __( 'nights', 'motopress-hotel-booking' ),
+					'default'		 => 0,
+					'min'			 => 0
+				) ),
+				FieldFactory::create( 'room_type_ids', array(
+					'type'			 => 'multiple-checkbox',
+					'label'			 => __( 'Accommodations', 'motopress-hotel-booking' ),
+					'all_value'		 => 0,
+					'default'		 => array( 0 ),
+					'list'			 => $roomTypes
+				) ),
+				FieldFactory::create( 'season_ids', array(
+					'type'			 => 'multiple-checkbox',
+					'label'			 => __( 'Seasons', 'motopress-hotel-booking' ),
+					'all_value'		 => 0,
+					'default'		 => array( 0 ),
+					'list'			 => $seasons
+				) )
+			)
+		), get_option( 'mphb_min_advance_reservation', array() ) );
+
+		$this->fields['mphb_max_advance_reservation'] = FieldFactory::create( 'mphb_max_advance_reservation', array(
+			'type'			 => 'rules-list',
+			'label'			 => __( 'Maximum advance reservation', 'motopress-hotel-booking' ),
+			'empty_label'	 => __( 'There are no maximum advance reservation rules.', 'motopress-hotel-booking' ),
+			'add_label'		 => __( 'Add rule', 'motopress-hotel-booking' ),
+			'sortable' => true,
+			'default'		 => array(),
+			'fields'		 => array(
+				FieldFactory::create( 'max_advance_reservation', array(
+					'type'			 => 'number',
+					'label'			 => __( 'Maximum advance reservation', 'motopress-hotel-booking' ),
+					'inner_label'	 => __( 'nights', 'motopress-hotel-booking' ),
+					'default'		 => 0,
+					'min'			 => 0
+				) ),
+				FieldFactory::create( 'room_type_ids', array(
+					'type'			 => 'multiple-checkbox',
+					'label'			 => __( 'Accommodations', 'motopress-hotel-booking' ),
+					'all_value'		 => 0,
+					'default'		 => array( 0 ),
+					'list'			 => $roomTypes
+				) ),
+				FieldFactory::create( 'season_ids', array(
+					'type'			 => 'multiple-checkbox',
+					'label'			 => __( 'Seasons', 'motopress-hotel-booking' ),
+					'all_value'		 => 0,
+					'default'		 => array( 0 ),
+					'list'			 => $seasons
+				) )
+			)
+		), get_option( 'mphb_max_advance_reservation', array() ) );
+
+        $this->fields['mphb_buffer_days'] = FieldFactory::create( 'mphb_buffer_days', array(
+            'type'			 => 'rules-list',
+            'label'			 => __( 'Booking buffer', 'motopress-hotel-booking' ),
+            'empty_label'	 => __( 'There are no booking buffer rules.', 'motopress-hotel-booking' ),
+            'add_label'		 => __( 'Add rule', 'motopress-hotel-booking' ),
+            'sortable'		 => true,
+            'default'		 => array(),
+            'fields'		 => array(
+                FieldFactory::create( 'buffer_days', array(
+                    'type'			 => 'number',
+                    'label'			 => __( 'Booking buffer', 'motopress-hotel-booking' ),
+                    'inner_label'	 => __( 'nights', 'motopress-hotel-booking' ),
+                    'default'		 => 0,
+                    'min'			 => 0
+                ) ),
+                FieldFactory::create( 'room_type_ids', array(
+                    'type'			 => 'multiple-checkbox',
+                    'label'			 => __( 'Accommodations', 'motopress-hotel-booking' ),
+                    'all_value'		 => 0,
+                    'default'		 => array( 0 ),
+                    'list'			 => $roomTypes
+                ) ),
+                FieldFactory::create( 'season_ids', array(
+                    'type'			 => 'multiple-checkbox',
+                    'label'			 => __( 'Seasons', 'motopress-hotel-booking' ),
+                    'all_value'		 => 0,
+                    'default'		 => array( 0 ),
+                    'list'			 => $seasons
+                ) )
+            )
+        ), get_option( 'mphb_buffer_days', array() ) );
 	}
 
 	protected function getMenuTitle(){

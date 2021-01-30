@@ -15,6 +15,11 @@ class MainSettings {
 	 */
 	private $datepickThemes;
 
+	/**
+	 * @since 3.9
+	 */
+	private $adminDatepickThemes;
+
 	public function __construct(){
 		$this->datepickThemes	 = array(
 			''				 => __( 'Default', 'motopress-hotel-booking' ),
@@ -33,6 +38,9 @@ class MainSettings {
 			'sky-blue'		 => __( 'Sky Blue', 'motopress-hotel-booking' ),
 			'slate-blue'	 => __( 'Slate Blue', 'motopress-hotel-booking' ),
 			'turquoise'		 => __( 'Turquoise', 'motopress-hotel-booking' )
+		);
+		$this->adminDatepickThemes = array(
+			'admin' => __( 'Default', 'motopress-hotel-booking' )
 		);
 		$this->countriesBundle	 = new \MPHB\Bundles\CountriesBundle();
 	}
@@ -290,7 +298,7 @@ class MainSettings {
 	}
 
 	public function getDatepickerAdminTheme(){
-		return apply_filters( 'mphb_dashboard_default_datepick_theme', 'grayscale' );
+		return apply_filters( 'mphb_dashboard_default_datepick_theme', 'admin' );
 	}
 
 	public function getDatepickerCurrentTheme(){
@@ -306,7 +314,7 @@ class MainSettings {
 
 		if (
 			$theme === '' // Default theme
-			|| !array_key_exists( $theme, $this->datepickThemes )
+			|| !array_key_exists( $theme, $this->datepickThemes ) && !array_key_exists( $theme, $this->adminDatepickThemes )
 		) {
 			return '';
 		}
@@ -320,6 +328,15 @@ class MainSettings {
 	 */
 	public function getDatepickerThemesList(){
 		return $this->datepickThemes;
+	}
+
+	/**
+	 * @since 3.9
+	 *
+	 * @return array
+	 */
+	public function getAdminDatepickerThemesList() {
+		return $this->adminDatepickThemes;
 	}
 
 	/**

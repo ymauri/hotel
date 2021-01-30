@@ -3,7 +3,7 @@ Contributors: MotoPress
 Donate link: https://motopress.com/
 Tags: hotel booking, reservation, hotel, booking engine, booking, booking calendar, booking system
 Requires at least: 4.6
-Tested up to: 5.5
+Tested up to: 5.6
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -40,6 +40,13 @@ Hotel Booking plugin is distributed under the terms of the GNU GPL.
 
 
 == Changelog ==
+
+= 3.9.1, Dec 10 2020 =
+* Bug fix: fixed an issue with the overbooking.
+
+= 3.9.0, Nov 24 2020 =
+* Added the ability to set the Booking Buffer option.
+* Added the ability to set Advance Reservation: the minimum number of days allowed before booking and the maximum number of days available for future bookings.
 
 = 3.8.7, Oct 30 2020 =
 * Fixed the issue with featured image of the Accommodation Type.
@@ -136,7 +143,7 @@ Hotel Booking plugin is distributed under the terms of the GNU GPL.
 
 = 3.4.0, May 22 2019 =
 * Major improvements on booking synchronization with online channels via iCal interface.
-* Added option for filtering and hiding imported bookings in the Bookings table. 
+* Added option for filtering and hiding imported bookings in the Bookings table.
 * Added option for including Blocked Accommodations to exportable calendars.
 * Minor bugfixes and improvements.
 
@@ -279,7 +286,7 @@ Hotel Booking plugin is distributed under the terms of the GNU GPL.
   * ability to set minimum and maximum stay-in days for individual accommodation types during chosen seasons;
   * ability to block individual accommodation types and actual accommodations for chosen dates;
 * Note: This release will perform an upgrade process on the database in the background. Please make sure that your previous booking rules are successfully transformed into new ones.
-* Updated translation files. 
+* Updated translation files.
 * Please note! Due to peculiarities of multilingual settings, the titles of custom post types and taxonomy (e.g. accommodation types, categories) are not translated from English into other languages in the URLs of the pages.
 
 = 2.2.0, Oct 9 2017 =

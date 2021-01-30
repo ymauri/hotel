@@ -40,7 +40,7 @@ class EditControl extends StepControl
     public function __construct($editBooking)
     {
         parent::__construct($editBooking);
-
+        
         $this->checkInDate = $editBooking->getCheckInDate();
         $this->checkOutDate = $editBooking->getCheckOutDate();
     }
@@ -59,11 +59,11 @@ class EditControl extends StepControl
         $this->checkOutDate = isset($_POST['check_out_date']) ? ParseUtils::parseCheckOutDate($_POST['check_out_date'], array('check_booking_rules' => false, 'check_in_date' => $this->checkInDate)) : $this->checkOutDate;
 
         // Get available rooms list
-        $availableRooms = mphb_get_available_rooms($this->checkInDate, $this->checkOutDate, array('exclude_bookings' => $this->editBooking->getId()));
+        $availableRooms = mphb_get_available_rooms($this->checkInDate, $this->checkOutDate, array('exclude_bookings' => $this->editBooking->getId() ));
         $roomsUtil = BookingDetailsUtil::createFromAvailableRooms($availableRooms);
 
         $this->availableRooms = $roomsUtil->addTitles()->getValues();
-        
+
         // Prepare reserved rooms list
         $roomsUtil = BookingDetailsUtil::createFromBooking($this->editBooking);
 

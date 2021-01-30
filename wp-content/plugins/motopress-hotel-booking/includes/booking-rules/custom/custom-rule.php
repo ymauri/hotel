@@ -2,10 +2,10 @@
 
 namespace MPHB\BookingRules\Custom;
 
-use \MPHB\BookingRules\RuleVerifiable;
-use \MPHB\Utils\DateUtils;
+use MPHB\BookingRules\RuleVerifyInterface;
+use MPHB\Utils\DateUtils;
 
-class CustomRule implements RuleVerifiable {
+class CustomRule implements RuleVerifyInterface {
 
     protected $roomTypeId = 0;
     protected $roomId = 0;

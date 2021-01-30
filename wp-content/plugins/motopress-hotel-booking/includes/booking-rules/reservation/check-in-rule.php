@@ -2,7 +2,9 @@
 
 namespace MPHB\BookingRules\Reservation;
 
-class CheckInRule extends Rule {
+use MPHB\BookingRules\AbstractRule;
+
+class CheckInRule extends AbstractRule {
 
 	private $checkInDays;
 

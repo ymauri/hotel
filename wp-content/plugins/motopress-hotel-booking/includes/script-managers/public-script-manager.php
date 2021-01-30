@@ -208,9 +208,12 @@ class PublicScriptManager extends ScriptManager {
 				'translations'		 => array(
 					'errorHasOccured'					 => __( 'An error has occurred, please try again later.', 'motopress-hotel-booking' ),
 					'booked'							 => __( 'Booked', 'motopress-hotel-booking' ),
+					'buffer'							 => __( 'Buffer time.', 'motopress-hotel-booking' ),
 					'pending'							 => __( 'Pending', 'motopress-hotel-booking' ),
 					'available'							 => __( 'Available', 'motopress-hotel-booking' ),
 					'notAvailable'						 => __( 'Not available', 'motopress-hotel-booking' ),
+					'earlierMinAdvance'					 => __( 'This is earlier than allowed by our advance reservation rules.', 'motopress-hotel-booking' ),
+					'laterMaxAdvance'					 => __( 'This is later than allowed by our advance reservation rules.', 'motopress-hotel-booking' ),
 					'notStayIn'							 => __( 'Not stay-in', 'motopress-hotel-booking' ),
 					'notCheckIn'						 => __( 'Not check-in', 'motopress-hotel-booking' ),
 					'notCheckOut'						 => __( 'Not check-out', 'motopress-hotel-booking' ),

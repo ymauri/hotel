@@ -2,23 +2,27 @@
 
 namespace MPHB\BookingRules\Reservation;
 
-use \MPHB\BookingRules\RuleVerifiable;
+use MPHB\BookingRules\RuleVerifyInterface;
 
-class ReservationRules implements RuleVerifiable {
+class ReservationRules implements RuleVerifyInterface {
 
 	const RULE_CHECK_IN = 'check_in_days';
 	const RULE_CHECK_OUT = 'check_out_days';
 	const RULE_MIN_STAY = 'min_stay_length';
 	const RULE_MAX_STAY = 'max_stay_length';
+	const RULE_MIN_ADVANCE = 'min_advance_reservation';
+	const RULE_MAX_ADVANCE = 'max_advance_reservation';
 
 	/**
-	 * @var RulesHolder[]
+	 * @var ReservationRulesList[]
 	 */
 	private $rules = array(
 		self::RULE_CHECK_IN  => null,
 		self::RULE_CHECK_OUT => null,
 		self::RULE_MIN_STAY  => null,
 		self::RULE_MAX_STAY  => null,
+		self::RULE_MIN_ADVANCE => null,
+		self::RULE_MAX_ADVANCE => null
 	);
 
 	/**
@@ -32,21 +36,29 @@ class ReservationRules implements RuleVerifiable {
 		$this->cleanEmptyRules( $rules );
 		$this->fillFallbackRules( $rules );
 
-		$this->rules['check_in_days'] = new RulesHolder( array_map( function ( $data ) {
+		$this->rules['check_in_days'] = new ReservationRulesList( array_map( function ( $data ) {
 			return new CheckInRule( $data );
 		}, $rules['check_in_days'] ), self::RULE_CHECK_IN );
 
-		$this->rules['check_out_days'] = new RulesHolder( array_map( function ( $data ) {
+		$this->rules['check_out_days'] = new ReservationRulesList( array_map( function ( $data ) {
 			return new CheckOutRule( $data );
 		}, $rules['check_out_days'] ), self::RULE_CHECK_OUT );
 
-		$this->rules['min_stay_length'] = new RulesHolder( array_map( function ( $data ) {
+		$this->rules['min_stay_length'] = new ReservationRulesList( array_map( function ( $data ) {
 			return new MinDaysRule( $data );
 		}, $rules['min_stay_length'] ), self::RULE_MIN_STAY );
 
-		$this->rules['max_stay_length'] = new RulesHolder( array_map( function ( $data ) {
+		$this->rules['max_stay_length'] = new ReservationRulesList( array_map( function ( $data ) {
 			return new MaxDaysRule( $data );
 		}, $rules['max_stay_length'] ), self::RULE_MAX_STAY );
+
+		$this->rules['min_advance_reservation'] = new ReservationRulesList( array_map( function ( $data ) {
+			return new MinAdvanceDaysRule( $data );
+		}, $rules['min_advance_reservation'] ), self::RULE_MIN_ADVANCE );
+
+		$this->rules['max_advance_reservation'] = new ReservationRulesList( array_map( function ( $data ) {
+			return new MaxAdvanceDaysRule( $data );
+		}, $rules['max_advance_reservation'] ), self::RULE_MAX_ADVANCE );
 	}
 
 	/**
@@ -89,6 +101,16 @@ class ReservationRules implements RuleVerifiable {
 			'season_ids'      => array( 0 ),
 			'room_type_ids'   => array( 0 ),
 		) );
+		array_push( $rules[ self::RULE_MIN_ADVANCE ], array(
+			'min_advance_reservation' => 0, // can be booked today
+			'season_ids'      => array( 0 ),
+			'room_type_ids'   => array( 0 ),
+		) );
+		array_push( $rules[ self::RULE_MAX_ADVANCE ], array(
+			'max_advance_reservation' => 0, // no limit
+			'season_ids'      => array( 0 ),
+			'room_type_ids'   => array( 0 ),
+		) );
 	}
 
 	/**
@@ -124,7 +146,7 @@ class ReservationRules implements RuleVerifiable {
 	 * @return array
 	 */
 	public function getData() {
-		return array_map( function ( RulesHolder $ruleHolder ) {
+		return array_map( function ( ReservationRulesList $ruleHolder ) {
 			return $ruleHolder->toArray();
 		}, $this->rules );
 	}
@@ -135,7 +157,7 @@ class ReservationRules implements RuleVerifiable {
 	 * @return int
 	 */
 	public function getMinDaysAllSeason( $roomTypeId ) {
-		return $this->rules[ self::RULE_MIN_STAY ]->findAllSeasonRuleForRoomType( $roomTypeId )->getMinDays();
+		return $this->rules[ self::RULE_MIN_STAY ]->findAllSeasonsRule( $roomTypeId )->getMinDays();
 	}
 
 }

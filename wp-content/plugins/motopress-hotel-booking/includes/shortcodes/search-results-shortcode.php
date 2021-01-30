@@ -284,9 +284,10 @@ class SearchResultsShortcode extends AbstractShortcode {
 		global $wpdb;
 
 		$roomsAtts = apply_filters('mphb_search_available_rooms', array(
-			'availability'	 => 'locked',
-			'from_date'		 => $this->checkInDate,
-			'to_date'		 => $this->checkOutDate
+			'availability'      => 'locked',
+			'from_date'         => $this->checkInDate,
+			'to_date'           => $this->checkOutDate,
+            'skip_buffer_rules' => false
 		));
 
 		$lockedRooms	 = MPHB()->getRoomPersistence()->searchRooms( $roomsAtts );
@@ -338,6 +339,7 @@ class SearchResultsShortcode extends AbstractShortcode {
 	}
 
 	private function renderRoomType(){
+
 		$templateAtts = array(
 			'checkInDate'		 => $this->checkInDate,
 			'checkOutDate'		 => $this->checkOutDate,

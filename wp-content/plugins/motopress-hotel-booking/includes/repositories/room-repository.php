@@ -136,10 +136,16 @@ class RoomRepository extends AbstractPostRepository {
      * @since 3.8 added new argument $atts and parameter "exclude_bookings".
 	 */
 	public function getLockedRooms( \DateTime $checkInDate, \DateTime $checkOutDate, $roomTypeId = 0, $atts = array() ){
+
+		/**
+		 * @since 3.9
+		 */
+		//$bookingPeriod = apply_filters( 'mphb_modify_booking_period', array( $checkInDate, $checkOutDate ), $roomTypeId );
+$bookingPeriod = array( $checkInDate, $checkOutDate );
 		$searchAtts = array_merge( array(
 			'availability'	 => 'locked',
 			'from_date'		 => $checkInDate,
-			'to_date'		 => $checkOutDate
+			'to_date'		 => $checkOutDate,
 		), $atts );
 
 		if ( $roomTypeId ) {
@@ -210,33 +216,36 @@ class RoomRepository extends AbstractPostRepository {
 				$dates[$dateYmd] = array_merge( $dates[$dateYmd], $usedRooms );
 			}
 
-			$checkInDateYmd = $booking->getCheckInDate()->format( 'Y-m-d' );
-			if ( !isset( $checkIns[$checkInDateYmd] ) ) {
-				$checkIns[$checkInDateYmd] = array();
-			}
-			$checkIns[$checkInDateYmd] = array_merge( $checkIns[$checkInDateYmd], $usedRooms );
+			$bufferDays = mphb_get_buffer_days( $booking->getCheckInDate(), $roomTypeId );
 
-			$checkOutDateYmd = $booking->getCheckOutDate()->format( 'Y-m-d' );
-			if ( !isset( $checkOuts[$checkOutDateYmd] ) ) {
-				$checkOuts[$checkOutDateYmd] = array();
+			if( $bufferDays > 0 ) {
+				$bufferDatesForRoom = mphb_modify_booking_buffer_period( $booking, $bufferDays );
+
+				if( !empty( $bufferDatesForRoom ) ) {
+					foreach( $bufferDatesForRoom as $date => $dateObj ) {
+						$bufferDateYmd = $dateObj->format( 'Y-m-d' );
+						if ( !isset( $dates[$bufferDateYmd]  ) ) {
+							$dates[$bufferDateYmd]  = array();
+						}
+						$dates[$bufferDateYmd]  = array_merge( $dates[$bufferDateYmd] , $usedRooms );
+					}
+				}
+
 			}
-			$checkOuts[$checkOutDateYmd] = array_merge( $checkOuts[$checkOutDateYmd], $usedRooms );
 		}
 
 		$dates = array_map( 'array_unique', $dates );
 		$dates = array_map( 'count', $dates );
 		ksort( $dates );
 
-		$checkIns = array_map( 'array_unique', $checkIns );
-		$checkIns = array_map( 'count', $checkIns );
-
-		$checkOuts = array_map( 'array_unique', $checkOuts );
-		$checkOuts = array_map( 'count', $checkOuts );
+		if( !empty( $dates ) ) {
+			list( $checkIns, $checkOuts ) = mphb_filter_checkin_checkout_dates( $dates, count($roomIds) );
+		}
 
 		return array(
 			'booked'	 => $dates,
 			'check-ins'	 => $checkIns,
-			'check-outs' => $checkOuts
+			'check-outs' => $checkOuts,
 		);
 	}
 

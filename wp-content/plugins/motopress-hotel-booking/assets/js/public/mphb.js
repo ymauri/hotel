@@ -41,6 +41,7 @@
 		}
 		return !this.dates[formattedDate].not_stay_in;
 	},
+
 	/**
 	 *
 	 * @param {Date} dateFrom
@@ -75,6 +76,7 @@
 		return $.datepick.formatDate( 'yyyy-mm-dd', date );
 	}
 } );
+
 /**
  * @class MPHB.Datepicker
  */
@@ -110,7 +112,7 @@ can.Control( 'MPHB.Datepicker', {}, {
 			monthsToShow: MPHB._data.settings.numberOfMonthDatepicker,
 			firstDay: MPHB._data.settings.firstDay,
 			pickerClass: MPHB._data.settings.datepickerClass,
-            useMouseWheel: false
+            useMouseWheel: false,
 		};
 		var datepickSettings = $.extend( defaultSettings, this.getDatepickSettings() );
 		this.element.datepick( datepickSettings );
@@ -182,6 +184,15 @@ can.Control( 'MPHB.Datepicker', {}, {
 		var maxDate = this.getOption( 'maxDate' );
 		return maxDate !== null && maxDate !== '' ? MPHB.Utils.cloneDate( maxDate ) : null;
 	},
+
+	/**
+	 *
+	 * @returns {Date|null}
+	 */
+	getMaxAdvanceDate: function() {
+		var maxAdvanceDate = this.getOption( 'maxAdvanceDate' );
+		return maxAdvanceDate ? MPHB.Utils.cloneDate( maxAdvanceDate ) : null;
+	},
 	/**
 	 *
 	 * @returns {undefined}
@@ -207,6 +218,7 @@ can.Control( 'MPHB.Datepicker', {}, {
 	}
 
 } );
+
 
 MPHB.FlexsliderGallery = can.Control.extend( {}, {
 	sliderEl: null,
@@ -390,6 +402,8 @@ MPHB.ReservationRulesChecker = can.Construct.extend({
 		checkOutDays: {},
 		minStay: {},
 		maxStay: {},
+		minAdvance: {},
+		maxAdvance: {}
 	},
 	init: function(rulesByTypes) {
 		this.rules.checkInDays = $.map(rulesByTypes['check_in_days'], function(ruleDetails) {
@@ -404,6 +418,13 @@ MPHB.ReservationRulesChecker = can.Construct.extend({
 		this.rules.maxStay = $.map(rulesByTypes['max_stay_length'], function(ruleDetails) {
 			return new MPHB.Rules.MaxDaysRule(ruleDetails);
 		});
+		this.rules.minAdvance = $.map(rulesByTypes['min_advance_reservation'], function(ruleDetails) {
+			return new MPHB.Rules.MinAdvanceDaysRule(ruleDetails);
+		});
+		this.rules.maxAdvance = $.map(rulesByTypes['max_advance_reservation'], function(ruleDetails) {
+			return new MPHB.Rules.MaxAdvanceDaysRule(ruleDetails);
+		});
+
 	},
 	/**
 	 *
@@ -429,6 +450,7 @@ MPHB.ReservationRulesChecker = can.Construct.extend({
 
 		$.each(this.rules[type], function(index, rule) {
 			var roomTypes = MPHB.Utils.arrayDiff(rule.roomTypeIds, processedRoomTypes);
+
 			if (!roomTypes.length) {
 				return; // continue
 			}
@@ -501,6 +523,26 @@ MPHB.ReservationRulesChecker = can.Construct.extend({
 					max_stay_length: softRule
 				});
 				break;
+			case 'minAdvance':
+				var softRule = MPHB.Utils.arrayMin($.map(rules, function(rule) {
+					return rule.min;
+				}));
+				rule = new MPHB.Rules.MinAdvanceDaysRule({
+					season_ids: [0],
+					room_type_ids: [0],
+					min_advance_reservation: softRule
+				});
+				break;
+			case 'maxAdvance':
+				var softRule = MPHB.Utils.arrayMax($.map(rules, function(rule) {
+					return rule.max;
+				}));
+				rule = new MPHB.Rules.MaxAdvanceDaysRule({
+					season_ids: [0],
+					room_type_ids: [0],
+					max_advance_reservation: softRule
+				});
+				break;
 		}
 		return rule;
 	},
@@ -568,6 +610,70 @@ MPHB.ReservationRulesChecker = can.Construct.extend({
 		}
 		return maxStay;
 	},
+
+    /**
+     * @returns {Date}
+     *
+     * @since 3.8.7
+     */
+    getToday: function() {
+        return MPHB.HotelDataManager.myThis.today;
+    },
+
+	/**
+	 *
+	 * @param {number} roomTypeId
+	 * @return {number}
+	 */
+	 getMinAdvance: function(roomTypeId) {
+		var minAdvance;
+		if (roomTypeId) {
+ 			minAdvance = this.getActualRule('minAdvance', this.getToday(), roomTypeId).min;
+ 		} else {
+ 			minAdvance = this.getActualCombinedRule('minAdvance', this.getToday()).min;
+ 		}
+ 		return minAdvance;
+	},
+
+	/**
+	 *
+	 * @param {number} roomTypeId
+	 * @return {number}
+	 */
+	 getMaxAdvance: function(roomTypeId) {
+		var maxAdvance;
+		if (roomTypeId) {
+ 			maxAdvance = this.getActualRule('maxAdvance', this.getToday(), roomTypeId).max;
+ 		} else {
+ 			maxAdvance = this.getActualCombinedRule('maxAdvance', this.getToday()).max;
+ 		}
+ 		return maxAdvance;
+	},
+
+	/**
+	 *
+	 * @returns {Date}
+	 */
+	getMinCheckInDate: function(roomTypeId) {
+		var minAdvance = this.getMinAdvance(roomTypeId);
+		if (minAdvance > 0) {
+			return $.datepick.add( MPHB.Utils.cloneDate(this.getToday()), minAdvance, 'd' );
+		}
+		return MPHB.Utils.cloneDate(this.getToday());
+	},
+
+	/**
+	 *
+	 * @returns {Date}
+	 */
+	getMaxAdvanceDate: function(roomTypeId) {
+		var maxAdvance = this.getMaxAdvance(roomTypeId);
+		if (maxAdvance > 0) {
+			return $.datepick.add( MPHB.Utils.cloneDate(this.getToday()), maxAdvance, 'd' );
+		}
+		return null;
+	},
+
 	/**
 	 *
 	 * @param {Date} checkInDate
@@ -577,6 +683,7 @@ MPHB.ReservationRulesChecker = can.Construct.extend({
 		var minDays = this.getMinStay(checkInDate, roomTypeId);
 		return $.datepick.add(MPHB.Utils.cloneDate(checkInDate), minDays, 'd');
 	},
+
 	/**
 	 *
 	 * @param {Date} checkInDate
@@ -586,7 +693,9 @@ MPHB.ReservationRulesChecker = can.Construct.extend({
 		var maxDays = this.getMaxStay(checkInDate, roomTypeId);
 		return $.datepick.add(MPHB.Utils.cloneDate(checkInDate), maxDays, 'd');
 	},
+
 });
+
 MPHB.Rules = {};
 
 MPHB.Rules.BasicRule = can.Construct.extend({}, {
@@ -606,6 +715,7 @@ MPHB.Rules.BasicRule = can.Construct.extend({}, {
 	init: function(data) {
 		this.seasonIds = data.season_ids;
 		this.roomTypeIds = data.room_type_ids;
+
 	},
 	/**
 	 *
@@ -808,6 +918,9 @@ can.Construct('MPHB.HotelDataManager', {
 	ROOM_STATUS_NOT_AVAILABLE: 'not-available',
 	ROOM_STATUS_BOOKED: 'booked',
 	ROOM_STATUS_PAST: 'past',
+	ROOM_STATUS_EARLIER_MIN_ADVANCE: 'earlier-min-advance',
+	ROOM_STATUS_LATER_MAX_ADVANCE: 'later-max-advance',
+	ROOM_STATUS_BOOKING_BUFFER: 'booking-buffer'
 }, {
 	today: null,
 	roomTypesData: {},
@@ -869,7 +982,7 @@ can.Construct('MPHB.HotelDataManager', {
 		} );
 	},
 	initRules: function( rules ) {
-		this.dateRules = new MPHB.DateRules( rules.dates )
+		this.dateRules = new MPHB.DateRules( rules.dates );
 
 		var self = this;
 		$.each( rules.blockedTypes, function( id, dates ) {
@@ -936,6 +1049,14 @@ can.Construct('MPHB.HotelDataManager', {
 			rulesClasses.push( 'mphb-not-check-out-date' );
 		}
 
+		if( MPHB.Utils.compareDates(date, this.today, '>=') && this.isEarlierThanMinAdvanceDate( date, roomTypeId ) ) {
+			rulesTitles.push( MPHB._data.translations.earlierMinAdvance );
+		}
+
+		if( type != 'checkOut' && this.isLaterThamMaxAdvanceDate( date, roomTypeId ) ) {
+			rulesTitles.push( MPHB._data.translations.laterMaxAdvance );
+		}
+
 		if ( rulesTitles.length ) {
 			dateData.title += ' ' + MPHB._data.translations.rules + ' ' + rulesTitles.join( ', ' );
 		}
@@ -996,7 +1117,32 @@ can.Construct('MPHB.HotelDataManager', {
 		return !canCheckOut;
 	},
 
+	/**
+	 *
+	 * @param {Date} date
+	 * @returns {Boolean}
+	 */
+	isEarlierThanMinAdvanceDate: function( date, roomTypeId ) {
+        var minCheckInDate = this.reservationRules.getMinCheckInDate( roomTypeId );
+
+		return minCheckInDate != null
+            && MPHB.Utils.compareDates( date, minCheckInDate, '<' );
+	},
+
+	/**
+	 *
+	 * @param {Date} date
+	 * @returns {Boolean}
+	 */
+	isLaterThamMaxAdvanceDate: function( date, roomTypeId ) {
+        var maxAdvanceDate = this.reservationRules.getMaxAdvanceDate( roomTypeId );
+
+		return maxAdvanceDate != null
+            && MPHB.Utils.compareDates( date, maxAdvanceDate, '>' );
+	}
+
 } );
+
 MPHB.TermsSwitcher = can.Construct.extend(
 	{},
 	{
@@ -1022,6 +1168,41 @@ MPHB.Utils = can.Construct.extend({
 	formatDateToCompare: function(date) {
 		return $.datepick.formatDate('yyyymmdd', date);
 	},
+    /**
+     * @param {Date} date1
+     * @param {Date} date2
+     * @param {String|Null} operator Optional.
+     * @returns {Number|Boolean}
+     *
+     * @since 3.8.7
+     */
+    compareDates: function(date1, date2, operator) {
+        var date1 = MPHB.Utils.formatDateToCompare(date1);
+        var date2 = MPHB.Utils.formatDateToCompare(date2);
+
+        if (operator != null) {
+            switch (operator) {
+                case '>' : return date1 >  date2; break;
+                case '>=': return date1 >= date2; break;
+                case '<' : return date1 <  date2; break;
+                case '<=': return date1 <= date2; break;
+                case '=' :
+                case '==': return date1 == date2; break;
+                case '!=': return date1 != date2; break;
+                default:
+                    return false;
+                    break;
+            }
+        } else {
+            if (date1 > date2) {
+                return 1;
+            } else if (date1 < date2) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+    },
 	/**
 	 *
 	 * @param {Date} date
@@ -2789,6 +2970,7 @@ MPHB.ReservationForm = can.Control.extend( {
 			'form': this,
 			'roomTypeId': this.searchRoomTypeId
 		} );
+		this.updateCheckInLimitations();
 	},
 	initCheckOutDatepicker: function() {
 		var checkOutEl = this.formEl.find( 'input[type="text"][id^=mphb_check_out_date]' );
@@ -2796,6 +2978,7 @@ MPHB.ReservationForm = can.Control.extend( {
 			'form': this,
 			'roomTypeId': this.searchRoomTypeId
 		} );
+
 	},
 	initReserveBtn: function() {
 		this.reserveBtn = this.formEl.find( '.mphb-reserve-btn' );
@@ -2808,16 +2991,46 @@ MPHB.ReservationForm = can.Control.extend( {
 	 * @param {bool} setDate
 	 * @returns {undefined}
 	 */
+	updateCheckInLimitations: function( setDate ) {
+		if ( typeof setDate === 'undefined' ) {
+			setDate = true;
+		}
+		var limitations = this.retrieveCheckInLimitations();
+
+		this.checkInDatepicker.setOption( 'maxAdvanceDate', limitations.maxAdvanceDate );
+	},
+	/**
+	 *
+	 * @param {bool} setDate
+	 * @returns {undefined}
+	 */
 	updateCheckOutLimitations: function( setDate ) {
 		if ( typeof setDate === 'undefined' ) {
 			setDate = true;
 		}
 		var limitations = this.retrieveCheckOutLimitations( this.checkInDatepicker.getDate(), this.checkOutDatepicker.getDate() );
-
 		this.checkOutDatepicker.setOption( 'minDate', limitations.minDate );
 		this.checkOutDatepicker.setOption( 'maxDate', limitations.maxDate );
+
 		this.checkOutDatepicker.setDate( setDate ? limitations.date : null );
 	},
+
+ /**
+ 	*
+	* @returns {Object} with keys
+	*	- {Date} maxAdvanceDate
+	*/
+	retrieveCheckInLimitations: function() {
+		var maxAdvanceDate = null;
+
+		maxAdvanceDate = MPHB.HotelDataManager.myThis.reservationRules.getMaxAdvanceDate(this.checkInDatepicker.roomTypeId);
+
+		return {
+			maxAdvanceDate: maxAdvanceDate
+		};
+
+	},
+
 	/**
 	 *
 	 * @param {type} checkInDate
@@ -2836,6 +3049,7 @@ MPHB.ReservationForm = can.Control.extend( {
 			minDate = MPHB.HotelDataManager.myThis.reservationRules.getMinCheckOutDate( checkInDate, this.searchRoomTypeId );
 
 			maxDate = MPHB.HotelDataManager.myThis.reservationRules.getMaxCheckOutDate( checkInDate, this.searchRoomTypeId );
+
 			if (this.isDirectBooking) {
 				maxDate = this.roomTypeData.getNearestLockedCheckOutDate( checkInDate, maxDate );
 				maxDate = this.roomTypeData.getNearestHaveNotPriceDate( checkInDate, maxDate );
@@ -2914,6 +3128,7 @@ MPHB.ReservationForm = can.Control.extend( {
 	}
 
 } );
+
 MPHB.RoomTypeCalendar = can.Control.extend( {}, {
 	roomTypeData: null,
 	roomTypeId: null,
@@ -2927,7 +3142,7 @@ MPHB.RoomTypeCalendar = can.Control.extend( {}, {
 			var customArray = customMonths.split( ',' );
 			monthsToShow = ( customArray.length == 1 ) ? parseInt( customMonths ) : customArray;
 		}
-
+		var minDate = MPHB.HotelDataManager.myThis.reservationRules.getMinCheckInDate( this.roomTypeId );
 		el.hide().datepick( {
 			onDate: this.proxy(function( date, current ) {
 				var dateData = {
@@ -2945,7 +3160,7 @@ MPHB.RoomTypeCalendar = can.Control.extend( {}, {
 
 				return dateData;
 			}),
-			minDate: MPHB.HotelDataManager.myThis.today,
+			minDate: minDate,
 			monthsToShow: monthsToShow,
 			firstDay: MPHB._data.settings.firstDay,
 			pickerClass: MPHB._data.settings.datepickerClass,
@@ -2964,6 +3179,7 @@ MPHB.RoomTypeCalendar = can.Control.extend( {}, {
 	}
 
 } );
+
 /**
  *
  * @requires ./../datepicker.js
@@ -2973,6 +3189,9 @@ MPHB.Datepicker( 'MPHB.RoomTypeCheckInDatepicker', {}, {
 	init: function( el, args ) {
 		this._super( el, args );
 		this.isDirectBooking = MPHB._data.settings.isDirectBooking == '1' ? true : false;
+		if(this.roomTypeId === 0) {
+			this.roomTypeId = args.form.hasOwnProperty('roomTypeId') ? args.form.roomTypeId : 0;
+		}
 	},
 	/**
 	 *
@@ -2980,6 +3199,7 @@ MPHB.Datepicker( 'MPHB.RoomTypeCheckInDatepicker', {}, {
 	 */
 	getDatepickSettings: function() {
 		return {
+			minDate: MPHB.HotelDataManager.myThis.reservationRules.getMinCheckInDate(this.roomTypeId),
 			onDate: this.proxy(function( date, current ) {
 				var dateData = {
 					dateClass: 'mphb-date-cell',
@@ -2990,7 +3210,13 @@ MPHB.Datepicker( 'MPHB.RoomTypeCheckInDatepicker', {}, {
 
 				if ( current ) {
 
-					var canCheckIn = MPHB.HotelDataManager.myThis.reservationRules.isCheckInSatisfy( date, this.roomTypeId )
+					var earlierThanMinAdvance = MPHB.Utils.compareDates( date, MPHB.HotelDataManager.myThis.reservationRules.getMinCheckInDate(this.roomTypeId), '<' );
+
+					var laterTnanMaxAdvance = this.getMaxAdvanceDate() !== null
+                        && MPHB.Utils.compareDates( date, this.getMaxAdvanceDate(), '>' );
+
+					var canCheckIn = !earlierThanMinAdvance && !laterTnanMaxAdvance
+                        && MPHB.HotelDataManager.myThis.reservationRules.isCheckInSatisfy( date, this.roomTypeId )
 						&& MPHB.HotelDataManager.myThis.dateRules.canCheckIn( date );
 
 					if ( this.isDirectBooking ) {
@@ -3014,6 +3240,8 @@ MPHB.Datepicker( 'MPHB.RoomTypeCheckInDatepicker', {}, {
 
 				if ( dateData.selectable ) {
 					dateData.dateClass += ' mphb-date-selectable';
+				} else {
+					dateData.dateClass += ' mphb-unselectable-date';
 				}
 
 				return dateData;
@@ -3046,6 +3274,7 @@ MPHB.Datepicker( 'MPHB.RoomTypeCheckInDatepicker', {}, {
 	}
 
 } );
+
 /**
  *
  * @requires ./../datepicker.js
@@ -3151,316 +3380,396 @@ MPHB.RoomTypeCheckOutDatepicker = MPHB.Datepicker.extend( {}, {
 		return this._super( date );
 	},
 } );
+
 MPHB.RoomTypeData = can.Construct.extend( {}, {
-	id: null,
-	originalId: null,
-	bookedDates: {},
-	checkInDates: {},
-	checkOutDates: {},
-	blockedDates: {}, // Blocked by custom rules. { %Date%: %Blocked rooms count% }
-	havePriceDates: {},
-	activeRoomsCount: 0,
-	/**
-	 *
-	 * @param {Object}	data
-	 * @param {Object}	data.bookedDates
-	 * @param {Object}	data.havePriceDates
-	 * @param {int}		data.activeRoomsCount
-	 * @returns {undefined}
-	 */
-	init: function( id, data ) {
-		this.id = id;
-		this.originalId = data.originalId;
-		this.setRoomsCount( data.activeRoomsCount );
-		this.setDates( data.dates );
-	},
-	update: function( data ) {
-		if ( data.hasOwnProperty( 'activeRoomsCount' ) ) {
-			this.setRoomsCount( data.activeRoomsCount );
-		}
+        id: null,
+        originalId: null,
+        bookedDates: {},
+        checkInDates: {},
+        checkOutDates: {},
+        blockedDates: {}, // Blocked by custom rules. { %Date%: %Blocked rooms count% }
+        havePriceDates: {},
+        activeRoomsCount: 0,
+        /**
+         *
+         * @param {Object}      data
+         * @param {Object}      data.bookedDates
+         * @param {Object}      data.havePriceDates
+         * @param {int}         data.activeRoomsCount
+         * @returns {undefined}
+         */
+        init: function( id, data ) {
+                this.id = id;
+                this.originalId = data.originalId;
+                this.setRoomsCount( data.activeRoomsCount );
+                this.setDates( data.dates );
+        },
+        update: function( data ) {
+                if ( data.hasOwnProperty( 'activeRoomsCount' ) ) {
+                        this.setRoomsCount( data.activeRoomsCount );
+                }
 
-		if ( data.hasOwnProperty( 'dates' ) ) {
-			this.setDates( data.dates );
-		}
+                if ( data.hasOwnProperty( 'dates' ) ) {
+                        this.setDates( data.dates );
+                }
 
-		$( window ).trigger( 'mphb-update-room-type-data-' + this.id );
-	},
+                $( window ).trigger( 'mphb-update-room-type-data-' + this.id );
+        },
+        /**
+         *
+         * @param {int} count
+         * @returns {undefined}
+         */
+        setRoomsCount: function( count ) {
+                this.activeRoomsCount = count;
+        },
+        /**
+         *
+         * @param {Object} dates
+         * @param {Object} dates.bookedDates
+         * @param {Object} dates.havePriceDates
+         * @returns {undefined}
+         */
+        setDates: function( dates ) {
+
+                this.bookedDates = dates.hasOwnProperty( 'booked' ) ? dates.booked : {};
+                this.checkInDates = dates.hasOwnProperty( 'checkIns' ) ? dates.checkIns : {};
+                this.checkOutDates = dates.hasOwnProperty( 'checkOuts' ) ? dates.checkOuts : {};
+                this.blockedDates = dates.hasOwnProperty( 'blocked' ) ? dates.blocked : {};
+                this.havePriceDates = dates.hasOwnProperty( 'havePrice' ) ? dates.havePrice : {};
+        },
+        blockAllRoomsOnDate: function( dateFormatted ){
+                this.blockedDates[dateFormatted] = this.activeRoomsCount;
+        },
+        /**
+         *
+         * @param {Date} checkInDate
+         * @param {Date} stopDate
+         * @returns {Date|false} Nearest locked room date if exists or false otherwise.
+         */
+        getNearestLockedCheckOutDate: function( checkInDate, stopDate ) {
+                var nearestDate = stopDate;
+                var activeRoomsCount = this.activeRoomsCount;
+
+                var startDateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', checkInDate );
+                var stopDateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', stopDate );
+
+                $.each( this.getLockedCheckoutDates(), function( dateFormatted, lockedRoomsCount ) {
+
+                        if ( stopDateFormatted < dateFormatted ) {
+                                return false; // break;
+                        }
+
+                        if ( startDateFormatted > dateFormatted ) {
+                                return true; // continue
+                        }
+
+                        if ( lockedRoomsCount >= activeRoomsCount ) {
+                                nearestDate = $.datepick.parseDate( 'yyyy-mm-dd', dateFormatted );
+                                return false; // break
+                        }
+
+                } );
+
+                return nearestDate;
+        },
+        /**
+         *
+         * @returns {Object}
+         */
+        getLockedCheckoutDates: function() {
+                var dates = $.extend( {}, this.bookedDates );
+                $.each( this.blockedDates, function( dateFormatted, blockedRoomsCount ) {
+                        if ( !dates.hasOwnProperty( dateFormatted ) ) {
+                                dates[dateFormatted] = blockedRoomsCount;
+                        } else {
+                                dates[dateFormatted] += blockedRoomsCount;
+                        }
+                } );
+                return dates;
+        },
+        /**
+         *
+         * @param {Date} dateFrom
+         * @param {Date} stopDate
+         * @returns {Date}
+         */
+        getNearestHaveNotPriceDate: function( dateFrom, stopDate ) {
+                var nearestDate = MPHB.Utils.cloneDate( stopDate );
+                var expectedDate = MPHB.Utils.cloneDate( dateFrom );
+
+                while ( MPHB.Utils.formatDateToCompare( expectedDate ) <= MPHB.Utils.formatDateToCompare( stopDate ) ) {
+                        if ( !this.hasPriceForDate( expectedDate ) ) {
+                                nearestDate = expectedDate;
+                                break;
+                        }
+                        expectedDate = $.datepick.add( expectedDate, 1, 'd' );
+                }
+
+                return nearestDate;
+        },
+        /**
+         *
+         * @returns {Object}
+         */
+        getHavePriceDates: function() {
+                var dates = {};
+                return $.extend( dates, this.havePriceDates );
+        },
+        /**
+         *
+         * @param {Date}
+         * @returns {String}
+         */
+        getDateStatus: function( date ) {
+                var status = MPHB.HotelDataManager.ROOM_STATUS_AVAILABLE;
+
+            		if ( this.isEarlierThanToday( date ) ) {
+            			status = MPHB.HotelDataManager.ROOM_STATUS_PAST;
+            		} else if ( this.isDateBooked( date ) ) {
+            			status = MPHB.HotelDataManager.ROOM_STATUS_BOOKED;
+            		} else if( MPHB.HotelDataManager.myThis.isEarlierThanMinAdvanceDate( date, this.originalId ) ) {
+            			status = MPHB.HotelDataManager.ROOM_STATUS_EARLIER_MIN_ADVANCE;
+            		} else if( MPHB.HotelDataManager.myThis.isLaterThamMaxAdvanceDate( date, this.originalId ) ) {
+            			status = MPHB.HotelDataManager.ROOM_STATUS_LATER_MAX_ADVANCE;
+            		} else if ( !this.hasPriceForDate( date ) ) {
+            			status = MPHB.HotelDataManager.ROOM_STATUS_NOT_AVAILABLE;
+            		} else if ( !this.getAvailableRoomsCount( date ) ) {
+            			status = MPHB.HotelDataManager.ROOM_STATUS_NOT_AVAILABLE;
+            		}
+
+                return status;
+        },
+        canCheckIn: function( date ) {
+                var status = this.getDateStatus( date );
+                if ( status == MPHB.HotelDataManager.ROOM_STATUS_AVAILABLE ) {
+                        return true;
+                } else {
+                        return false;
+                }
+        },
+        /**
+         *
+         * @param {Date} date
+         * @returns {Boolean}
+         */
+        isDateBooked: function( date ) {
+                var dateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', date );
+                return this.bookedDates.hasOwnProperty( dateFormatted ) && this.bookedDates[dateFormatted] >= this.activeRoomsCount;
+        },
+        /**
+         *
+         * @param {Date} date
+         * @returns {Boolean}
+         */
+        isDateBookingCheckIn: function( date ) {
+                var dateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', date );
+                return this.checkInDates.hasOwnProperty( dateFormatted );
+        },
+        /**
+         *
+         * @param {Date} date
+         * @returns {Boolean}
+         */
+        isDateBookingCheckOut: function( date ) {
+                var dateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', date );
+
+                if ( !this.checkOutDates.hasOwnProperty( dateFormatted ) ) {
+                        return false;
+                }
+
+                if ( this.bookedDates.hasOwnProperty( dateFormatted ) ) {
+                        var usedCount = this.checkOutDates[dateFormatted] + this.bookedDates[dateFormatted];
+                        return usedCount >= this.activeRoomsCount;
+                } else {
+                        return this.checkOutDates[dateFormatted] >= this.activeRoomsCount;
+                }
+        },
+        /**
+         *
+         * @param {Date} date
+         * @returns {Boolean}
+         */
+        hasPriceForDate: function( date ) {
+                var dateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', date );
+                return MPHB.Utils.inArray( dateFormatted, this.havePriceDates );
+        },
+        /**
+         *
+         * @param {Date} date
+         * @returns {int}
+         */
+        getAvailableRoomsCount: function( date ) {
+                var dateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', date );
+                var count = this.activeRoomsCount;
+
+                if ( this.bookedDates.hasOwnProperty( dateFormatted ) ) {
+                        count -= this.bookedDates[dateFormatted];
+                }
+
+                if ( this.blockedDates.hasOwnProperty( dateFormatted ) ) {
+                        count -= this.blockedDates[dateFormatted];
+                }
+
+                if ( count < 0 ) {
+                        count = 0;
+                }
+
+                return count;
+        },
+        /**
+         *
+         * @param {Object} dateData
+         * @param {Date} date
+         * @param {string} [type=""] checkIn, checkOut or empty string
+         * @param {Date} [dateForRules]
+         * @returns {Object}
+         */
+        fillDateData: function( dateData, date, type, dateForRules ) {
+                if (!dateForRules) {
+                        dateForRules = date;
+                }
+                var status = this.getDateStatus( date );
+                var titles = [ ];
+                var classes = [ ];
+
+            		switch ( status ) {
+            			case MPHB.HotelDataManager.ROOM_STATUS_PAST:
+            				classes.push( 'mphb-past-date' );
+            				titles.push( MPHB._data.translations.past );
+            				break;
+            			case MPHB.HotelDataManager.ROOM_STATUS_AVAILABLE:
+            				classes.push( 'mphb-available-date' );
+            				titles.push( MPHB._data.translations.available + '(' + this.getAvailableRoomsCount( date ) + ')' );
+            				if ( this.isDateBookingCheckOut( date ) ) {
+            					classes.push( 'mphb-date-check-out' );
+            				}
+            				break;
+            			case MPHB.HotelDataManager.ROOM_STATUS_NOT_AVAILABLE:
+            				classes.push( 'mphb-not-available-date' );
+            				titles.push( MPHB._data.translations.notAvailable );
+            				break;
+            			case MPHB.HotelDataManager.ROOM_STATUS_BOOKED:
+            				classes.push( 'mphb-booked-date' );
+            				titles.push( MPHB._data.translations.booked );
+            				if ( this.isDateBookingCheckIn( date ) ) {
+            					classes.push( 'mphb-date-check-in' );
+            				}
+            				if ( this.isDateBookingCheckOut( date ) ) {
+            					classes.push( 'mphb-date-check-out' );
+            				}
+            				break;
+            			case MPHB.HotelDataManager.ROOM_STATUS_EARLIER_MIN_ADVANCE:
+            			case MPHB.HotelDataManager.ROOM_STATUS_LATER_MAX_ADVANCE:
+            				titles.push( MPHB._data.translations.notAvailable );
+            				if ( this.isDateBookingCheckOut( date ) ) {
+            					classes.push( 'mphb-booked-date' );
+            					classes.push( 'mphb-date-check-out' );
+            					classes.push( 'mphb-available-date' );
+            				}
+            				break;
+            		}
+
+                dateData.dateClass += (dateData.dateClass.length ? ' ' : '') + classes.join( ' ' );
+                dateData.title += (dateData.title.length ? ', ' : '') + titles.join( ', ' );
+
+                dateData = MPHB.HotelDataManager.myThis.fillDateCellData( dateData, date, type, dateForRules );
+
+                return dateData;
+        },
+        appendRulesToTitle: function( date, title ) {
+                var rulesTitles = [ ];
+
+                if ( !MPHB.HotelDataManager.myThis.dateRules.canStayIn( date ) ) {
+                        rulesTitles.push( MPHB._data.translations.notStayIn );
+                }
+                if ( !MPHB.HotelDataManager.myThis.dateRules.canCheckIn( date ) ) {
+                        rulesTitles.push( MPHB._data.translations.notCheckIn );
+                }
+                if ( !MPHB.HotelDataManager.myThis.dateRules.canCheckOut( date ) ) {
+                        rulesTitles.push( MPHB._data.translations.notCheckOut );
+                }
+
+                if ( rulesTitles.length ) {
+                        title += ' ' + MPHB._data.translations.rules + ' ' + rulesTitles.join( ', ' );
+                }
+
+                return title;
+        },
+        /**
+         *
+         * @param {Date} date
+         * @returns {Boolean}
+         */
+        isEarlierThanToday: function( date ) {
+                return MPHB.Utils.formatDateToCompare( date ) < MPHB.Utils.formatDateToCompare( MPHB.HotelDataManager.myThis.today );
+        },
+
+} );
+
+/**
+ * @requires ./basic-rule.js
+ */
+/**
+ * @class MPHB.Rules.MaxAdvanceDaysRule
+ */
+MPHB.Rules.BasicRule('MPHB.Rules.MaxAdvanceDaysRule', {}, {
+	/**
+	 * @var {number}
+	 */
+	max: null,
 	/**
 	 *
-	 * @param {int} count
-	 * @returns {undefined}
+	 * @param {{season_ids: number[], room_type_ids: number[], max_advance_reservation: number}} data
 	 */
-	setRoomsCount: function( count ) {
-		this.activeRoomsCount = count;
-	},
-	/**
-	 *
-	 * @param {Object} dates
-	 * @param {Object} dates.bookedDates
-	 * @param {Object} dates.havePriceDates
-	 * @returns {undefined}
-	 */
-	setDates: function( dates ) {
-		this.bookedDates = dates.hasOwnProperty( 'booked' ) ? dates.booked : {};
-		this.checkInDates = dates.hasOwnProperty( 'checkIns' ) ? dates.checkIns : {};
-		this.checkOutDates = dates.hasOwnProperty( 'checkOuts' ) ? dates.checkOuts : {};
-		this.blockedDates = dates.hasOwnProperty( 'blocked' ) ? dates.blocked : {};
-		this.havePriceDates = dates.hasOwnProperty( 'havePrice' ) ? dates.havePrice : {};
-	},
-	blockAllRoomsOnDate: function( dateFormatted ){
-		this.blockedDates[dateFormatted] = this.activeRoomsCount;
+	init: function(data) {
+		this._super(data);
+		this.max = data.max_advance_reservation != 0 ? data.max_advance_reservation : 3652; // 10 years
 	},
 	/**
 	 *
 	 * @param {Date} checkInDate
-	 * @param {Date} stopDate
-	 * @returns {Date|false} Nearest locked room date if exists or false otherwise.
+	 * @param {Date} checkOutDate
+	 * @return {boolean}
 	 */
-	getNearestLockedCheckOutDate: function( checkInDate, stopDate ) {
-		var nearestDate = stopDate;
-		var activeRoomsCount = this.activeRoomsCount;
+	verify: function(checkInDate, checkOutDate) {
+		var maxCheckInDate = $.datepick.add(MPHB.Utils.cloneDate(MPHB.HotelDataManager.myThis.today), this.max, 'd');
+		return MPHB.Utils.compareDates(checkInDate, maxCheckInDate, '<=');
+	}
 
-		var startDateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', checkInDate );
-		var stopDateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', stopDate );
+});
 
-		$.each( this.getLockedCheckoutDates(), function( dateFormatted, lockedRoomsCount ) {
-
-			if ( stopDateFormatted < dateFormatted ) {
-				return false; // break;
-			}
-
-			if ( startDateFormatted > dateFormatted ) {
-				return true; // continue
-			}
-
-			if ( lockedRoomsCount >= activeRoomsCount ) {
-				nearestDate = $.datepick.parseDate( 'yyyy-mm-dd', dateFormatted );
-				return false; // break
-			}
-
-		} );
-
-		return nearestDate;
+/**
+ * @requires ./basic-rule.js
+ */
+/**
+ * @class MPHB.Rules.MinAdvanceDaysRule
+ */
+MPHB.Rules.BasicRule('MPHB.Rules.MinAdvanceDaysRule', {}, {
+	/**
+	 * @var {number}
+	 */
+	min: null,
+	/**
+	 *
+	 * @param {{season_ids: number[], room_type_ids: number[], min_advance_reservation: number}} data
+	 */
+	init: function(data) {
+		this._super(data);
+		this.min = data.min_advance_reservation;
 	},
 	/**
 	 *
-	 * @returns {Object}
+	 * @param {Date} checkInDate
+	 * @param {Date} checkOutDate
+	 * @return {boolean}
 	 */
-	getLockedCheckoutDates: function() {
-		var dates = $.extend( {}, this.bookedDates );
-		$.each( this.blockedDates, function( dateFormatted, blockedRoomsCount ) {
-			if ( !dates.hasOwnProperty( dateFormatted ) ) {
-				dates[dateFormatted] = blockedRoomsCount;
-			} else {
-				dates[dateFormatted] += blockedRoomsCount;
-			}
-		} );
-		return dates;
-	},
-	/**
-	 *
-	 * @param {Date} dateFrom
-	 * @param {Date} stopDate
-	 * @returns {Date}
-	 */
-	getNearestHaveNotPriceDate: function( dateFrom, stopDate ) {
-		var nearestDate = MPHB.Utils.cloneDate( stopDate );
-		var expectedDate = MPHB.Utils.cloneDate( dateFrom );
+	verify: function(checkInDate, checkOutDate) {
+		var minCheckInDate = $.datepick.add(MPHB.Utils.cloneDate(MPHB.HotelDataManager.myThis.today), this.min, 'd');
+		return MPHB.Utils.compareDates(minCheckInDate, checkInDate, '<=');
+	}
+});
 
-		while ( MPHB.Utils.formatDateToCompare( expectedDate ) <= MPHB.Utils.formatDateToCompare( stopDate ) ) {
-			if ( !this.hasPriceForDate( expectedDate ) ) {
-				nearestDate = expectedDate;
-				break;
-			}
-			expectedDate = $.datepick.add( expectedDate, 1, 'd' );
-		}
-
-		return nearestDate;
-	},
-	/**
-	 *
-	 * @returns {Object}
-	 */
-	getHavePriceDates: function() {
-		var dates = {};
-		return $.extend( dates, this.havePriceDates );
-	},
-	/**
-	 *
-	 * @param {Date}
-	 * @returns {String}
-	 */
-	getDateStatus: function( date ) {
-		var status = MPHB.HotelDataManager.ROOM_STATUS_AVAILABLE;
-
-		if ( this.isEarlierThanToday( date ) ) {
-			status = MPHB.HotelDataManager.ROOM_STATUS_PAST;
-		} else if ( this.isDateBooked( date ) ) {
-			status = MPHB.HotelDataManager.ROOM_STATUS_BOOKED;
-		} else if ( !this.hasPriceForDate( date ) ) {
-			status = MPHB.HotelDataManager.ROOM_STATUS_NOT_AVAILABLE;
-		} else if ( !this.getAvailableRoomsCount( date ) ) {
-			status = MPHB.HotelDataManager.ROOM_STATUS_NOT_AVAILABLE;
-		}
-
-		return status;
-	},
-	canCheckIn: function( date ) {
-		var status = this.getDateStatus( date );
-		if ( status == MPHB.HotelDataManager.ROOM_STATUS_AVAILABLE ) {
-			return true;
-		} else {
-			return false;
-		}
-	},
-	/**
-	 *
-	 * @param {Date} date
-	 * @returns {Boolean}
-	 */
-	isDateBooked: function( date ) {
-		var dateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', date );
-		return this.bookedDates.hasOwnProperty( dateFormatted ) && this.bookedDates[dateFormatted] >= this.activeRoomsCount;
-	},
-	/**
-	 *
-	 * @param {Date} date
-	 * @returns {Boolean}
-	 */
-	isDateBookingCheckIn: function( date ) {
-		var dateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', date );
-		return this.checkInDates.hasOwnProperty( dateFormatted );
-	},
-	/**
-	 *
-	 * @param {Date} date
-	 * @returns {Boolean}
-	 */
-	isDateBookingCheckOut: function( date ) {
-		var dateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', date );
-
-		if ( !this.checkOutDates.hasOwnProperty( dateFormatted ) ) {
-			return false;
-		}
-
-		if ( this.bookedDates.hasOwnProperty( dateFormatted ) ) {
-			var usedCount = this.checkOutDates[dateFormatted] + this.bookedDates[dateFormatted];
-			return usedCount >= this.activeRoomsCount;
-		} else {
-			return this.checkOutDates[dateFormatted] >= this.activeRoomsCount;
-		}
-	},
-	/**
-	 *
-	 * @param {Date} date
-	 * @returns {Boolean}
-	 */
-	hasPriceForDate: function( date ) {
-		var dateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', date );
-		return MPHB.Utils.inArray( dateFormatted, this.havePriceDates );
-	},
-	/**
-	 *
-	 * @param {Date} date
-	 * @returns {int}
-	 */
-	getAvailableRoomsCount: function( date ) {
-		var dateFormatted = $.datepick.formatDate( 'yyyy-mm-dd', date );
-		var count = this.activeRoomsCount;
-
-		if ( this.bookedDates.hasOwnProperty( dateFormatted ) ) {
-			count -= this.bookedDates[dateFormatted];
-		}
-
-		if ( this.blockedDates.hasOwnProperty( dateFormatted ) ) {
-			count -= this.blockedDates[dateFormatted];
-		}
-
-		if ( count < 0 ) {
-			count = 0;
-		}
-
-		return count;
-	},
-	/**
-	 *
-	 * @param {Object} dateData
-	 * @param {Date} date
-	 * @param {string} [type=""] checkIn, checkOut or empty string
-	 * @param {Date} [dateForRules]
-	 * @returns {Object}
-	 */
-	fillDateData: function( dateData, date, type, dateForRules ) {
-		if (!dateForRules) {
-			dateForRules = date;
-		}
-		var status = this.getDateStatus( date );
-		var titles = [ ];
-		var classes = [ ];
-
-		switch ( status ) {
-			case MPHB.HotelDataManager.ROOM_STATUS_PAST:
-				classes.push( 'mphb-past-date' );
-				titles.push( MPHB._data.translations.past );
-				break;
-			case MPHB.HotelDataManager.ROOM_STATUS_AVAILABLE:
-				classes.push( 'mphb-available-date' );
-				titles.push( MPHB._data.translations.available + '(' + this.getAvailableRoomsCount( date ) + ')' );
-				if ( this.isDateBookingCheckOut( date ) ) {
-					classes.push( 'mphb-date-check-out' );
-				}
-				break;
-			case MPHB.HotelDataManager.ROOM_STATUS_NOT_AVAILABLE:
-				classes.push( 'mphb-not-available-date' );
-				titles.push( MPHB._data.translations.notAvailable );
-				break;
-			case MPHB.HotelDataManager.ROOM_STATUS_BOOKED:
-				classes.push( 'mphb-booked-date' );
-				titles.push( MPHB._data.translations.booked );
-				if ( this.isDateBookingCheckIn( date ) ) {
-					classes.push( 'mphb-date-check-in' );
-				}
-				if ( this.isDateBookingCheckOut( date ) ) {
-					classes.push( 'mphb-date-check-out' );
-				}
-				break;
-		}
-
-		dateData.dateClass += (dateData.dateClass.length ? ' ' : '') + classes.join( ' ' );
-		dateData.title += (dateData.title.length ? ', ' : '') + titles.join( ', ' );
-
-		dateData = MPHB.HotelDataManager.myThis.fillDateCellData( dateData, date, type, dateForRules );
-
-		return dateData;
-	},
-	appendRulesToTitle: function( date, title ) {
-		var rulesTitles = [ ];
-
-		if ( !MPHB.HotelDataManager.myThis.dateRules.canStayIn( date ) ) {
-			rulesTitles.push( MPHB._data.translations.notStayIn );
-		}
-		if ( !MPHB.HotelDataManager.myThis.dateRules.canCheckIn( date ) ) {
-			rulesTitles.push( MPHB._data.translations.notCheckIn );
-		}
-		if ( !MPHB.HotelDataManager.myThis.dateRules.canCheckOut( date ) ) {
-			rulesTitles.push( MPHB._data.translations.notCheckOut );
-		}
-
-		if ( rulesTitles.length ) {
-			title += ' ' + MPHB._data.translations.rules + ' ' + rulesTitles.join( ', ' );
-		}
-
-		return title;
-	},
-	/**
-	 *
-	 * @param {Date} date
-	 * @returns {Boolean}
-	 */
-	isEarlierThanToday: function( date ) {
-		return MPHB.Utils.formatDateToCompare( date ) < MPHB.Utils.formatDateToCompare( MPHB.HotelDataManager.myThis.today );
-	},
-} );
 /**
  *
  * @requires ./../datepicker.js
@@ -3472,6 +3781,7 @@ MPHB.SearchCheckInDatepicker = MPHB.Datepicker.extend( {}, {
 	 */
 	getDatepickSettings: function() {
 		return {
+			minDate: MPHB.HotelDataManager.myThis.reservationRules.getMinCheckInDate(this.roomTypeId),
 			onSelect: this.proxy(function( dates ) {
 				this.form.updateCheckOutLimitations();
 			}),
@@ -3482,10 +3792,16 @@ MPHB.SearchCheckInDatepicker = MPHB.Datepicker.extend( {}, {
 					title: ''
 				};
 
+				var laterTnanMaxAdvance = this.getMaxAdvanceDate() !== null
+                    && MPHB.Utils.compareDates( date, this.getMaxAdvanceDate(), '>' );
+
+				var earlierThanMinAdvance = MPHB.Utils.compareDates( date, this.getMinDate(), '<' );
+
 				if ( current ) {
 
-					var canCheckIn = MPHB.HotelDataManager.myThis.reservationRules.isCheckInSatisfy( date, this.roomTypeId ) &&
-						MPHB.HotelDataManager.myThis.dateRules.canCheckIn( date );
+					var canCheckIn = !laterTnanMaxAdvance && !earlierThanMinAdvance
+                        && MPHB.HotelDataManager.myThis.reservationRules.isCheckInSatisfy( date, this.roomTypeId )
+                        && MPHB.HotelDataManager.myThis.dateRules.canCheckIn( date );
 
 					if ( canCheckIn ) {
 						dateData.selectable = true;
@@ -3509,6 +3825,7 @@ MPHB.SearchCheckInDatepicker = MPHB.Datepicker.extend( {}, {
 		};
 	}
 } );
+
 /**
  *
  * @requires ./../datepicker.js
@@ -3583,6 +3900,7 @@ MPHB.SearchCheckOutDatepicker = MPHB.Datepicker.extend( {}, {
 		};
 	}
 } );
+
 MPHB.SearchForm = can.Control.extend( {}, {
 	checkInDatepickerEl: null,
 	checkOutDatepickerEl: null,
@@ -3596,11 +3914,20 @@ MPHB.SearchForm = can.Control.extend( {}, {
 		this.checkInDatepicker = new MPHB.SearchCheckInDatepicker( this.checkInDatepickerEl, {'form': this} );
 		this.checkOutDatepicker = new MPHB.SearchCheckOutDatepicker( this.checkOutDatepickerEl, {'form': this} );
 
+		// Enable reservation rules on check-in date
+		this.updateCheckInLimitations();
+
 		// Enable reservation rules on check-out date
 		if ( this.checkInDatepicker.getDate() ) {
 			this.updateCheckOutLimitations();
 		}
 
+	},
+
+	updateCheckInLimitations: function() {
+		var limitations = this.retrieveCheckInLimitations();
+
+		this.checkInDatepicker.setOption( 'maxAdvanceDate', limitations.maxAdvanceDate );
 	},
 	/**
 	 *
@@ -3615,6 +3942,7 @@ MPHB.SearchForm = can.Control.extend( {}, {
 
 		this.checkOutDatepicker.setOption( 'minDate', limitations.minDate );
 		this.checkOutDatepicker.setOption( 'maxDate', limitations.maxDate );
+
 		this.checkOutDatepicker.setDate( setDate ? limitations.date : null );
 	},
 	retrieveCheckOutLimitations: function( checkInDate, checkOutDate ) {
@@ -3643,6 +3971,18 @@ MPHB.SearchForm = can.Control.extend( {}, {
 			date: recommendedDate
 		};
 	},
+
+ 	retrieveCheckInLimitations: function() {
+ 		var maxAdvanceDate = null;
+
+ 		maxAdvanceDate = MPHB.HotelDataManager.myThis.reservationRules.getMaxAdvanceDate(this.checkInDatepicker.roomTypeId);
+
+ 		return {
+ 			maxAdvanceDate: maxAdvanceDate
+ 		};
+
+ 	},
+
 	retrieveRecommendedCheckOutDate: function( checkInDate, minDate, maxDate ) {
 		var recommendedDate = null;
 		var expectedDate = MPHB.Utils.cloneDate( minDate );
@@ -3667,6 +4007,7 @@ MPHB.SearchForm = can.Control.extend( {}, {
 	}
 
 } );
+
 MPHB.RoomBookSection = can.Control.extend( {}, {
 	roomTypeId: null,
 	roomTitle: '',

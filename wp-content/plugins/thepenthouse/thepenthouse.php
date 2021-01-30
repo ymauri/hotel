@@ -98,3 +98,8 @@ function mphb_booking_filter_text($views)
   unset($views['all']);
   return $views;
 }
+
+add_filter( 'mphb_cb_checkout_room_details', 'mh_pd', 41,1 );
+function mh_pd($reservedRoom, $roomIndex, $roomType, $booking) {
+  var_dump($reservedRoom); die('asdasd');
+}

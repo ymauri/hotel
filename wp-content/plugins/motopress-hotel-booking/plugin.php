@@ -470,7 +470,10 @@ class HotelBookingPlugin {
 		$customRules = $this->settings->bookingRules()->getCustomRules();
 		$customRules = new MPHB\BookingRules\Custom\CustomRules( $customRules );
 
-		$this->rulesChecker = new MPHB\BookingRules\RulesChecker( $reservationRules, $customRules );
+        $bufferRules = $this->settings->bookingRules()->getBufferRules();
+        $bufferRules = MPHB\BookingRules\Buffer\BufferRulesList::create( $bufferRules );
+
+		$this->rulesChecker = new MPHB\BookingRules\RulesChecker( $reservationRules, $customRules, $bufferRules );
 	}
 
 	private function initWidgets(){

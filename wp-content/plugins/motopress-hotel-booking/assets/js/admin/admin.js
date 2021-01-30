@@ -24,11 +24,12 @@
 		var datepickers = this.filtersForm.find( '.mphb-datepick' );
 		datepickers.datepick( {
 			dateFormat: MPHBAdmin.Plugin.myThis.data.settings.dateFormat,
+			firstDay: MPHBAdmin.Plugin.myThis.data.settings.firstDay,
 			showSpeed: 0,
 			showOtherMonths: true,
 			monthsToShow: MPHBAdmin.Plugin.myThis.data.settings.numberOfMonthDatepicker,
 			pickerClass: MPHBAdmin.Plugin.myThis.data.settings.datepickerClass,
-            useMouseWheel: false
+      useMouseWheel: false
 		} );
 	},
 	'#mphb-bookings-calendar-filter-period change': function( el, e ) {
@@ -55,6 +56,7 @@
 	}
 
 } );
+
 MPHBAdmin.CalendarPopup = can.Control.extend(
     {},
     {
@@ -277,6 +279,7 @@ MPHBAdmin.ExportBookings = can.Control.extend(
 
             var settings = {
                 dateFormat: pluginSettings.dateFormat,
+                firstDay: pluginSettings.firstDay,
                 showSpeed: 0,
                 showOtherMonths: true,
                 monthsToShow: pluginSettings.numberOfMonthDatepicker,
@@ -1571,6 +1574,7 @@ MPHBAdmin.DatePickerCtrl = MPHBAdmin.Ctrl.extend( {
 		if ( !this.input.attr( 'readonly' ) ) {
 			this.input.datepick( {
 				dateFormat: MPHBAdmin.Plugin.myThis.data.settings.dateFormat,
+				firstDay: MPHBAdmin.Plugin.myThis.data.settings.firstDay,
 				altField: this.hiddenInput,
 				altFormat: MPHBAdmin.Plugin.myThis.data.settings.dateTransferFormat,
 				showSpeed: 0,
@@ -1609,6 +1613,7 @@ MPHBAdmin.DatePickerCtrl = MPHBAdmin.Ctrl.extend( {
 		}
 	}
 } );
+
 /**
  *
  * @requires ./ctrl.js

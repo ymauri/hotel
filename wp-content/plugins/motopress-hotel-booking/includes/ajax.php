@@ -1134,7 +1134,8 @@ class Ajax {
 			'availability'	 => 'free',
 			'from_date'		 => $checkIn,
 			'to_date'		 => $checkOut,
-			'room_type_id'	 => $typeId
+			'room_type_id'	 => $typeId,
+			'skip_buffer_rules'=> false
         ));
 		$availableRooms = MPHB()->getRoomPersistence()->searchRooms($searchArgs);
 		$unavailableRooms = MPHB()->getRulesChecker()->customRules()->getUnavailableRooms( $checkIn, $checkOut, $roomType->getOriginalId() );

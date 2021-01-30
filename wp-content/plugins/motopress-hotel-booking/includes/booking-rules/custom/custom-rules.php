@@ -2,9 +2,9 @@
 
 namespace MPHB\BookingRules\Custom;
 
-use \MPHB\BookingRules\RuleVerifiable;
+use MPHB\BookingRules\RuleVerifyInterface;
 
-class CustomRules implements RuleVerifiable {
+class CustomRules implements RuleVerifyInterface {
 
 	/**
 	 *

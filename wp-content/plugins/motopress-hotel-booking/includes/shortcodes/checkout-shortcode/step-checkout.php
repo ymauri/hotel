@@ -157,7 +157,16 @@ class StepCheckout extends Step {
 				continue;
 			}
 
-			if ( !MPHB()->getRoomPersistence()->isExistsRooms( $this->checkInDate, $this->checkOutDate, $roomsCount, $roomType->getOriginalId() ) ) {
+            $unavailableRooms = MPHB()->getRulesChecker()->customRules()->getUnavailableRooms( $this->checkInDate, $this->checkOutDate, $roomType->getOriginalId() );
+
+            $roomsExist = MPHB()->getRoomPersistence()->isExistsRooms( $this->checkInDate, $this->checkOutDate, array(
+                'count'             => $roomsCount,
+                'room_type_id'      => $roomType->getOriginalId(),
+                'exclude_rooms'     => $unavailableRooms,
+                'skip_buffer_rules' => false
+            ) );
+
+			if ( !$roomsExist ) {
 				$this->alreadyBooked = true;
 				break;
 			}

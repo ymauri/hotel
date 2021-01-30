@@ -2,10 +2,10 @@
 
 namespace MPHB\BookingRules\Reservation;
 
-
+use MPHB\BookingRules\AbstractRule;
 use MPHB\Utils\DateUtils;
 
-class MaxDaysRule extends Rule {
+class MaxDaysRule extends AbstractRule {
 
 	/**
 	 * @var int

@@ -38,6 +38,22 @@ class CalendarMenuPage extends AbstractMenuPage {
 
 	public function onLoad(){
 
+			if( ( !isset( $_REQUEST['mphb_bookings_calendar']['period'] ) ||
+			       empty( $_REQUEST['mphb_bookings_calendar']['period'] ) ) &&
+						 !isset( $_REQUEST['action_filter'] ) ) {
+
+					$redirectToCustomPeriod = add_query_arg(
+							array(
+									'page'=>'mphb_calendar',
+									'mphb_bookings_calendar' => array(
+											'period'=>'custom'
+									)
+							),
+							admin_url('admin.php') );
+
+					wp_safe_redirect($redirectToCustomPeriod);
+
+			}
 	}
 
 	protected function getMenuTitle(){

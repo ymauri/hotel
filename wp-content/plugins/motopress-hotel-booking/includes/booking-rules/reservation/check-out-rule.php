@@ -2,7 +2,9 @@
 
 namespace MPHB\BookingRules\Reservation;
 
-class CheckOutRule extends Rule {
+use MPHB\BookingRules\AbstractRule;
+
+class CheckOutRule extends AbstractRule {
 
 	/**
 	 * @var int[]
