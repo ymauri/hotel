@@ -30,14 +30,20 @@ class Guesty
         return ['result' => $a, 'status' => $status_code];
     }
 
+    
+    public function reservations($data)
+    {
+        return $this->conect('/reservations?'.http_build_query($data));
+    }
+
     public function createReservation($data)
     {
-        return $this->conect('/reservations', $data, 'POST');
+        // return $this->conect('/reservations', $data, 'POST');
     }
 
     public function updateReservation($id, $data)
     {
-        return $this->conect("/reservations/$id", $data, 'PUT');
+        // return $this->conect("/reservations/$id", $data, 'PUT');
     }
 
     public function getListingCalendar($idListing, $from, $to)
