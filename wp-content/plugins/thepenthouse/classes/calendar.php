@@ -6,54 +6,60 @@ class Calendar
     {
     }
 
-    public function syncCalendar(array $reservation, bool $isFromGuesty = true, bool $isFromPackage = false, int $roomId = null, int $parentBooking = 0)
+    public function syncCalendar(array $reservation, bool $isFromGuesty = true, bool $isFromPackage = false, int $roomId = null, int $parentBooking = 0, bool $syncOtherRooms = true)
     {
         global $wpdb;
         $bookingId = "";
         $status = $reservation['status'] == 'canceled' ? 'cancelled' : $reservation['status'];
-        if (!empty($reservation)) {
 
-            if (empty($roomId)) {
-                $room = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}postmeta where meta_key like 'guesty_id' and meta_value like '{$reservation['listingId']}'");
-                $roomId = $room->post_id;
+        if (empty($roomId)) {
+            $room = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}postmeta where meta_key like 'guesty_id' and meta_value like '{$reservation['listingId']}'");
+            $roomId = $room->post_id;
+        }
+
+        if (!empty($reservation['customFields']['bookingId'])) {
+            $bookingId = (int) $reservation['customFields']['bookingId'];
+        } else {
+            $calendar = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}postmeta where meta_key like 'mphb_reservation_id' and meta_value like '{$reservation['_id']}' ORDER BY ID DESC");
+            if (!empty($calendar->post_id)) {
+                $bookingId = $calendar->post_id;
             }
+        }
+        if (!empty($bookingId)) {
+            wp_update_post([
+                'ID' => $bookingId,
+                "post_status" => $status
+            ]);
+        } else if (!empty($roomId)) {
+            $bookingId = $this->createBookingPost($reservation, $isFromGuesty, $isFromPackage, $parentBooking);
 
-            if (!empty($reservation['customFields']['bookingId'])) {
-                $bookingId = (int) $reservation['customFields']['bookingId'];
-            } else {
-                $calendar = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}calendars where guesty_id like '{$reservation['_id']}' ORDER BY id DESC");
-                if (!empty($calendar->id)) {
-                    $bookingId = $calendar->booking_id;
-                }
-            }
-            if (!empty($bookingId)) {
-                wp_update_post([
-                    'ID' => $bookingId,
-                    "post_status" => $status
-                ]);
-            } else if (!empty($roomId)) {
-                $bookingId = $this->createBookingPost($reservation, $isFromGuesty, $isFromPackage, $parentBooking);
+            $bookedRoomId = wp_insert_post([
+                "post_type" => "mphb_reserved_room",
+                "post_status" => "publish",
+                "post_parent" => $bookingId,
+                "comment_status" => "closed",
+                "ping_status" => "closed",
+                "post_name" => 'Room'
+            ], false, false);
 
-                $bookedRoomId = wp_insert_post([
-                    "post_type" => "mphb_reserved_room",
-                    "post_status" => "publish",
-                    "post_parent" => $bookingId,
-                    "comment_status" => "closed",
-                    "ping_status" => "closed",
-                    "post_name" => 'Room'
-                ], false, false);
+            wp_update_post(["ID" => $bookedRoomId, "post_name" => $bookedRoomId]);
 
-                wp_update_post(["ID" => $bookedRoomId, "post_name" => $bookedRoomId]);
+            add_post_meta($bookedRoomId, '_mphb_room_id', $roomId);
+            add_post_meta($bookedRoomId, '_mphb_adults', $reservation["guestsCount"]);
+            add_post_meta($bookedRoomId, '_mphb_children', 0);
+            add_post_meta($bookedRoomId, '_mphb_guest_name', $isFromGuesty ? "Booked on Guesty" : $reservation["firstName"]);
+            add_post_meta($bookedRoomId, '_mphb_uid', $reservation["_id"] . "@thepenthouse-apartments.nl");
 
-                add_post_meta($bookedRoomId, '_mphb_room_id', $roomId);
-                add_post_meta($bookedRoomId, '_mphb_adults', $reservation["guestsCount"]);
-                add_post_meta($bookedRoomId, '_mphb_children', 0);
-                add_post_meta($bookedRoomId, '_mphb_guest_name', $isFromGuesty ? "Booked on Guesty" : $reservation["firstName"]);
-                add_post_meta($bookedRoomId, '_mphb_uid', $reservation["_id"] . "@thepenthouse-apartments.nl");
-            }
-            mail('ymauri@outlook.com', 'Sync Calendar', "Checkin: {$reservation['checkInDateLocalized']} \n Checkout: {$reservation['checkOutDateLocalized']} \n Listing: {$reservation['listingId']}");
+            $roomId = $bookingId;
         }
         $this->log($bookingId, $reservation["_id"]);
+
+        if ($syncOtherRooms) {
+            $this->syncOtherRooms($reservation['listingId'], $roomId, $reservation, ($parentBooking > 0 ? $parentBooking : $bookingId));
+        }
+
+        mail('ymauri@outlook.com', 'Sync Calendar', "Checkin: {$reservation['checkInDateLocalized']} \n Checkout: {$reservation['checkOutDateLocalized']} \n Listing: {$reservation['listingId']}");
+
         return $bookingId;
     }
 
@@ -181,4 +187,38 @@ class Calendar
         }
         return false;
     }
+
+    private function syncOtherRooms($listingId, $reservedRoom, $reservation, $bookingId)
+    {
+        $rooms = new WP_Query([
+            'post_type' => 'mphb_room',
+            'post_status' => 'published',
+            'meta_query' => [
+                [
+                    'key'     => 'guesty_id',
+                    'value'   => $listingId,
+                    'compare' => '=',
+                ]
+            ],
+        ]);
+
+        if ($rooms->have_posts()) {
+            while ($rooms->have_posts()) {
+                $rooms->the_post();
+                if (get_the_ID() != $reservedRoom) {
+                    $reservation['_id'] =  'package' . $bookingId;
+                    $reservation['guestsCount'] = 1;
+                    $reservation['status'] = in_array($reservation['status'],['canceled', 'cancelled']) ? 'cancelled' : 'pending';
+                    $reservation['firstName'] =  "Created Automatically";
+                    $reservation['lastName'] =   "Reference Booking #" . $bookingId;
+                    $reservation['email'] =  "this_is_not_@real.client.com";
+                    $reservation['phone'] =  "+3166666666";
+                    $reservation['details'] = "Created by The system. Reference Booking #" . $bookingId;
+                    $newBookingId = $this->syncCalendar($reservation, false, true, get_the_ID(), $bookingId, false);
+                    $this->log($newBookingId, $reservation['_id']);
+                }
+            }
+        }
+    }
+    
 }

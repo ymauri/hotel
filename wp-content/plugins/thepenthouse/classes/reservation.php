@@ -54,9 +54,9 @@ class Reservation
                     ];
 
                     if (empty($reservationId)) {
-                        // $response = $this->guesty->createReservation($data);
+                        $response = $this->guesty->createReservation($data);
                     } else {
-                        // $response = $this->guesty->updateReservation($reservationId, $data);
+                        $response = $this->guesty->updateReservation($reservationId, $data);
                     }
 
                     if (!empty($response['result']['_id'])) {
@@ -68,10 +68,8 @@ class Reservation
                         $this->log($response['result']['_id'], $this->booking->getId());
                     }
                 }
-                $this->syncOtherRooms($listingId, $item->getRoomId());
             }
         }
-        // wp_mail("ymauri@outlook.com", 'A booking has been created!', $this->notifier->renderBody(),  array('Content-Type: text/html; charset=UTF-8'));
     }
 
     public function isFreeCalendarDays(string $listingId, string $checkin, string $checkout, string $reservationId = null)
@@ -107,47 +105,6 @@ class Reservation
             'guesty_id' => $reservationId
         ];
         $wpdb->insert($wpdb->prefix . 'reservations', $row, ['%s', '%s']);
-    }
-
-    private function syncOtherRooms($listingId, $reservedRoom)
-    {
-        global $wpdb;
-        $rooms = new WP_Query([
-            'post_type' => 'mphb_room',
-            'post_status' => 'published',
-            'meta_query' => [
-                [
-                    'key'     => 'guesty_id',
-                    'value'   => $listingId,
-                    'compare' => '=',
-                ]
-            ],
-        ]);
-
-        if ($rooms->have_posts()) {
-            while ($rooms->have_posts()) {
-                $rooms->the_post();
-                if (get_the_ID() != $reservedRoom) {
-                    $reservation = [
-                        "_id"                   => 'package' . $this->booking->getId(),
-                        "status"                => $this->booking->getStatus() == 'cancelled' ? 'cancelled' : 'pending',
-                        "listingId"             => $listingId,
-                        "guestsCount"           => 1,
-                        "checkInDateLocalized"  => $this->booking->getCheckInDate()->format('Y-m-d'),
-                        "checkOutDateLocalized" => $this->booking->getCheckOutDate()->format('Y-m-d'),
-                        "firstName" => "Created Automatically",
-                        "lastName" =>  "Reference Booking #" . $this->booking->getId(),
-                        "email" => "this_is_not_@real.client.com",
-                        "phone" => "+3166666666",
-                        "details" => "Created by The system. Reference Booking #" . $this->booking->getId(),
-                    ];
-
-                    $bookingId = $this->calendar->syncCalendar($reservation, false, true, get_the_ID(), $this->booking->getId());
-                    $this->notifier->addRelatedBooking($bookingId);
-                    $this->calendar->log($bookingId, $reservation['_id']);
-                }
-            }
-        }
     }
 
     public function delete(int $bookingId)
