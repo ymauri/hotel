@@ -54,6 +54,7 @@ include(plugin_dir_path(__FILE__) . 'scripts/sync_reservations.php');
 include(plugin_dir_path(__FILE__) . 'scripts/accommodation_custom_field_guesty_id.php');
 include(plugin_dir_path(__FILE__) . 'scripts/sync_calendar.php');
 include(plugin_dir_path(__FILE__) . 'scripts/scripts_hotelchamp.php');
+include(plugin_dir_path(__FILE__) . 'scripts/scripts_ga.php');
 include(plugin_dir_path(__FILE__) . 'scripts/scripts_hotelbooking.php');
 
 add_action('admin_enqueue_scripts', "register_css_and_js");
@@ -99,7 +100,4 @@ function mphb_booking_filter_text($views)
   return $views;
 }
 
-add_filter( 'mphb_cb_checkout_room_details', 'mh_pd', 41,1 );
-function mh_pd($reservedRoom, $roomIndex, $roomType, $booking) {
-  var_dump($reservedRoom); die('asdasd');
-}
+
