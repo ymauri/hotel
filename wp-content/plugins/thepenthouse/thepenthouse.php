@@ -54,7 +54,6 @@ include(plugin_dir_path(__FILE__) . 'scripts/sync_reservations.php');
 include(plugin_dir_path(__FILE__) . 'scripts/accommodation_custom_field_guesty_id.php');
 include(plugin_dir_path(__FILE__) . 'scripts/sync_calendar.php');
 include(plugin_dir_path(__FILE__) . 'scripts/scripts_hotelchamp.php');
-include(plugin_dir_path(__FILE__) . 'scripts/scripts_ga.php');
 include(plugin_dir_path(__FILE__) . 'scripts/scripts_hotelbooking.php');
 include(plugin_dir_path(__FILE__) . 'scripts/config_page.php');
 
