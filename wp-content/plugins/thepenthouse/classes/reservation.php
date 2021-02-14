@@ -31,28 +31,28 @@ class Reservation
                 $checkin = $this->booking->getCheckInDate()->format('Y-m-d');
                 $checkout = $this->booking->getCheckOutDate()->format('Y-m-d');
                 $isFromGuesty = get_post_meta($this->booking->getId(), 'mphb_is_from_guesty', true);
-                $isFromPackage = get_post_meta($this->booking->getId(), 'mphb_is_from_package', true);
-                if (/*$this->isFreeCalendarDays($listingId, $checkin, $checkout, $reservationId) &&*/empty($isFromGuesty) && empty($isFromPackage)) {
-                    $data = [
-                        "listingId" => $listingId,
-                        "checkInDateLocalized" => $checkin,
-                        "checkOutDateLocalized" => $checkout,
-                        "status" =>  $status,
-                        "money" => [
-                            "fareAccommodation" => 1,
-                            "currency" => "EUR"
-                        ],
-                        "guest" => [
-                            "firstName" => $this->booking->getCustomer()->getFirstName(),
-                            "lastName" => $this->booking->getCustomer()->getLastName(),
-                            "email" => $this->booking->getCustomer()->getEmail(),
-                            "phone" => $this->booking->getCustomer()->getPhone(),
-                        ],
-                        "customFields" => [
-                            "bookingId" => $this->booking->getId()
-                        ]
-                    ];
 
+                $data = [
+                    "listingId" => $listingId,
+                    "checkInDateLocalized" => $checkin,
+                    "checkOutDateLocalized" => $checkout,
+                    "status" =>  $status,
+                    "money" => [
+                        "fareAccommodation" => 1,
+                        "currency" => "EUR"
+                    ],
+                    "guest" => [
+                        "firstName" => $this->booking->getCustomer()->getFirstName(),
+                        "lastName" => $this->booking->getCustomer()->getLastName(),
+                        "email" => $this->booking->getCustomer()->getEmail(),
+                        "phone" => $this->booking->getCustomer()->getPhone(),
+                    ],
+                    "customFields" => [
+                        "bookingId" => $this->booking->getId()
+                    ]
+                ];
+
+                if (empty($isFromGuesty)) {
                     if (empty($reservationId)) {
                         $response = $this->guesty->createReservation($data);
                     } else {
@@ -66,8 +66,15 @@ class Reservation
                             update_post_meta($this->booking->getId(), 'mphb_reservation_id', $response['result']['_id']);
                         }
                         $this->log($response['result']['_id'], $this->booking->getId());
-                    }
+                    }                    
                 }
+
+                if ($status == 'canceled') {
+                    $this->calendar->deleteBlockedRoom($listingId, $checkin, $checkout);
+                } else {
+                    $data['_id'] = get_post_meta($this->booking->getId(), 'mphb_reservation_id') ?? "";
+                    $this->calendar->syncOtherRooms($listingId, $item->getRoomId(), $data);
+                }    
             }
         }
     }
@@ -114,8 +121,15 @@ class Reservation
             'post_parent'    => $bookingId
         ]);
 
+        $checkin = get_post_meta( $bookingId, 'mphb_check_in_date', true );
+        $checkout = get_post_meta( $bookingId, 'mphb_check_out_date', true );
+
         if (is_array($children) && count($children) > 0) {
             foreach ($children as $child) {
+                $roomId = get_post_meta( $child->ID, '_mphb_room_id', true);
+                if (!empty($roomId)) {
+                    $this->calendar->deleteBlockedRoom($roomId, $checkin, $checkout);
+                }
                 wp_delete_post($child->ID, true);
             }
         }
