@@ -45,7 +45,7 @@ class BackgroundBookingUpgrader_2_3_0 extends \MPHB\BackgroundPausableProcess {
 
 		$customRules = MPHB()->settings()->bookingRules()->getCustomRules();
 		$customRules[] = $customRule;
-		update_option( 'mphb_booking_rules_custom', $customRules, 'no' );
+		// update_option( 'mphb_booking_rules_custom', $customRules, 'no' );
 
 		return false;
 	}
