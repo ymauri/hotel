@@ -16,6 +16,7 @@ include(plugin_dir_path(__FILE__) . 'classes/guesty.php');
 include(plugin_dir_path(__FILE__) . 'classes/reservation-notifier.php');
 include(plugin_dir_path(__FILE__) . 'classes/reservation.php');
 include(plugin_dir_path(__FILE__) . 'classes/calendar.php');
+include(plugin_dir_path(__FILE__) . 'classes/configs.php');
 
 // Create database structure
 register_activation_hook(__FILE__, 'datatbase_structure');
@@ -61,7 +62,11 @@ include(plugin_dir_path(__FILE__) . 'scripts/delete_old_blocked_deactivate.php')
 add_action('admin_enqueue_scripts', "register_css_and_js");
 function register_css_and_js()
 {
-  wp_enqueue_style('tph', plugins_url('assets/css/styles.css', __FILE__));
+  wp_enqueue_style('thepenthouse', plugins_url('/assets/css/styles.css', __FILE__));
+  wp_enqueue_style('thepenthouse', "https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css");
+
+  wp_enqueue_script('thepenthouse', "https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js");
+  // wp_enqueue_script('thepenthouse', plugins_url('/thepenthouse/assets/js/scripts.js', __FILE__, false, true));
 }
 
 add_filter('wp_mail_content_type', 'set_email_format');

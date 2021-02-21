@@ -118,7 +118,7 @@ class Calendar
         if ($rooms->have_posts()) {
             while ($rooms->have_posts()) {
                 $rooms->the_post();
-                if (get_the_ID() != $reservedRoom) {
+                if (get_the_ID() != $reservedRoom || empty($reservedRoom)) {
                     $keyBlocked = $this->isBlocked(get_the_ID(), $reservation['checkInDateLocalized'], $reservation['checkOutDateLocalized']);
                     $this->addBlockedRoom(get_the_ID(), $reservation['checkInDateLocalized'], $reservation['checkOutDateLocalized'], "", (int) $keyBlocked);
                 }
@@ -200,4 +200,30 @@ class Calendar
         update_option('mphb_booking_rules_custom', $blockedRooms);
     }
     
+    public function update($listingCalendar) {
+        $first = array_key_first($listingCalendar);
+        $last = array_key_last($listingCalendar);
+        $data = [
+            "listingId" => $listingCalendar[$first]['listingId'],
+            "checkInDateLocalized" =>  $listingCalendar[$first]['date'],
+            "checkOutDateLocalized" => $listingCalendar[$last]['date'],
+            "status" =>  'confirmed',
+        ];
+        if ($listingCalendar[$first]['status'] != 'available') {
+            $this->syncOtherRooms($listingCalendar[$first]['listingId'], '', $data);
+        } else {
+            $this->deleteBlockedRoom($listingCalendar[$first]['listingId'], $listingCalendar[$first]['date'], $listingCalendar[$last]['date']);
+        }
+    }
+
+    public function deleteBlockedRoomById($room_id, $from, $to){
+        $blockedRooms = $this->getBlockedRooms();
+
+        $keyBlocked = $this->isBlocked($room_id, $from, $to);
+        if ($keyBlocked !== false) {
+            unset($blockedRooms[$keyBlocked]);
+            update_option('mphb_booking_rules_custom', $blockedRooms);
+        }
+
+    }
 }
