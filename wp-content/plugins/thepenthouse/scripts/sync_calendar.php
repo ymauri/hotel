@@ -1,9 +1,9 @@
 <?php
 
 add_action('rest_api_init', function () {
-    register_rest_route('tphapi', '/listing/', ['methods' => ['POST', 'PUT'], 'callback' => 'sync_calendar']);
-    register_rest_route('tphapi', '/calendar/', ['methods' => ['POST', 'PUT'], 'callback' => 'sync_calendar_object']);
-    register_rest_route('tphapi', '/webhook/', ['methods' => 'POST', 'callback' => 'create_webhook']);
+    register_rest_route('tphapi', '/listing/', ['methods' => 'POST', 'callback' => 'sync_calendar', 'permission_callback' => '__return_true']);
+    register_rest_route('tphapi', '/calendar/', ['methods' => 'POST', 'callback' => 'sync_calendar_object', 'permission_callback' => '__return_true']);
+    register_rest_route('tphapi', '/webhook/', ['methods' => 'POST', 'callback' => 'create_webhook', 'permission_callback' => '__return_true']);
 });
 
 function sync_calendar($request)
