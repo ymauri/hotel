@@ -47,8 +47,8 @@ class Calendar
             add_post_meta($bookedRoomId, '_mphb_room_id', $roomId);
             add_post_meta($bookedRoomId, '_mphb_adults', $reservation["guestsCount"]);
             add_post_meta($bookedRoomId, '_mphb_children', 0);
-            add_post_meta($bookedRoomId, '_mphb_guest_name', $isFromGuesty ? "Booked on Guesty" : $reservation["firstName"]);
-            add_post_meta($bookedRoomId, '_mphb_uid', $reservation["_id"] . "@thepenthouse-apartments.nl");
+            add_post_meta($bookedRoomId, '_mphb_guest_name', $reservation['guest']["firstName"]);
+            add_post_meta($bookedRoomId, '_mphb_uid', $reservation['guest']["_id"]);
 
             $roomId = $bookingId;
         }
@@ -77,10 +77,10 @@ class Calendar
         add_post_meta($bookingId, 'mphb_check_in_date', $reservation['checkInDateLocalized']);
         add_post_meta($bookingId, 'mphb_check_out_date', $reservation['checkOutDateLocalized']);
         add_post_meta($bookingId, 'mphb_note', $isFromGuesty ? "Booked on Guesty" : $reservation['details']);
-        add_post_meta($bookingId, 'mphb_email', $isFromGuesty ? ($reservation["guestId"] . "@thepenthouse-apartments.nl") : $reservation['email']);
-        add_post_meta($bookingId, 'mphb_first_name', $isFromGuesty ? "Booked on Guesty" : $reservation["firstName"]);
-        add_post_meta($bookingId, 'mphb_last_name', $isFromGuesty ?  "Booked on Guesty" : $reservation["lastName"]);
-        add_post_meta($bookingId, 'mphb_phone', $isFromGuesty ? "+31666666666" : $reservation["phone"]);
+        add_post_meta($bookingId, 'mphb_email', $reservation['guest']['email'] ?? 'without_email@thph.nl');
+        add_post_meta($bookingId, 'mphb_first_name', $reservation['guest']["firstName"]);
+        add_post_meta($bookingId, 'mphb_last_name', $reservation['guest']["lastName"]);
+        add_post_meta($bookingId, 'mphb_phone', $reservation['guest']["phone"] ?? '+31666666666');
         add_post_meta($bookingId, 'mphb_country', "NL");
         add_post_meta($bookingId, 'mphb_total_price', 0);
         add_post_meta($bookingId, 'mphb_language', "en");
@@ -207,7 +207,7 @@ class Calendar
             "listingId" => $listingCalendar[$first]['listingId'],
             "checkInDateLocalized" =>  $listingCalendar[$first]['date'],
             "checkOutDateLocalized" => $listingCalendar[$last]['date'],
-            "status" =>  'confirmed',
+            "status" =>  'confirmed'
         ];
         if ($listingCalendar[$first]['status'] != 'available') {
             $this->syncOtherRooms($listingCalendar[$first]['listingId'], '', $data);
