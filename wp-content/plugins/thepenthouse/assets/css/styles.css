@@ -18,3 +18,8 @@
     float: right;
     text-align: right;
 }
+
+.form-inline-fields {
+    display: inline;
+    width: 20%;
+}

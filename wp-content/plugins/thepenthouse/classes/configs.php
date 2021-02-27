@@ -2,6 +2,7 @@
 
 class Configs {
     public function datatable_content() {
+        $this->renderStaticVars();
         ?>
         <div class="container" style="width: 98%;">
             <h3>Blocked Rooms</h3>
@@ -26,68 +27,30 @@ class Configs {
                 </table>
             </form>
         </div>
+        <br><br>
         
-        <script>
-            jQuery(document).ready(function() {
-                let table;
-                jQuery('body').on('click','#search-btn', function (e) {
-                    e.preventDefault();
-                    table.ajax.reload( null, false );
-                });
-                table = jQuery('#blockedRooms').DataTable({
-                    "ajax": {
-                        "url":`${ajaxurl}?action=fill_datatable`,
-                        "beforeSend" : function(jqXHR, settings){
-                            settings.url += jQuery('#search-form').serialize();
-                        }
-                    },
-                    "processing": true,
-                    "serverSide": true,
-                    "searching": false,
-                    "columns": [{
-                            "data": "room_type_id",
-                            "orderable" : false,
-                        },
-                        {
-                            "data": "room_id",
-                            "orderable" : false,
-                        },
-                        {
-                            "data": "date_from",
-                            "orderable" : false,
-                        },
-                        {
-                            "data": "date_to",
-                            "orderable" : false,
-                        },                        
-                        {
-                            "orderable" : false,
-                            "render": function(data, type, row, meta) {
-                                return `<a href="#" class="btn delete-item" data-date_to="${row.date_to}" data-date_from="${row.date_from}" data-room_id="${row.room_id}">Delete</a>`;
-                            }
-                        }
-                    ],
-
-                });
-                    jQuery('body').on('click', '.delete-item', function(e){
-                        e.preventDefault();
-                        var data = {
-                            'action': 'delete_calendar',
-                            'room_id': jQuery(this).data('room_id'),
-                            'date_from': jQuery(this).data('date_from'),
-                            'date_to': jQuery(this).data('date_to')
-                        };
-
-                        jQuery.post(ajaxurl, data, function() {
-                            alert('Done');     
-                            table.ajax.reload( null, false );
-                        });
-                        return;
-                    });
-                });
-
-        </script>
-
+                    
+        <form name="add-form" id="add-form" autocomplete="off" method="POST">
+            <div class="form-inline-fields">
+                <label>Accommodation Type</label>
+                <?php echo $this->renderAccommodationTypes();?>
+            </div>
+            <div class="form-inline-fields" id="content-accomodations">
+                <label>Accommodation</label>
+                <?php echo $this->renderAccommodationByType();?>
+            </div>                
+            <div class="form-inline-fields">
+                <label>From</label>
+                <input class="datepicker" name="date_from" id="date_from">
+            </div>                
+            <div class="form-inline-fields">
+                <label>To</label>
+                <input class="datepicker" name="date_to" id="date_to">
+            </div>
+            <div class="form-inline-fields">
+                <button id='register-blocked-room'>Add new one</button>
+            </div>
+        </form>      
     <?php
     
     }
@@ -121,6 +84,96 @@ class Configs {
         ];
         echo json_encode($data);
         wp_die();
+    }
+
+    private function renderAccommodationTypes() {
+        $select = '<select name="room_type" id="room_type" style="width: 200px;"> <option></option>';
+
+        $at = new WP_Query([
+            'post_type' => 'mphb_room_type',
+            'post_status' => 'published'            
+        ]);
+        
+        if ($at->have_posts()) {
+            while ($at->have_posts()) {
+                $at->the_post();
+                $select .= ("<option value='".get_the_ID()."'>".get_the_title()."</option>");
+            }
+        }
+        wp_reset_query();
+        $select .= '</select>';
+        return $select;
+    }
+
+    private function renderAccommodationByType($id = null) {
+        if (!empty($id)) {
+            $select = '<select name="room_id" id="room_id" style="width: 200px;"><option></option>';
+
+            $rooms = new WP_Query([
+                'post_type' => 'mphb_room',
+                'post_status' => 'published',
+                'meta_query' => [
+                    [
+                        'key'     => 'mphb_room_type_id',
+                        'value'   => $id,
+                        'compare' => '=',
+                    ]
+                ],          
+            ]);
+            
+            if ($rooms->have_posts()) {
+                while ($rooms->have_posts()) {
+                    $rooms->the_post();
+                    $select .= ("<option value='".get_the_ID()."'>".get_the_title()."</option>");
+                }
+            }
+            wp_reset_query();
+            $select .= '</select>';
+        } else {
+            $select = '<select name="room" id="room" style="width: 200px;"></select>';
+        }
+        
+        return $select;
+    }
+
+    public function fill_rooms_select() {
+        echo $this->renderAccommodationByType($_GET['id']);
+        wp_die();
+    }
+
+    public function renderStaticVars() {
+        $at = new WP_Query([
+            'post_type' => 'mphb_room_type',
+            'post_status' => 'published'            
+        ]);
+        $roomsTypes = $rooms = [];
+        if ($at->have_posts()) {
+            while ($at->have_posts()) {
+                $at->the_post();
+                $roomsTypes[get_the_ID()] = get_the_title();
+            }
+        }
+        wp_reset_query();
+
+        $roomsQuery = new WP_Query([
+            'post_type' => 'mphb_room',
+            'post_status' => 'published'
+        ]);
+
+        if ($roomsQuery->have_posts()) {
+            while ($roomsQuery->have_posts()) {
+                $roomsQuery->the_post();
+                $rooms[get_the_ID()] = get_the_title();
+            }
+        }
+        wp_reset_query();
+
+        ?>
+        <script>
+            const roomTypes = <?php echo json_encode($roomsTypes)?>;
+            const rooms = <?php echo json_encode($rooms)?>;
+        </script>
+        <?php
     }
 
  }

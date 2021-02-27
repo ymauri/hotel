@@ -63,10 +63,12 @@ add_action('admin_enqueue_scripts', "register_css_and_js");
 function register_css_and_js()
 {
   wp_enqueue_style('thepenthouse', plugins_url('/assets/css/styles.css', __FILE__));
-  wp_enqueue_style('thepenthouse', "https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css");
+  wp_enqueue_script('thepenthouse', plugins_url('/assets/js/scripts.js', __FILE__, false, true));
+  wp_enqueue_style('thepenthouse-datatable', "//cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css");
+  wp_enqueue_script('thepenthouse-datatable', "//cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js");
+  wp_enqueue_style('thepenthouse-datepicker', "//cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.css");
+  wp_enqueue_script('thepenthouse-datepicker', "//cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.js");
 
-  wp_enqueue_script('thepenthouse', "https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js");
-  // wp_enqueue_script('thepenthouse', plugins_url('/thepenthouse/assets/js/scripts.js', __FILE__, false, true));
 }
 
 add_filter('wp_mail_content_type', 'set_email_format');

@@ -82,3 +82,27 @@ function fill_datatable() {
     $config->fill_datatable();
 }
     
+
+add_action( 'wp_ajax_fill_rooms_select', 'fill_rooms_select' );
+
+function fill_rooms_select() {
+    $config = new Configs();
+    $config->fill_rooms_select();
+}
+
+
+add_action( 'wp_ajax_register_blocked_room', 'register_blocked_room' );
+
+function register_blocked_room() {
+    try {
+        $calendar = new Calendar();
+        if (!empty($_POST['room_id']) && !empty($_POST['date_from']) && !empty($_POST['date_to'])) {
+            $keyBlocked = $calendar->isBlocked($_POST['room_id'], $_POST['date_from'], $_POST['date_to']);
+            $calendar->addBlockedRoom($_POST['room_id'], $_POST['date_from'], $_POST['date_to'], "", $keyBlocked);
+        }
+        echo 'ok';
+    } catch (Exception $e) {
+        echo $e->getMessage();
+    }
+    wp_die();
+}
