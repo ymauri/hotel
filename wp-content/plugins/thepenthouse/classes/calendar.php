@@ -17,14 +17,11 @@ class Calendar
             $roomId = $room->post_id;
         }
 
-        if (!empty($reservation['customFields']['bookingId'])) {
-            $bookingId = (int) $reservation['customFields']['bookingId'];
-        } else {
-            $calendar = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}postmeta where meta_key like 'mphb_reservation_id' and meta_value like '{$reservation['_id']}' ORDER BY post_id DESC");
-            if (!empty($calendar->post_id)) {
-                $bookingId = $calendar->post_id;
-            }
+        $bookingObj = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}postmeta where meta_key like 'mphb_reservation_id' and meta_value like '{$reservation['_id']}'");
+        if (!empty($bookingObj)) {
+            $bookingId = $bookingObj->post_id;
         }
+
         if (!empty($bookingId)) {
             wp_update_post([
                 'ID' => $bookingId,
@@ -56,6 +53,11 @@ class Calendar
 
         if ($syncOtherRooms) {
             $this->syncOtherRooms($reservation['listingId'], $roomId, $reservation);
+        }
+
+        if ($status == 'cancelled') {
+            $checkout =  date("Y-m-d",strtotime($reservation['checkoutDateLocalized']."- 1 days"));
+            $this->deleteBlockedRoom($reservation['listingId'], $reservation['checkInDateLocalized'], $checkout);
         }
 
         return $bookingId;
@@ -144,6 +146,9 @@ class Calendar
 
     public function addBlockedRoom(int $roomId, string $checkin, string $checkout, string $comment = "", int $key = 0) {
         $blockedRooms = $this->getBlockedRooms();
+        if (strtotime($checkout) > strtotime($checkin)) {
+            $checkout = date("Y-m-d",strtotime($checkout."- 1 days"));
+        }
         $roomTypeId = get_post_meta( $roomId, 'mphb_room_type_id', true);
         if (!empty($roomTypeId)) {            
             $dataToUpdate = [
@@ -151,7 +156,7 @@ class Calendar
                 'room_id' => (string) $roomId,
                 'date_from' => $checkin,
                 'date_to' => $checkout,
-                'restrictions' => ['check-in', 'check-out', 'stay-in'],
+                'restrictions' => ['stay-in'],
                 'comment' => $comment
             ];
             if (empty($key)) {
