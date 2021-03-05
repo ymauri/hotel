@@ -41,10 +41,10 @@ jQuery(document).ready(function() {
                 "orderable": false,
                 "render": function(data, type, row, meta) {
                     return ` <a href="#"
-                                class = "btn delete-item"
-                                data - date_to = "${row.date_to}"
-                                data - date_from = "${row.date_from}"
-                                data - room_id = "${row.room_id}"> Delete </a>`;
+                                class="btn delete-item"
+                                data-date_to="${row.date_to}"
+                                data-date_from="${row.date_from}"
+                                data-room_id="${row.room_id}"> Delete </a>`;
                 }
             }
         ],
