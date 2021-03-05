@@ -91,7 +91,7 @@ class Configs {
 
         $at = new WP_Query([
             'post_type' => 'mphb_room_type',
-            'post_status' => 'published'            
+            'posts_per_page'=>-1
         ]);
         
         if ($at->have_posts()) {
@@ -111,7 +111,7 @@ class Configs {
 
             $rooms = new WP_Query([
                 'post_type' => 'mphb_room',
-                'post_status' => 'published',
+                'posts_per_page'=>-1,
                 'meta_query' => [
                     [
                         'key'     => 'mphb_room_type_id',
@@ -144,7 +144,7 @@ class Configs {
     public function renderStaticVars() {
         $at = new WP_Query([
             'post_type' => 'mphb_room_type',
-            'post_status' => 'published'            
+            'posts_per_page'=>-1
         ]);
         $roomsTypes = $rooms = [];
         if ($at->have_posts()) {
@@ -157,7 +157,7 @@ class Configs {
 
         $roomsQuery = new WP_Query([
             'post_type' => 'mphb_room',
-            'post_status' => 'published'
+            'posts_per_page'=>-1
         ]);
 
         if ($roomsQuery->have_posts()) {
