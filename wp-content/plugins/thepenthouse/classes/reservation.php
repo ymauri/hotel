@@ -46,9 +46,6 @@ class Reservation
                         "lastName" => $this->booking->getCustomer()->getLastName(),
                         "email" => $this->booking->getCustomer()->getEmail(),
                         "phone" => $this->booking->getCustomer()->getPhone(),
-                    ],
-                    "customFields" => [
-                        "bookingId" => $this->booking->getId()
                     ]
                 ];
 
@@ -59,13 +56,13 @@ class Reservation
                         $response = $this->guesty->updateReservation($reservationId, $data);
                     }
 
-                    if (!empty($response['result']['_id'])) {
+                    if (!empty($response['result']['id'])) {
                         if (empty($reservationId)) {
-                            add_post_meta($this->booking->getId(), 'mphb_reservation_id', $response['result']['_id']);
+                            add_post_meta($this->booking->getId(), 'mphb_reservation_id', $response['result']['id']);
                         } else {
-                            update_post_meta($this->booking->getId(), 'mphb_reservation_id', $response['result']['_id']);
+                            update_post_meta($this->booking->getId(), 'mphb_reservation_id', $response['result']['id']);
                         }
-                        $this->log($response['result']['_id'], $this->booking->getId());
+                        $this->log($response['result']['id'], $this->booking->getId());
                     }                    
                 }
 
