@@ -6,9 +6,12 @@ function thp_settings()
     $thePentHouse = sanitize_key('The Penthouse Settings');
     add_menu_page('The Penthouse Settings', "TPH Settings", "manage_options", $thePentHouse, 'thp_settings_content', 'dashicons-admin-multisite', 80);
     add_submenu_page($thePentHouse, 'Booking Rules', 'Booking Rules', 'manage_options', sanitize_key("Booking Rules"), 'booking_rules');
+
     add_submenu_page($thePentHouse, 'Guesty Listings', 'Guesty Listings', 'manage_options', 'tph_listings_list', 'guesty_listing');
     add_submenu_page(null, 'Add Listing', 'Add Listing', 'manage_options', 'tph_listings_create', 'add_guesty_listing');
     add_submenu_page(null, 'Update Listing', 'Update Listing', 'manage_options', 'tph_listings_update', 'update_guesty_listing');
+
+    add_submenu_page($thePentHouse, 'Seasons & Rates', 'Seasons & Rates', 'manage_options', 'tph_seasons_rates', 'list_seasons_rates');
 }
 
 // Config page. Basic view
@@ -129,4 +132,17 @@ function add_guesty_listing() {
 function update_guesty_listing() {
     $listings = new Listings();
     $listings->update();
+}
+
+// Manage seasons and rates
+function list_seasons_rates() {
+    $seasonsRates = new SeasonsRates();
+    $seasonsRates->syncSeasonsView();
+    $roomTypes = $_POST['roomTypes'] ?? null;
+    $startDate = $_POST['startDate'] ?? null;
+    $endDate = $_POST['endDate'] ?? null;
+    $price = $_POST['price'] ?? null;
+    if (!empty($roomTypes) && !empty($startDate) && !empty($endDate) && !empty($price)) {
+        $seasonsRates->syncSeasons($roomTypes, $price, $startDate, $endDate);
+    }
 }

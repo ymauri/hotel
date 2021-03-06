@@ -1,5 +1,5 @@
 jQuery(document).ready(function() {
-    jQuery("#date_from, #date_to").datepicker({ format: 'YYYY-MM-DD' });
+    jQuery("#date_from, #date_to, #startDate, #endDate").datepicker({ format: 'YYYY-MM-DD' });
     let table;
     jQuery('body').on('click', '#search-btn', function(e) {
         e.preventDefault();

@@ -18,6 +18,7 @@ include(plugin_dir_path(__FILE__) . 'classes/reservation.php');
 include(plugin_dir_path(__FILE__) . 'classes/calendar.php');
 include(plugin_dir_path(__FILE__) . 'classes/configs.php');
 include(plugin_dir_path(__FILE__) . 'classes/listings.php');
+include(plugin_dir_path(__FILE__) . 'classes/seasons-rates.php');
 
 // Create database structure
 register_activation_hook(__FILE__, 'datatbase_structure');
