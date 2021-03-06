@@ -17,6 +17,7 @@ include(plugin_dir_path(__FILE__) . 'classes/reservation-notifier.php');
 include(plugin_dir_path(__FILE__) . 'classes/reservation.php');
 include(plugin_dir_path(__FILE__) . 'classes/calendar.php');
 include(plugin_dir_path(__FILE__) . 'classes/configs.php');
+include(plugin_dir_path(__FILE__) . 'classes/listings.php');
 
 // Create database structure
 register_activation_hook(__FILE__, 'datatbase_structure');
@@ -27,6 +28,7 @@ function datatbase_structure()
 
   $reservations = $wpdb->prefix . "reservations";
   $calendars = $wpdb->prefix . "calendars";
+  $listings = $wpdb->prefix . "listings";
   $charset_collate = $wpdb->get_charset_collate();
 
   $sql = "CREATE TABLE $reservations (
@@ -44,6 +46,13 @@ function datatbase_structure()
         guesty_id varchar(255) DEFAULT '' NOT NULL,
         created timestamp NOT NULL default CURRENT_TIMESTAMP,
         updated timestamp NOT NULL default CURRENT_TIMESTAMP,
+        UNIQUE KEY id (id)
+      ) $charset_collate;
+      
+      CREATE TABLE $listings (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        number mediumint(9) NOT NULL,
+        guesty_id varchar(255) DEFAULT '' NOT NULL,
         UNIQUE KEY id (id)
       ) $charset_collate;";
 
