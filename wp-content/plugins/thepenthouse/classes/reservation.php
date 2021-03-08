@@ -115,7 +115,8 @@ class Reservation
     {
         $children = get_posts([
             'post_type'      => 'mphb_booking',
-            'post_parent'    => $bookingId
+            'post_parent'    => $bookingId,
+            'posts_per_page' => -1 
         ]);
 
         $checkin = get_post_meta( $bookingId, 'mphb_check_in_date', true );

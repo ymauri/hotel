@@ -66,6 +66,7 @@ class SeasonsRates
         return;
     
     }
+
     private function searchSeason (string $startDate, string $endDate) {
         $seasons = new WP_Query([
             'post_type' => 'mphb_season',
@@ -97,8 +98,9 @@ class SeasonsRates
 
     private function searchRate (int $roomType) {
         $rates = get_posts([
-            'post_type' => 'mphb_rate',
-            'title' => 'roomType-'.$roomType,
+            'post_type'      => 'mphb_rate',
+            'title'          => 'roomType-'.$roomType,
+            'posts_per_page' => -1 
         ]);
         foreach ($rates as $rate) {
             return $rate->ID;
@@ -152,6 +154,38 @@ class SeasonsRates
         }
     }
 
-    public function reset(string $guestyId) {}
+    public function updatePrice(array $dataCalendar) {
+        $first = array_key_first($dataCalendar);
+        $listingId = $dataCalendar[$first]['listingId'];
+
+        $rooms = get_posts([
+            'post_type' => 'mphb_room',
+            'meta_key'      => 'guesty_id',
+            'posts_per_page'      => -1,
+            'meta_value'    => $listingId
+        ]);
+
+        $roomTypes = [];
+        foreach ($rooms as $room) {
+            $roomType =  get_post_meta( $room->ID, 'mphb_room_type_id', true );
+            $roomTypes[] = $roomType;
+        }
+
+        foreach ($dataCalendar as $calendar) { 
+            $this->syncSeasons($roomTypes, $calendar['price'], $calendar['date'], $calendar['date']);    
+        }
+    }
+
+    public function deleteOldSeasons() {
+        $date = date("Y-m-d",strtotime(date("Y-m-d")." - 1 days"));
+        $seasons = get_posts([
+            'post_type' => 'mphb_room',
+            "post_name" => 'season'.$date.'to'.$date,
+        ]);
+
+        foreach ($seasons as $season) {
+            wp_delete_post($season->ID, true);
+        }
+    }
 
 }
