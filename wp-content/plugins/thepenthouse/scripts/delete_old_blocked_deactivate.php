@@ -8,11 +8,13 @@ add_action('init', function() {
     register_deactivation_hook( __FILE__, 'delete_old_blocked_deactivate' );
  
     if (! wp_next_scheduled ( 'delete_old_blocked' )) {
-        wp_schedule_event( strtotime('11:02:00'), 'daily', 'delete_old_blocked' );
+        wp_schedule_event( strtotime('11:48:00'), 'daily', 'delete_old_blocked' );
     }
 });
  
 function delete_old_blocked_run() {
     $calendar  = new Calendar();
     $calendar->deletePast();
+    $seasons = new SeasonsRates();
+    $seasons->deleteOldSeasons();
 }
