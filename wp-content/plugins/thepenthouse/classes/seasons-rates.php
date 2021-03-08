@@ -172,7 +172,9 @@ class SeasonsRates
         }
 
         foreach ($dataCalendar as $calendar) { 
-            $this->syncSeasons($roomTypes, $calendar['price'], $calendar['date'], $calendar['date']);    
+            if ($calendar['status'] != "booked") {
+                $this->syncSeasons($roomTypes, $calendar['price'], $calendar['date'], $calendar['date']);    
+            }
         }
     }
 
