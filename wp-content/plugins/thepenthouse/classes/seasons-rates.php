@@ -168,7 +168,9 @@ class SeasonsRates
         $roomTypes = [];
         foreach ($rooms as $room) {
             $roomType =  get_post_meta( $room->ID, 'mphb_room_type_id', true );
-            $roomTypes[] = $roomType;
+            if (!empty(get_post_meta( $roomType, 'update_price', true ))) {
+                $roomTypes[] = $roomType;
+            }            
         }
 
         foreach ($dataCalendar as $calendar) { 
