@@ -2,7 +2,6 @@
 
 class Guesty
 {
-    //  private $base_url = "https://superhostuser.herokuapp.com/api/v2/";
     private $base_url = "https://api.guesty.com/api/v2/";
     private $user = "1557f8d8d289daced94570a67fd3c81a";
     private $pass = "e029cb29fecb6ef9d3bc315eff7ee26c";    
@@ -48,7 +47,7 @@ class Guesty
 
     public function getListingCalendar($idListing, $from, $to)
     {
-        return $this->conect('listings/' . $idListing . '/calendar/?from=' . $from . '&to=' . $to);
+        return $this->conect('availability-pricing/api/calendar/listings/' . $idListing .'?startDate=' . $from . '&endDate=' . $to);
     }
 
     public function createWebhook($data){
