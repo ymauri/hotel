@@ -22,7 +22,7 @@ function show_guesty_id_meta_box()
     // echo '<input type="hidden" name="guesty_id_nonce" value="'.wp_create_nonce( basename(__FILE__) ).'">';
 }
 
-function save_guesty_id_meta($post_id)
+function save_custom_posts_meta($post_id)
 {
     // verify nonce
     // if (!wp_verify_nonce($_POST['guesty_id_nonce'], basename(__FILE__))) {
@@ -49,6 +49,32 @@ function save_guesty_id_meta($post_id)
     } elseif ('' === $new && $old) {
         delete_post_meta($post_id, 'guesty_id', $old);
     }
+
+    $updatePrice = isset($_POST['update_price']);
+    update_post_meta($post_id, 'update_price', $updatePrice);
+
 }
 
-add_action('save_post', 'save_guesty_id_meta');
+add_action('save_post', 'save_custom_posts_meta');
+
+
+function add_update_price_checkbox()
+{
+    add_meta_box(
+        'update_price_meta_box', // $id
+        'Update the prices with Guesty values', // $title
+        'show_update_price_checkbox', // $callback
+        'mphb_room_type', // $screen
+        'normal', // $context
+        'high' // $priority
+    );
+}
+add_action('add_meta_boxes', 'add_update_price_checkbox');
+
+function show_update_price_checkbox()
+{
+    global $post;
+    $meta = get_post_meta($post->ID, 'update_price', true);
+    echo '<input type="checkbox" name="update_price" id="update_price" '. (!empty($meta) ? " checked " : "") . "> Yes";
+}
+
