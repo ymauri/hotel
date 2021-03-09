@@ -172,6 +172,18 @@ class SeasonsRates
             <input type='hidden' name="action" value='tph_seasons_rates_create' class='button'>
             <input type='submit' name="update" value='Update seasons' class='button'>
         </form>
+
+        <hr>
+        <form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
+            <h4>Get prices from guesty</h4>
+            <label>Listing</label>
+            <input class="datepicker" name="listingId" id="listingId" value="60414098eddcc400306ff648">
+            <label>Year</label>
+            <input class="datepicker" name="year" id="year" value="<?php echo date('Y'); ?>">
+
+            <input type='hidden' name="action" value='tph_seasons_rates_create' class='button'>
+            <input type='submit' name="update" value='Sync data' class='button'>
+        </form>
 <?php
     }
 
@@ -247,6 +259,30 @@ class SeasonsRates
 
         foreach ($seasons as $season) {
             wp_delete_post($season->ID, true);
+        }
+    }
+
+    /**
+     * Retrieve prices from guesty calendar
+     * @param string $listingId
+     * 
+     * @return void
+     */
+    public function retrievePrices(string $listingId, string $year)
+    {
+        $guesty = new Guesty();
+        if ($year >= date('Y')) {
+            $startDate = $year == date('Y') ? date("Y-m-d") : $year . "-01-01";
+            $endDate = date("Y-m-d", strtotime($startDate . " + 1 month"));
+            do {
+                $response = $guesty->getListingCalendar($listingId, $startDate, $endDate);
+                $calendars = !empty($response['result']['data']['days']) ? $response['result']['data']['days'] : [];
+                if (count($calendars)) {
+                    $this->updatePrice($calendars);
+                }
+                $startDate = $endDate;
+                $endDate = date("Y-m-d", strtotime($startDate . " + 1 month"));
+            } while (date("m",strtotime($endDate)) <= 12 && date("Y",strtotime($endDate)) == $year);
         }
     }
 }
