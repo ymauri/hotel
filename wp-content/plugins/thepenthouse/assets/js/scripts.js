@@ -1,4 +1,12 @@
 jQuery(document).ready(function() {
+    let checked = true;
+    jQuery('.check-all').click(function(e) {
+        checked = !checked;
+        e.preventDefault();
+        let inputsClass = jQuery(this).data('field');
+        jQuery('.' + inputsClass).prop('checked', checked);
+    });
+
     jQuery("#date_from, #date_to, #startDate, #endDate").datepicker({ format: 'YYYY-MM-DD' });
     let table;
     jQuery('body').on('click', '#search-btn', function(e) {

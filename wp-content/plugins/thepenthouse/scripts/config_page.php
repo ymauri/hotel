@@ -12,7 +12,7 @@ function thp_settings()
     add_submenu_page(null, 'Update Listing', 'Update Listing', 'manage_options', 'tph_listings_update', 'update_guesty_listing');
 
     add_submenu_page($thePentHouse, 'Seasons & Rates', 'Seasons & Rates', 'manage_options', 'tph_seasons_rates', 'list_seasons_rates');
-    add_submenu_page($thePentHouse, 'Seasons & Rates', 'Seasons & Rates', 'manage_options', 'tph_seasons_rates', 'retrieve_guesty_calendar');
+    add_submenu_page(null, 'Seasons & Rates', 'Seasons & Rates', 'manage_options', 'tph_seasons_rates', 'retrieve_guesty_calendar');
 }
 
 // Config page. Basic view
@@ -150,9 +150,12 @@ function list_seasons_rates() {
 
 function retrieve_guesty_calendar() {
     $year = $_POST['year'] ?? null;
-    $listingId = $_POST['listingId'] ?? null;
-    if (!empty($year) && !empty($listingId)) {
-        $seasonsRates = new SeasonsRates();
-        $seasonsRates->retrievePrices($listingId, $year);
+    $listingsId = $_POST['listingsId'] ?? null;
+    if (!empty($year) && !empty($listingsId)) {
+        foreach ($listingsId as $listingId) {            
+            $seasonsRates = new SeasonsRates();
+            $seasonsRates->retrievePrices($listingId, $year);
+            sleep(60);
+        }
     }
 }

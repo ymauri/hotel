@@ -151,11 +151,13 @@ class SeasonsRates
         ]);
 ?>
         <form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
-            <h4>Select the accommodation types</h4>
+            <h4>Use this section for generating the seasons and them prices</h4>
+            <label>Accommodations Types <a href="#" class="check-all" data-field="accommodations-types">Select/Unselect all</a></label>
+
             <ul>
                 <?php while ($roomTypes->have_posts()) {
                     $roomTypes->the_post(); ?>
-                    <li style="list-style: none;"><input type="checkbox" name="roomTypes[]" checked value="<?php echo get_the_ID(); ?>"><?php echo get_the_title(); ?></li>
+                    <li style="list-style: none;"><input class="accommodations-types" type="checkbox" name="roomTypes[]" checked value="<?php echo get_the_ID(); ?>"><?php echo get_the_title(); ?></li>
                 <?php } ?>
             </ul>
             <label>Select the initial date</label>
@@ -172,15 +174,27 @@ class SeasonsRates
             <input type='hidden' name="action" value='tph_seasons_rates_create' class='button'>
             <input type='submit' name="update" value='Update seasons' class='button'>
         </form>
-
+        </br>
+        </br>
         <hr>
-        <form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
-            <h4>Get prices from guesty</h4>
-            <label>Listing</label>
-            <input class="datepicker" name="listingId" id="listingId" value="60414098eddcc400306ff648">
-            <label>Year</label>
-            <input class="datepicker" name="year" id="year" value="<?php echo date('Y'); ?>">
+        <?php
+            global $wpdb;
+            $table_name = $wpdb->prefix . "listings";
 
+            $listings = $wpdb->get_results("SELECT id, number, guesty_id from $table_name");
+        ?>
+        <form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
+            <h4>Use this section for generating the seasons and them prices with Guesty calendar values</h4>
+            <label>Guesty Listings <a href="#" class="check-all" data-field="listing">Select/Unselect all</a></label>
+            <ul>
+                <?php foreach ($listings as $listing) {?>
+                    <li style="list-style: none; display:inline; margin-right: 10px;"><input class="listing" type="checkbox" name="listingsId[]" checked value="<?php echo $listing->guesty_id; ?>"><?php echo $listing->number; ?></li>
+                <?php } ?>
+            </ul>
+            <label>Year</label>
+            <input class="datepicker" name="year" id="year" maxlength="4" minlength="4" value="<?php echo date('Y'); ?>">
+            </br>
+            </br>
             <input type='hidden' name="action" value='tph_seasons_rates_create' class='button'>
             <input type='submit' name="update" value='Sync data' class='button'>
         </form>
