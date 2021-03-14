@@ -108,6 +108,7 @@ class Calendar
         $rooms = new WP_Query([
             'post_type' => 'mphb_room',
             'post_status' => 'published',
+            'posts_per_page' => -1,
             'meta_query' => [
                 [
                     'key'     => 'guesty_id',
@@ -182,6 +183,7 @@ class Calendar
         $rooms = new WP_Query([
             'post_type' => 'mphb_room',
             'post_status' => 'published',
+            'posts_per_page' => -1,
             'meta_query' => [
                 [
                     'key'     => 'guesty_id',

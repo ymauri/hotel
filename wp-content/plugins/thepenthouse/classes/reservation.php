@@ -4,13 +4,11 @@ class Reservation
 {
     private $booking;
     private $calendar;
-    private $notifier;
 
     public function __construct()
     {
         $this->guesty = new Guesty();
         $this->calendar = new Calendar();
-        $this->notifier = new ReservationNotifier();
     }
 
     public function setBooking($booking)
@@ -20,9 +18,7 @@ class Reservation
 
     public function put()
     {
-        global $wpdb;
         $status = $this->booking->getStatus() == "confirmed" ? "confirmed" : "canceled";
-        $this->notifier->setBooking($this->booking->getId());
         $reservationId = get_post_meta($this->booking->getId(), 'mphb_reservation_id', true);
         foreach ($this->booking->getReservedRooms() as $item) {
             $listingId = get_post_meta($item->getRoomId(), 'guesty_id', true);

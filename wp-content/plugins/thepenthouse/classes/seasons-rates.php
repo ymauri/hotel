@@ -95,6 +95,7 @@ class SeasonsRates
         $seasons = new WP_Query([
             'post_type' => 'mphb_season',
             'post_status' => 'publish',
+            'posts_per_page' => -1,
             'meta_query' => [
                 [
                     'key'     => 'mphb_start_date',
@@ -265,7 +266,7 @@ class SeasonsRates
      */
     public function deleteOldSeasons()
     {
-        $date = date("Y-m-d", strtotime(date("Y-m-d") . " - 1 days"));
+        $date = date("Y-m-d", strtotime(" -1 day"));
         $seasons = get_posts([
             'post_type' => 'mphb_season',
             "post_name" => 'season' . $date . 'to' . $date,
