@@ -62,12 +62,12 @@ class Reservation
                     }                    
                 }
 
-                if ($status == 'canceled') {
-                    $this->calendar->deleteBlockedRoom($listingId, $checkin, $checkout);
-                } else {
-                    $data['_id'] = get_post_meta($this->booking->getId(), 'mphb_reservation_id') ?? "";
-                    $this->calendar->syncOtherRooms($listingId, $item->getRoomId(), $data);
-                }    
+                // if ($status == 'canceled') {
+                //     $this->calendar->deleteBlockedRoom($listingId, $checkin, $checkout);
+                // } else {
+                //     $data['_id'] = get_post_meta($this->booking->getId(), 'mphb_reservation_id') ?? "";
+                //     $this->calendar->syncOtherRooms($listingId, $item->getRoomId(), $data);
+                // }    
             }
         }
     }
@@ -117,6 +117,7 @@ class Reservation
 
         $checkin = get_post_meta( $bookingId, 'mphb_check_in_date', true );
         $checkout = get_post_meta( $bookingId, 'mphb_check_out_date', true );
+        $checkout = date('Y-m-d', strtotime($checkout.' -1 day'));
 
         if (is_array($children) && count($children) > 0) {
             foreach ($children as $child) {

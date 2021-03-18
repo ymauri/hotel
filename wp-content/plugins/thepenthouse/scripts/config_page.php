@@ -106,8 +106,7 @@ function register_blocked_room()
     try {
         $calendar = new Calendar();
         if (!empty($_POST['room_id']) && !empty($_POST['date_from']) && !empty($_POST['date_to'])) {
-            $keyBlocked = $calendar->isBlocked($_POST['room_id'], $_POST['date_from'], $_POST['date_to']);
-            $calendar->addBlockedRoom($_POST['room_id'], $_POST['date_from'], $_POST['date_to'], "", $keyBlocked);
+            $calendar->addBlockedRoom($_POST['room_id'], $_POST['date_from'], $_POST['date_to'], "");
         }
         echo 'ok';
     } catch (Exception $e) {
