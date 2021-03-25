@@ -78,3 +78,26 @@ function show_update_price_checkbox()
     echo '<input type="checkbox" name="update_price" id="update_price" '. (!empty($meta) ? " checked " : "") . "> Yes";
 }
 
+function add_guesty_reservation_id_meta_box()
+{
+    add_meta_box(
+        'guesty_reservation_id_meta_box', // $id
+        'Guesty Id', // $title
+        'show_guesty_reservation_id_meta_box', // $callback
+        'mphb_booking', // $screen
+        'normal', // $context
+        'high' // $priority
+    );
+}
+add_action('add_meta_boxes', 'add_guesty_reservation_id_meta_box');
+
+function show_guesty_reservation_id_meta_box()
+{
+    global $post;
+    $meta = get_post_meta($post->ID, 'mphb_reservation_id', true);
+    if (!empty($meta)) {
+        echo '<p><a target="_blank" href="https://app.guesty.com/reservations/'.$meta.'/summary">Click here to see this reservation in Guesty</a></p>';
+    } else {
+        echo '<p>There is not Guesty ID register for this reservation</p>';
+    }
+}
