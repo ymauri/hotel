@@ -154,7 +154,7 @@ function retrieve_guesty_calendar() {
         foreach ($listingsId as $listingId) {            
             $seasonsRates = new SeasonsRates();
             $seasonsRates->retrievePrices($listingId, $year);
-            sleep(60);
+            sleep(30);
         }
     }
 }
