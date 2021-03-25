@@ -79,7 +79,7 @@ class Calendar
         add_post_meta($bookedRoomId, '_mphb_adults', $reservation["guestsCount"]);
         add_post_meta($bookedRoomId, '_mphb_children', 0);
         add_post_meta($bookedRoomId, '_mphb_guest_name', $reservation['guest']["firstName"]);
-        add_post_meta($bookedRoomId, '_mphb_uid', $reservation['guest']["_id"]);
+        add_post_meta($bookedRoomId, '_mphb_uid', $reservation['guestId'] ?? "");
     }
 
     /**
