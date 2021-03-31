@@ -111,11 +111,11 @@ function mphb_booking_table_filter($query)
 }
 
 //Delete option view all reservations
-add_filter("views_edit-mphb_booking", 'mphb_booking_filter_text');
-function mphb_booking_filter_text($views)
-{
-  unset($views['all']);
-  return $views;
-}
+// add_filter("views_edit-mphb_booking", 'mphb_booking_filter_text');
+// function mphb_booking_filter_text($views)
+// {
+//   unset($views['all']);
+//   return $views;
+// }
 
 
