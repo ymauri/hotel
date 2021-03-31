@@ -198,14 +198,15 @@ class Service {
 
 		if ( !$this->isFree() ) {
 			if ( $periodicity ) {
-				$price .= ' / ';
+				// $price .= ' / ';
 				if ( $this->isPayPerNight() ) {
-					$price .= __( 'Per Day', 'motopress-hotel-booking' );
-				} else if ($this->isFlexiblePay()) {
-                    $price .= __('Per Instance', 'motopress-hotel-booking');
-                } else {
-					$price .= __( 'Once', 'motopress-hotel-booking' );
-				}
+					$price .= ' / '. __( 'Per Day', 'motopress-hotel-booking' );
+				} 
+				// else if ($this->isFlexiblePay()) {
+                //     // $price .= __('', 'motopress-hotel-booking');
+                // } else {
+				// 	// $price .= ' / '. __( 'Once', 'motopress-hotel-booking' );
+				// }
 			}
 			if ( $repeatability ) {
 				$price .= ' / ';
