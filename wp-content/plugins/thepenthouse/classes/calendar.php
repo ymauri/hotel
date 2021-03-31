@@ -18,30 +18,49 @@ class Calendar
     public function syncCalendar(array $reservation, array $oldReservation = []) //, bool $isFromGuesty = true, bool $isFromPackage = false, int $roomId = null, int $parentBooking = 0, bool $syncOtherRooms = true)
     {
         global $wpdb;
-        $bookingId = "";
-        $status = ($reservation['status'] == 'canceled' ? 'cancelled' : $reservation['status']);
+        $bookingId = $roomId = "";
+        $status = $this->parseStatus($reservation['status']);
 
-        if (empty($roomId)) {
-            $room = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}postmeta where meta_key like 'guesty_id' and meta_value like '{$reservation['listingId']}'");
+        $room = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}postmeta where meta_key like 'guesty_id' and meta_value like '{$reservation['listingId']}' order by post_id asc");
+        if (!empty($room)) {
             $roomId = $room->post_id;
         }
 
-        $bookingObj = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}postmeta where meta_key like 'mphb_reservation_id' and meta_value like '{$reservation['_id']}' order by post_id desc");
-        if (!empty($bookingObj)) {
-            $bookingId = $bookingObj->post_id;
+        $booking = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}postmeta where meta_key like 'mphb_reservation_id' and meta_value like '{$reservation['_id']}' order by post_id desc");
+        if (!empty($booking)) {
+            $bookingStatus = get_post_status($booking->post_id);
+            $bookingId = !in_array($bookingStatus, ['cancelled', 'canceled']) ? $booking->post_id : "";
         }
 
-        if (!empty($bookingId) && !empty($roomId)) {
-            // Update reservation metadata
-            $this->updateBookingMetdata($reservation, $bookingId, $status, $roomId, $oldReservation);
-        } else if (!empty($roomId)) {
-            // Create new booking 
-            $bookingId = $this->createBookingPost($reservation);
-            // Create new reserved room
-            $this->createReservedRoomPost($bookingId, $roomId, $reservation);
+        if (!empty($roomId)) {
+            if (!empty($bookingId)) {
+                // Update reservation metadata
+                $this->updateBookingMetdata($reservation, $bookingId, $status, $roomId, $oldReservation);
+            } else {
+                // Create new booking 
+                $bookingId = $this->createBookingPost($reservation);
+                // Create new reserved room
+                $this->createReservedRoomPost($bookingId, $roomId, $reservation);
+                $this->populateChanges($reservation, $roomId, $status);
+            }
         }
 
         $this->log($bookingId, $reservation["_id"]);
+
+        return $bookingId;
+    }
+
+    /**
+     * Populate changes after create reservation
+     * 
+     * @param array $reservation
+     * @param int $roomId
+     * @param string $reservation
+     * 
+     * @return void
+     */
+    private function populateChanges(array $reservation, int $roomId, string $status)
+    {
         $checkout =  date("Y-m-d", strtotime($reservation['checkOutDateLocalized'] . " -1 day"));
 
         if ($status == 'cancelled') {
@@ -49,8 +68,6 @@ class Calendar
         } else {
             $this->syncOtherRooms($reservation['listingId'], $roomId, $reservation);
         }
-
-        return $bookingId;
     }
 
     /**
@@ -122,6 +139,19 @@ class Calendar
             $oldCheckout =  date("Y-m-d", strtotime($oldReservation['checkOutDateLocalized'] . " -1 day"));
             $this->deleteBlockedRoom($oldReservation['listingId'], $oldReservation['checkInDateLocalized'], $oldCheckout);
         }
+
+        //Delete any blocked room associated to the current reservation
+        //This is because Guesty generates many bloks before change on reservation from a listing to another.
+        $checkout = $reservation['checkOutDateLocalized'];
+        if (strtotime($reservation['checkOutDateLocalized']) > strtotime($reservation['checkInDateLocalized'])) {
+            $checkout =  date("Y-m-d", strtotime($reservation['checkOutDateLocalized'] . " -1 day"));
+        }
+        $currentBlockedKey = $this->isBlocked($roomId, $reservation['checkInDateLocalized'], $checkout);
+        if ($currentBlockedKey !== -1) {
+            $blockedRooms = $this->getBlockedRooms();
+            unset($blockedRooms[$currentBlockedKey]);
+            update_option('mphb_booking_rules_custom', $blockedRooms);
+        }
     }
 
     /**
@@ -135,7 +165,7 @@ class Calendar
     {
         $bookingId = wp_insert_post([
             "post_type" => "mphb_booking",
-            "post_status" => $reservation['status'] == 'canceled' ? 'cancelled' : $reservation['status'],
+            "post_status" =>  $this->parseStatus($reservation['status']),
             "comment_status" => "closed",
             "ping_status" => "closed",
             "post_name" => 'Booking'
@@ -250,30 +280,70 @@ class Calendar
      */
     public function addBlockedRoom(int $roomId, string $checkin, string $checkout, string $comment = "", $key = false)
     {
-        $blockedRooms = $this->getBlockedRooms();
-        if (strtotime($checkout) > strtotime($checkin)) {
-            $checkout = date("Y-m-d", strtotime($checkout . " -1 day"));
-        }
-        $roomTypeId = get_post_meta($roomId, 'mphb_room_type_id', true);
-        if (!empty($roomTypeId)) {
-            $dataToUpdate = [
-                'room_type_id' => $roomTypeId,
-                'room_id' => (string) $roomId,
-                'date_from' => $checkin,
-                'date_to' => $checkout,
-                'restrictions' => ['stay-in'],
-                'comment' => $comment
-            ];
-            if ($key === false) {
-                $key = $this->isBlocked($roomId, $checkin, $checkout);
+        if (strtotime($checkout) >= strtotime($checkin)) {
+            // Do not add new blocked room if there is any reservation for the same dates
+            //Search booking by dates
+            $bookings = get_posts([
+                'post_type'  => 'mphb_booking',
+                'post_status' => 'confirmed',
+                'meta_query' => [
+                    [
+                        'key'   => 'mphb_check_in_date',
+                        'value' => $checkin
+                    ],
+                    [
+                        'key'   => 'mphb_check_out_date',
+                        'value' => $checkout
+                    ]
+                ]
+            ]);
+
+            //Search rooms include into this bookings
+            foreach ($bookings as $booking) {
+                $rooms = get_posts([
+                    'post_type'  => 'mphb_reserved_room',
+                    'post_parent' => $booking->ID,
+                    'meta_query' => [
+                        [
+                            'key'   => '_mphb_room_id',
+                            'value' => $roomId
+                        ]
+                    ]
+                ]);
+                if (count($rooms)) {
+                    //If i found any room i cant add the blocked room             
+                    return false;
+                }
             }
-            if ($key < 0) {
-                $blockedRooms[] = $dataToUpdate;
-            } else {
-                $blockedRooms[$key] = $dataToUpdate;
+
+            $blockedRooms = $this->getBlockedRooms();
+            if (strtotime($checkout) > strtotime($checkin)) {
+                $checkout = date("Y-m-d", strtotime($checkout . " -1 day"));
             }
-            update_option('mphb_booking_rules_custom', $blockedRooms);
+
+            $roomTypeId = get_post_meta($roomId, 'mphb_room_type_id', true);
+            if (!empty($roomTypeId)) {
+                $dataToUpdate = [
+                    'room_type_id' => $roomTypeId,
+                    'room_id' => (string) $roomId,
+                    'date_from' => $checkin,
+                    'date_to' => $checkout,
+                    'restrictions' => ['stay-in'],
+                    'comment' => $comment
+                ];
+                if ($key === false) {
+                    $key = $this->isBlocked($roomId, $checkin, $checkout);
+                }
+                if ($key < 0) {
+                    $blockedRooms[] = $dataToUpdate;
+                } else {
+                    $blockedRooms[$key] = $dataToUpdate;
+                }
+                update_option('mphb_booking_rules_custom', $blockedRooms);
+                return true;
+            }
         }
+        return false;
     }
 
     /**
@@ -335,10 +405,12 @@ class Calendar
     {
         $first = array_key_first($listingCalendar);
         $last = array_key_last($listingCalendar);
+        //We must add a day to the last day of the calendar because it means one more night
+        $checkout = date('Y-m-d', strtotime($listingCalendar[$last]['date'] . " +1 day"));
         $data = [
             "listingId" => $listingCalendar[$first]['listingId'],
             "checkInDateLocalized" =>  $listingCalendar[$first]['date'],
-            "checkOutDateLocalized" => $listingCalendar[$last]['date'],
+            "checkOutDateLocalized" => $checkout,
             "status" =>  'confirmed'
         ];
         //Search bookedRoom before sync
@@ -355,7 +427,7 @@ class Calendar
             ]);
             $bookedRoomId = '';
             foreach ($bookings as $booking) {
-                $bookedRooms = get_post([
+                $bookedRooms = get_posts([
                     'post_type'  => 'mphb_reserved_room',
                     'post_parent' => $booking->ID,
                 ]);
@@ -391,5 +463,24 @@ class Calendar
             unset($blockedRooms[$keyBlocked]);
             update_option('mphb_booking_rules_custom', $blockedRooms);
         }
+    }
+
+     /**
+     * Get status well formated 
+     * 
+     * @param string $status
+     * @return string 
+     * 
+     */
+    public function parseStatus(string $status) : string {
+        if (in_array($status, ['cancelled', 'canceled', 'checked_out', 'inquiry', 'closed', 'awaiting_payment'])) {
+            return 'cancelled';
+        } 
+
+        if (in_array($status, ['reserved', 'confirmed', 'checked_in', 'booked'])) {
+            return 'confirmed';
+        }
+
+        return $status;
     }
 }
