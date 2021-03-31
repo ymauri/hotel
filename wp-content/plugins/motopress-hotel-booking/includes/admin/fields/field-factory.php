@@ -89,6 +89,9 @@ class FieldFactory {
 			case 'rules-list':
 				return new RulesListField( $name, $details, $value );
 				break;
+			case 'notes-list':
+				return new NotesListField( $name, $details, $value );
+				break;
 			case 'variable-pricing':
 				return new VariablePricingField( $name, $details, $value );
 				break;

@@ -86,8 +86,8 @@ class Booking {
 	private $iCalDescription = '';
 
 	/**
-     * 32-character UUID4 string.
-     *
+	 * 32-character UUID4 string.
+	 *
 	 * Used only on booking step of checkout shortcode. When user submits data
 	 * (and creates booking with "pending" status) and then clicks "Back" button
 	 * in browser, we can use this ID to find already created booking to merge
@@ -100,24 +100,24 @@ class Booking {
 	 */
 	private $checkoutId = '';
 
-    /**
-     * Identifies the source calendar of the imported booking. "Outdated" for
-     * all bookings imported before v3.4.0.
-     *
-     * @var string
-     *
-     * @see Task MB-906.
-     */
-    protected $syncId = '';
+	/**
+	 * Identifies the source calendar of the imported booking. "Outdated" for
+	 * all bookings imported before v3.4.0.
+	 *
+	 * @var string
+	 *
+	 * @see Task MB-906.
+	 */
+	protected $syncId = '';
 
-    /**
-     * In which queue we imported this booking.
-     *
-     * @var int
-     */
-    protected $syncQueueId = 0;
+	/**
+	 * In which queue we imported this booking.
+	 *
+	 * @var int
+	 */
+	protected $syncQueueId = 0;
 
-    protected $priceBreakdown = [];
+	protected $priceBreakdown = [];
 
 	/**
 	 *
@@ -125,6 +125,7 @@ class Booking {
 	 */
 	public function __construct( $atts ){
 		$this->setupParameters( $atts );
+
 	}
 
 	/**
@@ -144,6 +145,7 @@ class Booking {
 	 * @param string		 $atts['ical_description'] Optional.
 	 * @param string		 $atts['language']
 	 * @param string		 $atts['checkout_id'] Optional.
+	 * @param array 		 $atts['internal_notes'] Optional.
 	 *
 	 */
 	public static function create( $atts ){
@@ -167,6 +169,7 @@ class Booking {
 	 * @param string		 $atts['ical_description'] Optional.
 	 * @param string		 $atts['language']
 	 * @param string		 $atts['checkout_id'] Optional.
+	 * @param array 		 $atts['internal_notes'] Optional.
 	 *
 	 */
 	protected function setupParameters( $atts = array() ){
@@ -227,15 +230,19 @@ class Booking {
 			$this->checkoutId = $atts['checkout_id'];
 		}
 
-        // If booking has such meta value and meta value is not empty - then the
-        // booking is imported
-        if ( isset( $atts['sync_id'] ) ) {
-            $this->syncId = $atts['sync_id'];
-        }
+		// If booking has such meta value and meta value is not empty - then the
+		// booking is imported
+		if ( isset( $atts['sync_id'] ) ) {
+			$this->syncId = $atts['sync_id'];
+		}
 
         if ( !empty( $atts['sync_queue_id'] ) ) {
             $this->syncQueueId = intval( $atts['sync_queue_id'] );
         }
+
+		$atts['internal_notes'] = !empty( $atts['internal_notes'] ) ? $atts['internal_notes'] : array();
+
+		$this->internalNotes = $atts['internal_notes'];
 	}
 
 	/**
@@ -737,6 +744,13 @@ class Booking {
     {
         return $this->syncQueueId;
     }
+
+	/**
+     * @since 3.9.3
+     */
+	public function getInternalNotes() {
+		return $this->internalNotes;
+	}
 
     /**
      * @return bool

@@ -374,8 +374,6 @@ function mphb_the_flexslider_gallery( $ids, $atts, $flexsliderAtts = array() ){
 		$dataAtts .= " data-group='{$atts['group_id']}'";
 	}
 
-    add_filter('wp_lazy_loading_enabled', 'mphb_sliders_lazy_load_enabled');
-
 	$output = "<div id='$selector' class='gallery-columns-{$columns} gallery-size-{$sizeClass} {$atts['mphb_wrapper_class']}' {$dataAtts}>";
 
 	$i = 0;
@@ -383,6 +381,8 @@ function mphb_the_flexslider_gallery( $ids, $atts, $flexsliderAtts = array() ){
 	foreach ( $attachments as $id => $attachment ) {
 
 		$attr = ( trim( $attachment->post_excerpt ) ) ? array( 'aria-describedby' => "$selector-$id" ) : array();
+        $attr['loading'] = 'eager';
+
 		/**
 		 * Disable lazy loading for gallery images
 		 *
@@ -419,8 +419,6 @@ function mphb_the_flexslider_gallery( $ids, $atts, $flexsliderAtts = array() ){
 
 	$output .= "
 		</div>\n";
-
-    remove_filter('wp_lazy_loading_enabled', 'mphb_sliders_lazy_load_enabled');
 
 	echo $output;
 }

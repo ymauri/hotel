@@ -206,6 +206,8 @@ class BookingRepository extends AbstractPostRepository {
 
         $bookingAtts['sync_queue_id'] = get_post_meta( $postId, '_mphb_sync_queue_id', true );
 
+				$bookingAtts['internal_notes'] = get_post_meta(  $postId, '_mphb_booking_internal_notes', true );
+
 		return $bookingAtts;
 	}
 

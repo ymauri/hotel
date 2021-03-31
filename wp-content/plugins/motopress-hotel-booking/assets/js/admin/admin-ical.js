@@ -600,4 +600,4 @@ if ( uploadImportWrapper.length ) {
 
 	} );
 
-})( jQuery, MPHB_iCal );
+})( jQuery, MPHB_iCal );

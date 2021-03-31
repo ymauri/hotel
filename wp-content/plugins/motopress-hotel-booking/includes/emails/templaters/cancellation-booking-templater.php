@@ -35,7 +35,7 @@ class CancellationBookingTemplater extends AbstractTemplater {
 		switch ( $tag ) {
 			case 'user_cancel_link':
 				if ( isset( $this->booking ) ) {
-					$replaceText = MPHB()->userActions()->getBookingCancellationAction()->generateLink( $this->booking );
+					$replaceText = apply_filters( 'wpml_permalink', MPHB()->userActions()->getBookingCancellationAction()->generateLink( $this->booking ), apply_filters( 'wpml_current_language', NULL ) );
 				}
 				break;
 		}

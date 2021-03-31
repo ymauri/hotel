@@ -7,7 +7,7 @@ use \MPHB\Entities;
 class BookingsCalendar {
 
 	const ALL_ROOM_TYPES		 = '0';
-	const PERIOD_TYPE_MONTH	 = 'month';
+	const PERIOD_TYPE_MONTH	= 'month';
 	const PERIOD_TYPE_QUARTER	 = 'quarter';
 	const PERIOD_TYPE_YEAR	 = 'year';
 	const PERIOD_TYPE_CUSTOM	 = 'custom';
@@ -153,8 +153,7 @@ class BookingsCalendar {
 
 		$roomAtts = array(
 			'fields'		 => 'all',
-			'posts_per_page' => -1,
-			'orderby' => 'title'
+			'posts_per_page' => -1
 		);
 
 		if ( $this->isUseSearch ) {
@@ -225,22 +224,22 @@ class BookingsCalendar {
 					$data[$roomId] = array();
 				}
 
-                $bookingDetails['guest_name'] = $reservedRoom->getGuestName();
-                $bookingDetails['adults'] = $reservedRoom->getAdults();
-                $bookingDetails['children'] = $reservedRoom->getChildren();
-                $bookingDetails['ical'] = array();
+				$bookingDetails['guest_name'] = $reservedRoom->getGuestName();
+				$bookingDetails['adults'] = $reservedRoom->getAdults();
+				$bookingDetails['children'] = $reservedRoom->getChildren();
+				$bookingDetails['ical'] = array();
 
-                if ($booking->isImported()) {
-                    $bookingDetails['ical'] = array(
-                        'uid'         => $reservedRoom->getUid(),
-                        'summary'     => $booking->getICalSummary(),
-                        'description' => $booking->getICalDescription(),
-                        'prodid'      => $booking->getICalProdid()
-                    );
-                }
+				if ($booking->isImported()) {
+					$bookingDetails['ical'] = array(
+						'uid'         => $reservedRoom->getUid(),
+						'summary'     => $booking->getICalSummary(),
+						'description' => $booking->getICalDescription(),
+						'prodid'      => $booking->getICalProdid()
+					);
+				}
 
-                // Add check-in and middle dates
-                $checkInDateYmd = $booking->getCheckInDate()->format( 'Y-m-d' );
+				// Add check-in and middle dates
+				$checkInDateYmd = $booking->getCheckInDate()->format( 'Y-m-d' );
 
 				foreach ( $booking->getDates() as $ymdDate => $date ) {
 					if ( !isset( $data[$roomId][$ymdDate] ) ) {
@@ -253,13 +252,13 @@ class BookingsCalendar {
 						'booking_status'	 => $booking->getStatus(),
 						'booking_id'		 => $booking->getId(),
 						'booking_edit_link'	 => get_edit_post_link( $booking->getId() ),
-                        'booking_details'    => $bookingDetails
+						'booking_details'    => $bookingDetails
 					);
 
 					$data[$roomId][$ymdDate] = array_merge( $data[$roomId][$ymdDate], $roomDateDetails );
 				}
 
-                // Add day of check-out
+				// Add day of check-out
 				$checkOutDateYmd = $booking->getCheckOutDate()->format( 'Y-m-d' );
 
 				if ( !isset( $data[$roomId][$checkOutDateYmd] ) ) {
@@ -270,39 +269,39 @@ class BookingsCalendar {
 					'is_check_out'				 => true,
 					'check_out_booking_id'		 => $booking->getId(),
 					'check_out_booking_status'	 => $booking->getStatus(),
-                    'check_out_booking_details'  => $bookingDetails
+					'check_out_booking_details'  => $bookingDetails
 					)
 				);
 
-                // Add buffer days
-                $roomTypeId = intval( get_post_meta( $roomId, 'mphb_room_type_id', true ) );
-                $bufferDays = mphb_get_buffer_days( $booking->getCheckInDate(), $roomTypeId );
+					// Add buffer days
+					$roomTypeId = intval( get_post_meta( $roomId, 'mphb_room_type_id', true ) );
+					$bufferDays = mphb_get_buffer_days( $booking->getCheckInDate(), $roomTypeId );
 
-                if ( $bufferDays > 0 ) {
-                    $bufferDates = array_keys( mphb_modify_booking_buffer_period( $booking, $bufferDays, true ) );
+				if ( $bufferDays > 0 ) {
+					$bufferDates = array_keys( mphb_modify_booking_buffer_period( $booking, $bufferDays, true ) );
 
-                    $firstDateYmd = reset( $bufferDates );
-                    $lastDateYmd = end( $bufferDates );
+					$firstDateYmd = reset( $bufferDates );
+					$lastDateYmd = end( $bufferDates );
 
-                    foreach ( $bufferDates as $bufferDateYmd ) {
-                        if ( !isset( $data[$roomId][$bufferDateYmd] ) ) {
-                            $data[$roomId][$bufferDateYmd] = array(
-                                'is_buffer_first'  => false,
-                                'is_buffer_second' => false
-                            );
-                        }
+					foreach ( $bufferDates as $bufferDateYmd ) {
+						if ( !isset( $data[$roomId][$bufferDateYmd] ) ) {
+							$data[$roomId][$bufferDateYmd] = array(
+								'is_buffer_first'  => false,
+								'is_buffer_second' => false
+							);
+						}
 
-                        $data[$roomId][$bufferDateYmd]['is_buffer'] = true;
+						$data[$roomId][$bufferDateYmd]['is_buffer'] = true;
 
-                        if ( $bufferDateYmd != $firstDateYmd && $bufferDateYmd != $checkOutDateYmd ) {
-                            $data[$roomId][$bufferDateYmd]['is_buffer_first'] = true;
-                        }
+						if ( $bufferDateYmd != $firstDateYmd && $bufferDateYmd != $checkOutDateYmd ) {
+							$data[$roomId][$bufferDateYmd]['is_buffer_first'] = true;
+						}
 
-                        if ( $bufferDateYmd != $lastDateYmd && $bufferDateYmd != $checkInDateYmd ) {
-                            $data[$roomId][$bufferDateYmd]['is_buffer_second'] = true;
-                        }
-                    }
-                }
+						if ( $bufferDateYmd != $lastDateYmd && $bufferDateYmd != $checkInDateYmd ) {
+							$data[$roomId][$bufferDateYmd]['is_buffer_second'] = true;
+						}
+					}
+				}
 			}
 		}
 
@@ -363,9 +362,9 @@ class BookingsCalendar {
 			'is_check_out'     => false,
 			'is_check_in'      => false,
 			'is_blocked'       => false,
-            'is_buffer'        => false,
-            'is_buffer_first'  => false,
-            'is_buffer_second' => false
+			'is_buffer'        => false,
+			'is_buffer_first'  => false,
+			'is_buffer_second' => false
 		);
 
 		if ( isset( $this->data[$roomId] ) && isset( $this->data[$roomId][$dateFormatted] ) ) {
@@ -503,10 +502,10 @@ class BookingsCalendar {
 	public function render(){
 		MPHB()->getAdminScriptManager()->enqueue();
 
-        $period = $this->periodType;
-        if ($period == self::PERIOD_TYPE_CUSTOM) {
-            $period .= '-period';
-        }
+		$period = $this->periodType;
+		if ($period == self::PERIOD_TYPE_CUSTOM) {
+			$period .= '-period';
+		}
 
 		?>
 		<div class="mphb-bookings-calendar-wrapper">
@@ -517,21 +516,21 @@ class BookingsCalendar {
 					<?php $this->renderDatesTable(); ?>
 				</div>
 			</div>
-            <div id="mphb-bookings-calendar-popup" class="mphb-popup mphb-hide">
-                <div class="mphb-popup-backdrop"></div>
-                <div class="mphb-popup-body">
-                    <div class="mphb-header">
-                        <h2 class="mphb-title mphb-inline"><?php _e('Booking #%s', 'motopress-hotel-booking'); ?></h2>
-                        <span class="mphb-preloader mphb-hide"></span>
-                        <span class="mphb-status mphb-hide"><?php _ex('Confirmed', 'Booking status', 'motopress-hotel-booking'); ?></span>
-                        <button class="mphb-close-popup-button dashicons dashicons-no-alt"></button>
-                    </div>
-                    <div class="mphb-content"></div>
-                    <div class="mphb-footer">
-                        <a href="#" class="button button-primary mphb-edit-button"><?php _e('Edit', 'motopress-hotel-booking'); ?></a>
-                    </div>
-                </div>
-            </div>
+			<div id="mphb-bookings-calendar-popup" class="mphb-popup mphb-hide">
+				<div class="mphb-popup-backdrop"></div>
+				<div class="mphb-popup-body">
+					<div class="mphb-header">
+						<h2 class="mphb-title mphb-inline"><?php _e('Booking #%s', 'motopress-hotel-booking'); ?></h2>
+						<span class="mphb-preloader mphb-hide"></span>
+						<span class="mphb-status mphb-hide"><?php _ex('Confirmed', 'Booking status', 'motopress-hotel-booking'); ?></span>
+						<button class="mphb-close-popup-button dashicons dashicons-no-alt"></button>
+					</div>
+					<div class="mphb-content"></div>
+					<div class="mphb-footer">
+						<a href="#" class="button button-primary mphb-edit-button"><?php _e('Edit', 'motopress-hotel-booking'); ?></a>
+					</div>
+				</div>
+			</div>
 		</div>
 		<?php
 	}
@@ -775,9 +774,9 @@ class BookingsCalendar {
 					<br />
 					<?php echo _x( $date->format( 'M' ), $date->format('F') . ' abbreviation' ); ?>
 					<br />
-                    <small class="mphb-subscript"><?php echo $date->format( 'Y' ); ?></small>
+					<small class="mphb-subscript"><?php echo $date->format( 'Y' ); ?></small>
 					<br />
-                    <small class="mphb-subscript"><?php echo translate( $date->format( 'D' ) ); ?></small>
+					<small class="mphb-subscript"><?php echo translate( $date->format( 'D' ) ); ?></small>
 				</th>
 			<?php endforeach; ?>
 		</tr>
@@ -885,30 +884,30 @@ class BookingsCalendar {
 			$secondPartClass .= ' mphb-date-room-locked mphb-date-blocked';
 		}
 
-        // Mark buffer days
-        if ( !$dateDetails['is_blocked'] && $dateDetails['is_buffer'] ) {
-            // Don't replace check-out classes and don't mark as buffered the middle booking days
-            if ( $dateDetails['is_buffer_first'] && !$dateDetails['is_check_out'] && strpos( $firstPartClass, 'mphb-date-room-locked' ) === false ) {
-                $firstPartClass .= ' mphb-date-room-locked mphb-date-buffer';
-            }
+		// Mark buffer days
+		if ( !$dateDetails['is_blocked'] && $dateDetails['is_buffer'] ) {
+			// Don't replace check-out classes and don't mark as buffered the middle booking days
+			if ( $dateDetails['is_buffer_first'] && !$dateDetails['is_check_out'] && strpos( $firstPartClass, 'mphb-date-room-locked' ) === false ) {
+				$firstPartClass .= ' mphb-date-room-locked mphb-date-buffer';
+			}
 
-            // Don't replace check-in classes and don't mark as buffered the middle booking days
-            if ( $dateDetails['is_buffer_second'] && !$dateDetails['is_check_in'] && strpos( $secondPartClass, 'mphb-date-room-locked' ) === false ) {
-                $secondPartClass .= ' mphb-date-room-locked mphb-date-buffer';
-            }
-        }
+			// Don't replace check-in classes and don't mark as buffered the middle booking days
+			if ( $dateDetails['is_buffer_second'] && !$dateDetails['is_check_in'] && strpos( $secondPartClass, 'mphb-date-room-locked' ) === false ) {
+				$secondPartClass .= ' mphb-date-room-locked mphb-date-buffer';
+			}
+		}
 
-        // Mark as free
-        if ( !$dateDetails['is_locked'] && !$dateDetails['is_blocked'] ) {
-            if ( !$dateDetails['is_check_out'] && !$dateDetails['is_buffer_first'] ) {
-                $firstPartClass .= ' mphb-date-free';
-            }
-            if ( !$dateDetails['is_buffer_second'] ) {
-                $secondPartClass .= ' mphb-date-free';
-            }
-        }
+		// Mark as free
+		if ( !$dateDetails['is_locked'] && !$dateDetails['is_blocked'] ) {
+			if ( !$dateDetails['is_check_out'] && !$dateDetails['is_buffer_first'] ) {
+				$firstPartClass .= ' mphb-date-free';
+			}
+			if ( !$dateDetails['is_buffer_second'] ) {
+				$secondPartClass .= ' mphb-date-free';
+			}
+		}
 
-        // Generate titles
+		// Generate titles
 		$firstTitle = $this->generateCellTitle( $date, $dateDetails, 'first' );
 		$secondTitle = $this->generateCellTitle( $date, $dateDetails, 'second' );
 		?>
@@ -917,95 +916,96 @@ class BookingsCalendar {
 		<?php
 	}
 
-    /**
-     * @param \DateTime $date
-     * @param array $details
-     * @param string $part "first"|"second"
-     * @return string
-     */
-    private function generateCellTitle($date, $details, $part)
-    {
-        $titles = array();
+	/**
+	 * @param \DateTime $date
+	 * @param array $details
+	 * @param string $part "first"|"second"
+	 * @return string
+	 */
+	private function generateCellTitle($date, $details, $part)
+	{
+		$titles = array();
 
-        if ($details['is_check_out']) {
-            $titles[] = sprintf(__('Check-out #%d', 'motopress-hotel-booking'), (int)$details['check_out_booking_id']);
-        }
+		if ($details['is_check_out']) {
+			$titles[] = sprintf(__('Check-out #%d', 'motopress-hotel-booking'), (int)$details['check_out_booking_id']);
+		}
 
-        if ($details['is_check_in']) {
-            $titles[] = sprintf(__('Check-in #%d', 'motopress-hotel-booking'), (int)$details['booking_id']);
-        }
+		if ($details['is_check_in']) {
+			$titles[] = sprintf(__('Check-in #%d', 'motopress-hotel-booking'), (int)$details['booking_id']);
+		}
 
-        if ($details['is_locked'] && !($details['is_check_in'] || $details['is_check_out'])) {
-            $titles[] = sprintf(__('Booking #%d', 'motopress-hotel-booking'), (int)$details['booking_id']);
-        } else if ($details['is_blocked']) {
-            $titles[] = !empty($details['comments']) ? $details['comments'] : __('Blocked', 'motopress-hotel-booking');
-        } else if ($part == 'first' && $details['is_buffer_first']) {
-            if (!$details['is_check_out']) {
-                $titles[] = __('Buffer time.', 'motopress-hotel-booking');
-            }
-        } else if ($part == 'second' && $details['is_buffer_second']) {
-            if (!$details['is_check_in']) {
-                $titles[] = __('Buffer time.', 'motopress-hotel-booking');
-            }
-        } else if (!$details['is_locked'] && !$details['is_check_out']) { // is_check_out != is_locked
-            $titles[] = _x('Free', 'Availability', 'motopress-hotel-booking');
-        }
+		if ($details['is_locked'] && !($details['is_check_in'] || $details['is_check_out'])) {
+			$titles[] = sprintf(__('Booking #%d', 'motopress-hotel-booking'), (int)$details['booking_id']);
+		} else if ($details['is_blocked']) {
+			$titles[] = !empty($details['comments']) ? $details['comments'] : __('Blocked', 'motopress-hotel-booking');
+		} else if ($part == 'first' && $details['is_buffer_first']) {
+			if (!$details['is_check_out']) {
+				$titles[] = __('Buffer time.', 'motopress-hotel-booking');
+			}
+		} else if ($part == 'second' && $details['is_buffer_second']) {
+			if (!$details['is_check_in']) {
+				$titles[] = __('Buffer time.', 'motopress-hotel-booking');
+			}
+		} else if (!$details['is_locked'] && !$details['is_check_out']) { // is_check_out != is_locked
+			$titles[] = _x('Free', 'Availability', 'motopress-hotel-booking');
+		}
 
-        $dateString = $date->format('D j, M Y:');
-        $availabilityString = implode(', ', $titles);
-        $summary = $dateString . ' ' . $availabilityString;
+		$dateString = $date->format('D j, M Y:');
+		$availabilityString = implode(', ', $titles);
+		$summary = $dateString . ' ' . $availabilityString;
 
-        $bookingDetails = array();
-        if ($part == 'first' && $details['is_check_out']) {
-            $bookingDetails = $details['check_out_booking_details'];
-        } else if (isset($details['booking_details'])) {
-            // Don't show details on the first part of the cell with check-in
-            if ($part != 'first' || !$details['is_check_in']) {
-                $bookingDetails = $details['booking_details'];
-            }
-        }
+		$bookingDetails = array();
+		if ($part == 'first' && $details['is_check_out']) {
+			$bookingDetails = $details['check_out_booking_details'];
+		} else if (isset($details['booking_details'])) {
+			// Don't show details on the first part of the cell with check-in
+			if ($part != 'first' || !$details['is_check_in']) {
+				$bookingDetails = $details['booking_details'];
+			}
+		}
 
-        $ical = array();
-        if (isset($bookingDetails['ical'])) {
-            $ical = $bookingDetails['ical'];
-            unset($bookingDetails['ical']);
-        }
+		$ical = array();
+		if (isset($bookingDetails['ical'])) {
+			$ical = $bookingDetails['ical'];
+			unset($bookingDetails['ical']);
+		}
 
-        $info = array_merge(array('summury' => $summary), $bookingDetails);
-        $info = array_map('trim', $info);
-        $info = array_filter($info);
+		$info = array_merge(array('summury' => $summary), $bookingDetails);
 
-        if (isset($info['adults'])) {
-            $info['adults'] = sprintf(__('Adults: %s', 'motopress-hotel-booking'), $info['adults']);
-        }
+		$info = array_map('trim', $info);
+		$info = array_filter($info);
 
-        if (isset($info['children'])) {
-            $info['children'] = sprintf(__('Children: %s', 'motopress-hotel-booking'), $info['children']);
-        }
+		if (isset($info['adults'])) {
+			$info['adults'] = sprintf(__('Adults: %s', 'motopress-hotel-booking'), $info['adults']);
+		}
 
-        $title = implode('&#10;', $info);
+		if (isset($info['children'])) {
+			$info['children'] = sprintf(__('Children: %s', 'motopress-hotel-booking'), $info['children']);
+		}
 
-        if (!empty($ical)) {
-            if (!empty($ical['uid'])) {
-                $title .= '&#10;' . sprintf(__('Booking imported with UID %s.', 'motopress-hotel-booking'), $ical['uid']);
-            } else {
-                $title .= '&#10;' . __('Imported booking.', 'motopress-hotel-booking');
-            }
+		$title = implode('&#10;', $info);
 
-            if (!empty($ical['summary'])) {
-                $title .= '&#10;' . sprintf(__('Summary: %s.', 'motopress-hotel-booking'), $ical['summary']);
-            }
+		if (!empty($ical)) {
+			if (!empty($ical['uid'])) {
+				$title .= '&#10;' . sprintf(__('Booking imported with UID %s.', 'motopress-hotel-booking'), $ical['uid']);
+			} else {
+				$title .= '&#10;' . __('Imported booking.', 'motopress-hotel-booking');
+			}
 
-            if (!empty($ical['description'])) {
-                $title .= '&#10;' . sprintf(__('Description: %s.', 'motopress-hotel-booking'), $ical['description']);
-            }
+			if (!empty($ical['summary'])) {
+				$title .= '&#10;' . sprintf(__('Summary: %s.', 'motopress-hotel-booking'), $ical['summary']);
+			}
 
-            if (!empty($ical['prodid'])) {
-                $title .= '&#10;' . sprintf(__('Source: %s.', 'motopress-hotel-booking'), $ical['prodid']);
-            }
-        }
+			if (!empty($ical['description'])) {
+				$title .= '&#10;' . sprintf(__('Description: %s.', 'motopress-hotel-booking'), $ical['description']);
+			}
 
-        return $title;
-    }
+			if (!empty($ical['prodid'])) {
+				$title .= '&#10;' . sprintf(__('Source: %s.', 'motopress-hotel-booking'), $ical['prodid']);
+			}
+		}
+
+		return $title;
+	}
 
 }

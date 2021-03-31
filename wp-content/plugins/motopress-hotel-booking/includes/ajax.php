@@ -20,92 +20,92 @@ class Ajax {
 	protected $nonceName		 = 'mphb_nonce';
 	protected $actionPrefix	 = 'mphb_';
 	protected $ajaxActions	 = array(
-		// Admin
-        'export_bookings_csv' => array( // Start export
-            'method' => 'POST',
-            'nopriv' => false
-        ),
-        'check_bookings_csv' => array( // Get export progress
-            'method' => 'GET',
-            'nopriv' => false
-        ),
-        'cancel_bookings_csv' => array( // Cancel export
-            'method' => 'POST',
-            'nopriv' => false
-        ),
-        'install_plugin' => array(
-            'method' => 'POST',
-            'nopriv' => false
-        ),
-        'display_imported_bookings'  => array(
-            'method' => 'POST',
-            'nopriv' => false
-        ),
-		'recalculate_total'			 => array(
-			'method' => 'POST',
-			'nopriv' => false
-		),
-		'get_rates_for_room'		 => array(
-			'method' => 'GET',
-			'nopriv' => false
-		),
-		'dismiss_license_notice'	 => array(
-			'method' => 'POST',
-			'nopriv' => false
-		),
-		'attributes_custom_ordering' => array(
-			'method' => 'POST',
-			'nopriv' => false
-		),
-		// Frontend
-        'create_stripe_payment_intent' => array(
-            'method' => 'POST',
-            'nopriv' => true
-        ),
-		'update_checkout_info'		 => array(
-			'method' => 'GET',
-			'nopriv' => true
-		),
-		'update_rate_prices'		 => array(
-			'method' => 'GET',
-			'nopriv' => true
-		),
-		'get_billing_fields'		 => array(
-			'method' => 'GET',
-			'nopriv' => true
-		),
-		'apply_coupon'				 => array(
-			'method' => 'POST',
-			'nopriv' => true
-		),
-		'ical_sync_abort'			 => array(
-			'method' => 'POST'
-		),
-		'ical_sync_clear_all'		 => array(
-			'method' => 'POST'
-		),
-		'ical_sync_remove_item'		 => array(
-			'method' => 'POST'
-		),
-		'ical_sync_get_progress'	 => array(
-			'method' => 'POST'
-		),
-		'ical_upload_get_progress'	 => array(
-			'method' => 'GET'
-		),
-		'ical_upload_abort'			 => array(
-			'method' => 'POST'
-		),
-		'get_booking_info'           => array(
-			'method' => 'GET'
-		),
-		'get_accommodations_list'	 => array(
-			'method' => 'GET'
-		),
-		'get_free_accommodations_amount'	 => array(
-			'method' => 'GET',
-			'nopriv' => true
-		)
+	// Admin
+	'export_bookings_csv' => array( // Start export
+	    'method' => 'POST',
+	    'nopriv' => false
+	),
+	'check_bookings_csv' => array( // Get export progress
+	    'method' => 'GET',
+	    'nopriv' => false
+	),
+	'cancel_bookings_csv' => array( // Cancel export
+	    'method' => 'POST',
+	    'nopriv' => false
+	),
+	'install_plugin' => array(
+	    'method' => 'POST',
+	    'nopriv' => false
+	),
+	'display_imported_bookings'  => array(
+	    'method' => 'POST',
+	    'nopriv' => false
+	),
+	'recalculate_total'			 => array(
+		'method' => 'POST',
+		'nopriv' => false
+	),
+	'get_rates_for_room'		 => array(
+		'method' => 'GET',
+		'nopriv' => false
+	),
+	'dismiss_license_notice'	 => array(
+		'method' => 'POST',
+		'nopriv' => false
+	),
+	'attributes_custom_ordering' => array(
+		'method' => 'POST',
+		'nopriv' => false
+	),
+	// Frontend
+	'create_stripe_payment_intent' => array(
+		'method' => 'POST',
+		'nopriv' => true
+	),
+	'update_checkout_info'		 => array(
+		'method' => 'GET',
+		'nopriv' => true
+	),
+	'update_rate_prices'		 => array(
+		'method' => 'GET',
+		'nopriv' => true
+	),
+	'get_billing_fields'		 => array(
+		'method' => 'GET',
+		'nopriv' => true
+	),
+	'apply_coupon'				 => array(
+		'method' => 'POST',
+		'nopriv' => true
+	),
+	'ical_sync_abort'			 => array(
+		'method' => 'POST'
+	),
+	'ical_sync_clear_all'		 => array(
+		'method' => 'POST'
+	),
+	'ical_sync_remove_item'		 => array(
+		'method' => 'POST'
+	),
+	'ical_sync_get_progress'	 => array(
+		'method' => 'POST'
+	),
+	'ical_upload_get_progress'	 => array(
+		'method' => 'GET'
+	),
+	'ical_upload_abort'			 => array(
+		'method' => 'POST'
+	),
+	'get_booking_info'           => array(
+		'method' => 'GET'
+	),
+	'get_accommodations_list'	 => array(
+		'method' => 'GET'
+	),
+	'get_free_accommodations_amount'	 => array(
+		'method' => 'GET',
+		'nopriv' => true
+	)
 	);
 
 	public function __construct(){
@@ -167,9 +167,9 @@ class Ajax {
 				$input	 = $_REQUEST;
 		}
 
-        if ( isset( $input['lang'] ) ) {
-            MPHB()->translation()->switchLanguage( sanitize_text_field( $input['lang'] ) );
-        }
+		if ( isset( $input['lang'] ) ) {
+			MPHB()->translation()->switchLanguage( sanitize_text_field( $input['lang'] ) );
+		}
 
 		return $input;
 	}
@@ -212,145 +212,145 @@ class Ajax {
 		return $nonces;
 	}
 
-    public function export_bookings_csv()
-    {
-        $this->verifyNonce(__FUNCTION__);
+	public function export_bookings_csv()
+	{
+		$this->verifyNonce(__FUNCTION__);
 
-        // Don't start another export when the previous one was not finished
-        $exporter = MPHB()->getBookingsExporter();
+		// Don't start another export when the previous one was not finished
+		$exporter = MPHB()->getBookingsExporter();
 
-        if ($exporter->isInProgress()) {
-            wp_send_json_success();
-        }
+		if ($exporter->isInProgress()) {
+			wp_send_json_success();
+		}
 
-        // Prepare new export
-        $input = $this->retrieveInput(__FUNCTION__);
-        $args  = isset($input['args']) ? mphb_clean($input['args']) : array();
-        $query = new \MPHB\CSV\Bookings\BookingsQuery($args);
+		// Prepare new export
+		$input = $this->retrieveInput(__FUNCTION__);
+		$args  = isset($input['args']) ? mphb_clean($input['args']) : array();
+		$query = new \MPHB\CSV\Bookings\BookingsQuery($args);
 
-        if ($query->hasErrors()) {
-            wp_send_json_error(array('message' => $query->getErrorMessage()));
-        } else {
-            $args = $query->getInputs(); // Get validated inputs
-        }
+		if ($query->hasErrors()) {
+			wp_send_json_error(array('message' => $query->getErrorMessage()));
+		} else {
+			$args = $query->getInputs(); // Get validated inputs
+		}
 
-        // Save selected columns for next tries
-        MPHB()->settings()->export()->setUserExportColumns($args['columns']);
+		// Save selected columns for next tries
+		MPHB()->settings()->export()->setUserExportColumns($args['columns']);
 
-        // Query bookings
-        $ids = $query->query()->filterByRoomType($args['room'])->getIds();
+		// Query bookings
+		$ids = $query->query()->filterByRoomType($args['room'])->getIds();
 
-        if (empty($ids)) {
-            wp_send_json_error(array('message' => __('No bookings found for your request.', 'motopress-hotel-booking')));
-        }
+		if (empty($ids)) {
+			wp_send_json_error(array('message' => __('No bookings found for your request.', 'motopress-hotel-booking')));
+		}
 
-        // Try to create the file
-        $exporter->setupOutput($args);
+		// Try to create the file
+		$exporter->setupOutput($args);
 
-        if (!file_exists($exporter->pathToFile())) {
-            wp_send_json_error(array('message' => __('Uploads directory is not writable.', 'motopress-hotel-booking')));
-        }
+		if (!file_exists($exporter->pathToFile())) {
+			wp_send_json_error(array('message' => __('Uploads directory is not writable.', 'motopress-hotel-booking')));
+		}
 
-        // Start new export
-        $exporter->data($ids)->save();
-        $exporter->dispatch();
+		// Start new export
+		$exporter->data($ids)->save();
+		$exporter->dispatch();
 
-        wp_send_json_success();
-    }
+		wp_send_json_success();
+	}
 
-    public function check_bookings_csv()
-    {
-        $this->verifyNonce(__FUNCTION__);
+	public function check_bookings_csv()
+	{
+		$this->verifyNonce(__FUNCTION__);
 
-        $exporter = MPHB()->getBookingsExporter();
-        $isFinished = !$exporter->isInProgress();
+		$exporter = MPHB()->getBookingsExporter();
+		$isFinished = !$exporter->isInProgress();
 
-        if ($isFinished) {
-            wp_send_json_success(
-                array(
-                    'progress' => 100,
-                    'finished' => true,
-                    'file'     => $exporter->getDownloadLink()
-                )
-            );
-        } else {
-            wp_send_json_success(
-                array(
-                    'progress' => $exporter->getProgress(),
-                    'finished' => false
-                )
-            );
-        }
-    }
+		if ($isFinished) {
+			wp_send_json_success(
+				array(
+					'progress' => 100,
+					'finished' => true,
+					'file'     => $exporter->getDownloadLink()
+				)
+			);
+		} else {
+			wp_send_json_success(
+				array(
+					'progress' => $exporter->getProgress(),
+					'finished' => false
+				)
+			);
+		}
+	}
 
-    public function cancel_bookings_csv()
-    {
-        $this->verifyNonce(__FUNCTION__);
+	public function cancel_bookings_csv()
+	{
+		$this->verifyNonce(__FUNCTION__);
 
-        $exporter = MPHB()->getBookingsExporter();
-        $isRunning = $exporter->isInProgress(); // Check before canceling the process
+		$exporter = MPHB()->getBookingsExporter();
+		$isRunning = $exporter->isInProgress(); // Check before canceling the process
 
-        if ($isRunning && !$exporter->isAborting()) {
-            $exporter->abort();
-        }
+		if ($isRunning && !$exporter->isAborting()) {
+			$exporter->abort();
+		}
 
-        // Background process needs some time to cancel all tasks and stop completely
-        wp_send_json_success(array('cancelled' => !$isRunning));
-    }
+		// Background process needs some time to cancel all tasks and stop completely
+		wp_send_json_success(array('cancelled' => !$isRunning));
+	}
 
-    /**
-     * @since 3.8.1
-     */
-    public function install_plugin()
-    {
-        $this->verifyNonce(__FUNCTION__);
+	/**
+	 * @since 3.8.1
+	 */
+	public function install_plugin()
+	{
+		$this->verifyNonce(__FUNCTION__);
 
-        $input = $this->retrieveInput(__FUNCTION__);
+		$input = $this->retrieveInput(__FUNCTION__);
 
-        if (!isset($input['plugin_slug'], $input['plugin_zip'])) {
-            wp_send_json_error(array('message' => __('No enough data', 'motopress-hotel-booking')));
-        }
+		if (!isset($input['plugin_slug'], $input['plugin_zip'])) {
+			wp_send_json_error(array('message' => __('No enough data', 'motopress-hotel-booking')));
+		}
 
-        $pluginSlug = sanitize_text_field($input['plugin_slug']);
-        $pluginZip = sanitize_text_field($input['plugin_zip']);
+		$pluginSlug = sanitize_text_field($input['plugin_slug']);
+		$pluginZip = sanitize_text_field($input['plugin_zip']);
 
-        $installed = ThirdPartyPluginsUtils::isPluginInstalled($pluginSlug);
+		$installed = ThirdPartyPluginsUtils::isPluginInstalled($pluginSlug);
 
-        if (!$installed) {
-            $installed = ThirdPartyPluginsUtils::installPlugin($pluginZip);
-        }
+		if (!$installed) {
+			$installed = ThirdPartyPluginsUtils::installPlugin($pluginZip);
+		}
 
-        $activated = ThirdPartyPluginsUtils::isPluginActive($pluginSlug)
-            || ($installed && ThirdPartyPluginsUtils::activatePlugin($pluginSlug));
+		$activated = ThirdPartyPluginsUtils::isPluginActive($pluginSlug)
+			|| ($installed && ThirdPartyPluginsUtils::activatePlugin($pluginSlug));
 
-        if ($installed && $activated) {
-            wp_send_json_success();
-        } else {
-            wp_send_json_error(array('message' => __('An error has occurred', 'motopress-hotel-booking'))); // Very informative
-        }
-    }
+		if ($installed && $activated) {
+			wp_send_json_success();
+		} else {
+			wp_send_json_error(array('message' => __('An error has occurred', 'motopress-hotel-booking'))); // Very informative
+		}
+	}
 
-    public function display_imported_bookings()
-    {
-        $this->verifyNonce(__FUNCTION__);
+	public function display_imported_bookings()
+	{
+		$this->verifyNonce(__FUNCTION__);
 
-        $input = $this->retrieveInput(__FUNCTION__);
+		$input = $this->retrieveInput(__FUNCTION__);
 
-        if (!isset($input['new_value']) || !isset($input['user_id'])) {
-            wp_send_json_error(array(
-                'message' => __('Please complete all required fields and try again.', 'motopress-hotel-booking')
-            ));
-        }
+		if (!isset($input['new_value']) || !isset($input['user_id'])) {
+			wp_send_json_error(array(
+				'message' => __('Please complete all required fields and try again.', 'motopress-hotel-booking')
+			));
+		}
 
-        $newValue = Utils\ValidateUtils::validateBool($input['new_value']);
-        $userId = Utils\ValidateUtils::parseInt($input['user_id']);
+		$newValue = Utils\ValidateUtils::validateBool($input['new_value']);
+		$userId = Utils\ValidateUtils::parseInt($input['user_id']);
 
-        if ($userId > 0) {
-            MPHB()->settings()->main()->displayImportedBookings($userId, $newValue);
-        }
+		if ($userId > 0) {
+			MPHB()->settings()->main()->displayImportedBookings($userId, $newValue);
+		}
 
-        wp_send_json_success();
-    }
+		wp_send_json_success();
+	}
 
 	public function recalculate_total(){
 
@@ -500,7 +500,7 @@ class Ajax {
 		$checkInDate = $this->parseCheckInDate( $input['check_in_date'] );
 		$checkOutDate = $this->parseCheckInDate( $input['check_out_date'] );
 
-        MPHB()->reservationRequest()->setupParameters( array(
+		MPHB()->reservationRequest()->setupParameters( array(
 			'adults' => $adults,
 			'children' => $children,
 			'check_in_date' => $checkInDate,
@@ -591,11 +591,11 @@ class Ajax {
 			$adults = $this->parseAdults( $roomDetails['adults'] );
 			$children = $this->parseChildren( $roomDetails['children'] );
 
-            if ($roomType->hasLimitedTotalCapacity() && $adults + $children > $roomType->getTotalCapacity()) {
-                wp_send_json_error(array(
-                    'message' => __('The total number of guests is not valid.', 'motopress-hotel-booking')
-                ));
-            }
+			if ($roomType->hasLimitedTotalCapacity() && $adults + $children > $roomType->getTotalCapacity()) {
+				wp_send_json_error(array(
+					'message' => __('The total number of guests is not valid.', 'motopress-hotel-booking')
+				));
+			}
 
 			$allowedServices = $roomType->getServices();
 
@@ -613,15 +613,15 @@ class Ajax {
 						continue;
 					}
 
-                    $quantity = isset($serviceDetails['quantity']) ? Utils\ValidateUtils::validateInt($serviceDetails['quantity']) : 1;
-                    if (isset($serviceDetails['quantity']) && $quantity < 1) {
-                        continue;
-                    }
+					$quantity = isset($serviceDetails['quantity']) ? Utils\ValidateUtils::validateInt($serviceDetails['quantity']) : 1;
+					if (isset($serviceDetails['quantity']) && $quantity < 1) {
+						continue;
+					}
 
 					$services[] = Entities\ReservedService::create( array(
 						'id'        => (int) $serviceDetails['id'],
 						'adults'    => $serviceAdults,
-                        'quantity'  => $quantity
+						'quantity'  => $quantity
 					) );
 				}
 			}
@@ -659,49 +659,49 @@ class Ajax {
 		return $booking;
 	}
 
-    /**
-     * @since 3.6.0
-     */
-    public function create_stripe_payment_intent()
-    {
-        $this->verifyNonce(__FUNCTION__);
+	/**
+	 * @since 3.6.0
+	 */
+	public function create_stripe_payment_intent()
+	{
+		$this->verifyNonce( __FUNCTION__ );
 
-        $input = $this->retrieveInput(__FUNCTION__);
+		$input = $this->retrieveInput( __FUNCTION__ );
 
-        if (!isset($input['amount'])) {
-            wp_send_json_error(array(
-                'message' => __('Please complete all required fields and try again.', 'motopress-hotel-booking')
-            ));
-        }
+		if ( !isset( $input['amount'] ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Please complete all required fields and try again.', 'motopress-hotel-booking' )
+			) );
+		}
 
-        $amount      = floatval($input['amount']);
-        $description = isset($input['description']) ? mphb_clean($input['description']) : '';
+		$amount      = floatval($input['amount']);
+		$description = isset($input['description']) ? mphb_clean($input['description']) : '';
 
-        $currency  = MPHB()->settings()->currency()->getCurrencyCode();
-        $stripeApi = MPHB()->gatewayManager()->getGateway('stripe')->getApi();
+		$currency  = MPHB()->settings()->currency()->getCurrencyCode();
+		$stripeApi = MPHB()->gatewayManager()->getGateway('stripe')->getApi();
 
-        if (!$stripeApi->checkMinimumAmount($amount, $currency)) {
-            $minimumAmount = $stripeApi->getMinimumAmount($currency);
-            $minimumPrice = mphb_format_price($minimumAmount);
+		if (!$stripeApi->checkMinimumAmount($amount, $currency)) {
+			$minimumAmount = $stripeApi->getMinimumAmount($currency);
+			$minimumPrice = mphb_format_price($minimumAmount);
 
-            wp_send_json_error(array(
-                'message' => sprintf(__('Sorry, the minimum allowed payment amount is %s to use this payment method.', 'motopress-hotel-booking'), $minimumPrice)
-            ));
-        }
+			wp_send_json_error(array(
+				'message' => sprintf(__('Sorry, the minimum allowed payment amount is %s to use this payment method.', 'motopress-hotel-booking'), $minimumPrice)
+			));
+		}
 
-        $response = $stripeApi->createPaymentIntent($amount, $description, $currency);
+		$response = $stripeApi->createPaymentIntent($amount, $description, $currency);
 
-        if (is_wp_error($response)) {
-            wp_send_json_error(array(
-                'message' => $response->get_error_message()
-            ));
-        }
+		if (is_wp_error($response)) {
+			wp_send_json_error(array(
+				'message' => $response->get_error_message()
+			));
+		}
 
-        wp_send_json_success(array(
-            'id'            => $response->id,
-            'client_secret' => $response->client_secret
-        ));
-    }
+		wp_send_json_success(array(
+			'id'            => $response->id,
+			'client_secret' => $response->client_secret
+		));
+	}
 
 	public function update_checkout_info(){
 
@@ -713,15 +713,15 @@ class Ajax {
 
 		$total = $booking->calcPrice();
 
-        $responseData = array(
-            'newAmount'      => $total,
-            'priceHtml'      => mphb_format_price($total),
-            'priceBreakdown' => Views\BookingView::generatePriceBreakdown($booking)
-        );
+		$responseData = array(
+			'newAmount'      => $total,
+			'priceHtml'      => mphb_format_price($total),
+			'priceBreakdown' => Views\BookingView::generatePriceBreakdown($booking)
+		);
 
 		if ( MPHB()->settings()->main()->getConfirmationMode() === 'payment' ) {
-            $responseData['depositAmount'] = $booking->calcDepositAmount();
-            $responseData['depositPrice'] = mphb_format_price($responseData['depositAmount']);
+			$responseData['depositAmount'] = $booking->calcDepositAmount();
+			$responseData['depositPrice'] = mphb_format_price($responseData['depositAmount']);
 
 			$responseData['gateways'] = array_map( function($gateway) use ($booking) {
 				return $gateway->getCheckoutData( $booking );
@@ -829,12 +829,12 @@ class Ajax {
 
 		$total = $booking->calcPrice();
 
-        $responseData['newAmount']       = $total;
-        $responseData['priceHtml']       = mphb_format_price( $total );
+		$responseData['newAmount']       = $total;
+		$responseData['priceHtml']       = mphb_format_price( $total );
 		$responseData['priceBreakdown']	 = Views\BookingView::generatePriceBreakdown( $booking );
 
 		if ( MPHB()->settings()->main()->getConfirmationMode() === 'payment' ) {
-            $responseData['depositAmount'] = $booking->calcDepositAmount();
+			$responseData['depositAmount'] = $booking->calcDepositAmount();
 			$responseData['depositPrice'] = mphb_format_price($responseData['depositAmount']);
 
 			$responseData['gateways'] = array_map( function($gateway) use ($booking) {
@@ -906,40 +906,40 @@ class Ajax {
 	public function ical_sync_get_progress(){
 		$this->verifyNonce( __FUNCTION__ );
 
-        $items    = isset($_POST['focus']) ? (array)$_POST['focus'] : array();
-        $queue    = iCal\Queue::selectItems($items);
-        $queueIds = array_keys($queue);
-        $stats    = iCal\Stats::selectStats($queueIds);
+		$items    = isset($_POST['focus']) ? (array)$_POST['focus'] : array();
+		$queue    = iCal\Queue::selectItems($items);
+		$queueIds = array_keys($queue);
+		$stats    = iCal\Stats::selectStats($queueIds);
 
-        $processedItems = array();
+		$processedItems = array();
 
-        foreach ($queueIds as $queueId) {
-            $item = array();
+		foreach ($queueIds as $queueId) {
+			$item = array();
 
-            $queueName = $queue[$queueId]['queue'];
+			$queueName = $queue[$queueId]['queue'];
 
-            $status = $queue[$queueId]['status'];
-            $statusClass = 'mphb-status-' . $status;
+			$status = $queue[$queueId]['status'];
+			$statusClass = 'mphb-status-' . $status;
 
-            switch ($status) {
-                case iCal\Queue::STATUS_WAIT:        $statusText = __('Waiting', 'motopress-hotel-booking');    break;
-                case iCal\Queue::STATUS_IN_PROGRESS: $statusText = __('Processing', 'motopress-hotel-booking'); break;
-                case iCal\Queue::STATUS_DONE:        $statusText = __('Done', 'motopress-hotel-booking');       break;
+			switch ($status) {
+				case iCal\Queue::STATUS_WAIT:        $statusText = __('Waiting', 'motopress-hotel-booking');    break;
+				case iCal\Queue::STATUS_IN_PROGRESS: $statusText = __('Processing', 'motopress-hotel-booking'); break;
+				case iCal\Queue::STATUS_DONE:        $statusText = __('Done', 'motopress-hotel-booking');       break;
 
-                default: $statusText = ucfirst(str_replace('-', ' ', $status)); break;
-            }
+				default: $statusText = ucfirst(str_replace('-', ' ', $status)); break;
+			}
 
-            $itemStats = $stats[$queueId];
+			$itemStats = $stats[$queueId];
 
-            $processedItems[$queueName] = array(
-                'status' => array(
-                    'code'  => $status,
-                    'class' => $statusClass,
-                    'text'  => $statusText
-                ),
-                'stats'  => $itemStats
-            );
-        }
+			$processedItems[$queueName] = array(
+				'status' => array(
+					'code'  => $status,
+					'class' => $statusClass,
+					'text'  => $statusText
+				),
+				'stats'  => $itemStats
+			);
+		}
 
 		wp_send_json_success( array(
 			'items'		 => $processedItems,
@@ -972,7 +972,7 @@ class Ajax {
 			'succeed'    => $stats['succeed'],
 			'skipped'    => $stats['skipped'],
 			'failed'     => $stats['failed'],
-            'removed'    => $stats['removed'],
+			'removed'    => $stats['removed'],
 			'progress'   => $uploader->getProgress(),
 			'logs'       => $logsHandler->logsToHtml( $logs ),
 			'logsShown'  => $logsShown,
@@ -989,109 +989,144 @@ class Ajax {
 		wp_send_json_success();
 	}
 
-    public function get_booking_info()
-    {
-        $this->verifyNonce(__FUNCTION__);
+	public function get_booking_info()
+	{
+		$this->verifyNonce(__FUNCTION__);
 
-        $input     = $this->retrieveInput(__FUNCTION__);
-        $bookingId = isset($input['bookingId']) ? absint($input['bookingId']) : 0;
-        $booking   = $bookingId > 0 ? MPHB()->getBookingRepository()->findById($bookingId) : null;
+		$input     = $this->retrieveInput(__FUNCTION__);
+		$bookingId = isset($input['bookingId']) ? absint($input['bookingId']) : 0;
+		$booking   = $bookingId > 0 ? MPHB()->getBookingRepository()->findById($bookingId) : null;
 
-        if (is_null($booking)) {
-            wp_send_json_error( array('message' => __('The booking not found.', 'motopress-hotel-booking')) );
-        }
+		if (is_null($booking)) {
+			wp_send_json_error( array('message' => __('The booking not found.', 'motopress-hotel-booking')) );
+		}
 
-        $customer   = $booking->getCustomer();
-        $couponCode = $booking->getCouponCode();
-        $dateFormat = MPHB()->settings()->dateTime()->getDateFormat();
+		$customer   = $booking->getCustomer();
+		$couponCode = $booking->getCouponCode();
+		$dateFormat = MPHB()->settings()->dateTime()->getDateFormat();
 
-        ob_start();
-        ?>
-        <h2><?php _e('Booking Information', 'motopress-hotel-booking'); ?></h2>
-        <table class="widefat striped">
-            <tbody>
-                <tr>
-                    <th><?php _e('ID', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($booking->getId()); ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e('Check-in Date', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($booking->getCheckInDate()->format($dateFormat)); ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e('Check-out Date', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($booking->getCheckOutDate()->format($dateFormat)); ?></td>
-                </tr>
-            </tbody>
-        </table>
+		ob_start();
+		?>
+		<h2><?php _e('Booking Information', 'motopress-hotel-booking'); ?></h2>
+		<table class="widefat striped">
+			<tbody>
+				<tr>
+					<th><?php _e('ID', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($booking->getId()); ?></td>
+				</tr>
+				<tr>
+					<th><?php _e('Check-in Date', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($booking->getCheckInDate()->format($dateFormat)); ?></td>
+				</tr>
+				<tr>
+					<th><?php _e('Check-out Date', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($booking->getCheckOutDate()->format($dateFormat)); ?></td>
+				</tr>
+			</tbody>
+		</table>
 
-        <h2><?php _e('Reserved Accommodations', 'motopress-hotel-booking'); ?></h2>
-        <?php mphb_tmpl_the_reserved_rooms_details($booking->getReservedRooms()); ?>
+		<h2><?php _e('Reserved Accommodations', 'motopress-hotel-booking'); ?></h2>
+		<?php mphb_tmpl_the_reserved_rooms_details($booking->getReservedRooms()); ?>
 
-        <h2><?php _e('Customer Information', 'motopress-hotel-booking'); ?></h2>
-        <table class="widefat striped">
-            <tbody>
-                <tr>
-                    <th><?php _e('First Name', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($customer->getFirstName()); ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e('Last Name', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($customer->getLastName()); ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e('Email', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($customer->getEmail()); ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e('Phone', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($customer->getPhone()); ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e('Country', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($customer->getCountry()); ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e('Address', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($customer->getAddress1()); ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e('City', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($customer->getCity()); ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e('State / County', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($customer->getState()); ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e('Postcode', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($customer->getZip()); ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e('Customer Note', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo esc_html($booking->getNote()); ?></td>
-                </tr>
-            </tbody>
-        </table>
+		<h2><?php _e('Customer Information', 'motopress-hotel-booking'); ?></h2>
+		<table class="widefat striped">
+			<tbody>
+				<tr>
+					<th><?php _e('First Name', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($customer->getFirstName()); ?></td>
+				</tr>
+				<tr>
+					<th><?php _e('Last Name', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($customer->getLastName()); ?></td>
+				</tr>
+				<tr>
+					<th><?php _e('Email', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($customer->getEmail()); ?></td>
+				</tr>
+				<tr>
+					<th><?php _e('Phone', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($customer->getPhone()); ?></td>
+				</tr>
+				<tr>
+					<th><?php _e('Country', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($customer->getCountry()); ?></td>
+				</tr>
+				<tr>
+					<th><?php _e('Address', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($customer->getAddress1()); ?></td>
+				</tr>
+				<tr>
+					<th><?php _e('City', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($customer->getCity()); ?></td>
+				</tr>
+				<tr>
+					<th><?php _e('State / County', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($customer->getState()); ?></td>
+				</tr>
+				<tr>
+					<th><?php _e('Postcode', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($customer->getZip()); ?></td>
+				</tr>
+				<tr>
+					<th><?php _e('Customer Note', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo esc_html($booking->getNote()); ?></td>
+				</tr>
+			</tbody>
+		</table>
 
-        <h2><?php _e('Additional Information', 'motopress-hotel-booking'); ?></h2>
-        <table class="form-table">
-            <tbody>
-                <tr>
-                    <th><?php _e('Coupon', 'motopress-hotel-booking'); ?></th>
-                    <td><?php echo !empty($couponCode) ? esc_html($couponCode) : '&#8212;' ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e('Total Booking Price', 'motopress-hotel-booking'); ?></th>
-                    <td><?php mphb_tmpl_the_payments_table($booking); ?></td>
-                </tr>
-            </tbody>
-        </table>
-        <?php
-        $bookingInfo = ob_get_clean();
+		<h2><?php _e('Additional Information', 'motopress-hotel-booking'); ?></h2>
+		<table class="form-table">
+			<tbody>
+				<tr>
+					<th><?php _e('Coupon', 'motopress-hotel-booking'); ?></th>
+					<td><?php echo !empty($couponCode) ? esc_html($couponCode) : '&#8212;' ?></td>
+				</tr>
+				<tr>
+					<th><?php _e('Total Booking Price', 'motopress-hotel-booking'); ?></th>
+					<td><?php mphb_tmpl_the_payments_table($booking); ?></td>
+				</tr>
+			</tbody>
+		</table>
 
-        wp_send_json_success(array('bookingInfo' => $bookingInfo));
-    }
+		<?php
+		if( !empty( $booking->getInternalNotes() ) ) {
+			?>
+			<h2><?php echo __( 'Notes', 'motopress-hotel-booking' ); ?></h2>
+			<table class="widefat striped">
+				<tbody>
+					<?php
+					$dateFormat = get_option( 'date_format' );
+					foreach( $booking->getInternalNotes() as $note ) {
+						$user = get_user_by( 'id', $note['user'] );
+						$displayName = $user ? esc_attr( $user->display_name ) : '';
+						$noteDate = wp_date( $dateFormat, $note['date'] );
+						?><tr> 
+							<td>
+								<?php echo wpautop( sprintf( '%s', $note['note'] ) ); ?>
+								<p class="description"><?php
+								if ( $displayName ) {
+									/* translators: %1$s: note author, %1$s: note date */
+									printf( esc_html__( '%1$s on %2$s', 'motopress-hotel-booking' ),
+										$displayName,
+										$noteDate
+									);
+								} else {
+									echo $noteDate;
+								}?></p>
+							</td>
+						</tr><?php
+					}
+					?>
+				</tbody>
+			</table>
+			<p></p>
+			<?php
+		}
+
+		$bookingInfo = ob_get_clean();
+
+		wp_send_json_success(array('bookingInfo' => $bookingInfo));
+	}
 
 	public function get_accommodations_list(){
 		$this->verifyNonce( __FUNCTION__ );
@@ -1105,10 +1140,10 @@ class Ajax {
 		wp_send_json_success( array( 'options' => $roomsList ) );
 	}
 
-    /**
-     * @since 3.7.0 added new filter - "mphb_search_available_rooms".
-     * @since 3.8.3 added "price" and "priceHtml" to response.
-     */
+	/**
+	 * @since 3.7.0 added new filter - "mphb_search_available_rooms".
+	 * @since 3.8.3 added "price" and "priceHtml" to response.
+	 */
 	public function get_free_accommodations_amount(){
 		$this->verifyNonce( __FUNCTION__ );
 
@@ -1116,8 +1151,8 @@ class Ajax {
 		$dateFormat	 = MPHB()->settings()->dateTime()->getDateTransferFormat();
 		$checkIn	 = \DateTime::createFromFormat( $dateFormat, $input['checkInDate'] );
 		$checkOut	 = \DateTime::createFromFormat( $dateFormat, $input['checkOutDate'] );
-        $adults      = isset( $input['adults'] ) ? ValidateUtils::validateAdults( $input['adults'] ) : false;
-        $children    = isset( $input['children'] ) ? ValidateUtils::validateChildren( $input['children'] ) : false;
+		$adults      = isset( $input['adults'] ) ? ValidateUtils::validateAdults( $input['adults'] ) : false;
+		$children    = isset( $input['children'] ) ? ValidateUtils::validateChildren( $input['children'] ) : false;
 
 		if ( $checkIn === false || $checkOut === false || $checkIn > $checkOut ) {
 			wp_send_json_error( array( 'message' => __( 'Nothing found. Please try again with different search parameters.', 'motopress-hotel-booking' ) ) );
@@ -1130,45 +1165,45 @@ class Ajax {
 			wp_send_json_error( array( 'message' => __( 'Nothing found. Please try again with different search parameters.', 'motopress-hotel-booking' ) ) );
 		}
 
-        $searchArgs = apply_filters('mphb_search_available_rooms', array(
+		$searchArgs = apply_filters('mphb_search_available_rooms', array(
 			'availability'	 => 'free',
 			'from_date'		 => $checkIn,
 			'to_date'		 => $checkOut,
 			'room_type_id'	 => $typeId,
 			'skip_buffer_rules'=> false
-        ));
+		));
 		$availableRooms = MPHB()->getRoomPersistence()->searchRooms($searchArgs);
 		$unavailableRooms = MPHB()->getRulesChecker()->customRules()->getUnavailableRooms( $checkIn, $checkOut, $roomType->getOriginalId() );
 		$unavailableRooms = array_intersect( $availableRooms, $unavailableRooms ); // Filter not available rooms
 		$freeCount = count( $availableRooms ) - count( $unavailableRooms );
 
-        // Calculate the price for the period
-        $price = 0;
-        $priceHtml = '';
+		// Calculate the price for the period
+		$price = 0;
+		$priceHtml = '';
 
-        if ( MPHB()->settings()->main()->getDirectBookingPricing() != 'disabled' ) {
-            $args = array();
+		if ( MPHB()->settings()->main()->getDirectBookingPricing() != 'disabled' ) {
+			$args = array();
 
-            if ( $adults !== false && $children !== false ) {
-                $args['adults'] = $adults;
-                $args['children'] = $children;
-            }
+			if ( $adults !== false && $children !== false ) {
+				$args['adults'] = $adults;
+				$args['children'] = $children;
+			}
 
-            $price = mphb_get_room_type_period_price( $checkIn, $checkOut, $roomType, $args );
+			$price = mphb_get_room_type_period_price( $checkIn, $checkOut, $roomType, $args );
 
-            $priceHtml = mphb_format_price( $price, array(
-                'period'        => true,
-                'period_nights' => DateUtils::calcNights( $checkIn, $checkOut ),
-                'period_title'  => __( 'Based on your search parameters', 'motopress-hotel-booking' )
-            ) );
-        }
+			$priceHtml = mphb_format_price( $price, array(
+				'period'        => true,
+				'period_nights' => DateUtils::calcNights( $checkIn, $checkOut ),
+				'period_title'  => __( 'Based on your search parameters', 'motopress-hotel-booking' )
+			) );
+		}
 
 		if ( $freeCount > 0 ) {
 			wp_send_json_success( array(
-                'freeCount' => $freeCount,
-                'price'     => $price,
-                'priceHtml' => $priceHtml
-            ) );
+				'freeCount' => $freeCount,
+				'price'     => $price,
+				'priceHtml' => $priceHtml
+			) );
 		} else {
 			wp_send_json_error( array( 'message' => __( 'Nothing found. Please try again with different search parameters.', 'motopress-hotel-booking' ) ) );
 		}

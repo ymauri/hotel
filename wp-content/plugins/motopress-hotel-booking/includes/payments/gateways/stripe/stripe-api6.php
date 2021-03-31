@@ -97,7 +97,7 @@ class StripeAPI6
                 $amount = absint($amount);
                 break;
             default:
-                $amount = round($amount, 2) * 100; // In cents
+                $amount = round($amount * 100); // In cents
                 break;
         }
 

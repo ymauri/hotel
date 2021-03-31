@@ -7,6 +7,9 @@ class BookingEditCPTPage extends EditCPTPage {
 	protected function addActions(){
 		parent::addActions();
 		add_action( '_mphb_admin_after_field_render', array( $this, 'renderPaymentsDetails' ) );
+		add_action( 'admin_init', array( $this, 'resendConfirmationEmail' ) );
+		add_filter( 'post_updated_messages', array( $this, 'onResendEmailMessage' ) );
+		add_action( 'add_meta_boxes', array( $this, 'addResendEmailMetabox' ), 10, 2 );
 	}
 
 	public function customizeMetaBoxes(){
@@ -71,19 +74,45 @@ class BookingEditCPTPage extends EditCPTPage {
 		<?php
 	}
 
+	/**
+	 *
+	 * @since 3.9.3
+	 */
+	public function addResendEmailMetabox( $post_type, $post ) {
+
+		if( $post->post_status == 'confirmed' ) {
+			add_meta_box( 'resendconfirm', __( 'Resend Email', 'motopress-hotel-booking' ), array( $this, 'renderResendMetaBox' ), $this->postType, 'side', 'low' );
+		}
+	}
+
+	/**
+	 *
+	 * @since 3.9.3
+	 */
+	public function renderResendMetaBox( $post, $metabox ) {
+		wp_nonce_field( 'mphb_resend_confirm', 'mphb_resend_confirm_nonce' );
+		?>
+		<p>
+			<input type="hidden" name="mphb_post_id" value="<?php echo $post->ID; ?>" />
+			<input type="submit" name="mphb_resend_confirm" class="button button-primary button-large" value="<?php echo __( 'Resend Email', 'motopress-hotel-booking' ); ?>" />
+		</p>
+		<p><?php echo __( 'Send a copy of the Approved Booking email to the customer`s email address.', 'motopress-hotel-booking' ); ?></p>
+		<?php
+	}
+
 	public function renderRoomsDetailsMetaBox( $post, $metabox ){
 		// @todo add possibility of manage and edit reserved rooms
 
 		$reservedRooms = MPHB()->getReservedRoomRepository()->findAllByBooking( $post->ID );
 
-        mphb_tmpl_the_reserved_rooms_details( $reservedRooms );
+		mphb_tmpl_the_reserved_rooms_details( $reservedRooms );
 
-        $booking = mphb_get_booking( $post->ID );
+		$booking = mphb_get_booking( $post->ID );
 
-        if ( !is_null( $booking ) && !$booking->isImported() ) {
-            $editBookingUrl = MPHB()->getEditBookingMenuPage()->getUrl( array( 'booking_id' => $post->ID ) );
-            echo '<a href="' . esc_url( $editBookingUrl ) . '" class="button">', __( 'Edit Accommodations', 'motopress-hotel-booking' ), '</a>';
-        }
+		if ( !is_null( $booking ) && !$booking->isImported() ) {
+			$editBookingUrl = MPHB()->getEditBookingMenuPage()->getUrl( array( 'booking_id' => $post->ID ) );
+			echo '<a href="' . esc_url( $editBookingUrl ) . '" class="button">', __( 'Edit Accommodations', 'motopress-hotel-booking' ), '</a>';
+		}
 	}
 
 	public function renderLogMetaBox( $post, $metabox ){
@@ -131,6 +160,52 @@ class BookingEditCPTPage extends EditCPTPage {
 		echo '<br/>';
 
 		mphb_tmpl_the_payments_table($booking);
+	}
+
+	/**
+	 *
+	 * @since 3.9.3
+	 */
+	public function resendConfirmationEmail() {
+
+		if( !isset( $_REQUEST['mphb_resend_confirm_nonce'] ) ||
+				!wp_verify_nonce( $_REQUEST['mphb_resend_confirm_nonce'], 'mphb_resend_confirm' )
+			) {
+			return;
+		}
+
+		if( isset( $_REQUEST['mphb_resend_confirm'] ) && isset( $_REQUEST['mphb_post_id'] ) ) {
+			$postID = (int)$_REQUEST['mphb_post_id'];
+			$booking = MPHB()->getBookingRepository()->findById( $postID );
+
+			/**
+			 * Triggs when user clicks button.
+			 *
+			 * @since 3.9.3
+			 */
+			do_action( 'mphb_resend_confirm', $booking );
+
+			add_filter( 'redirect_post_location', array( $this, 'onRedirectPostLocation' ) );
+		}
+	}
+
+	/**
+	 *
+	 * @since 3.9.3
+	 */
+	function onRedirectPostLocation( $loc ) {
+		return add_query_arg( 'confirmation_resend', 'true', $loc );
+	}
+
+	/**
+	 *
+	 * @since 3.9.3
+	 */
+	function onResendEmailMessage( $messages ) {
+		if( !empty( $_GET['confirmation_resend'] ) ) {
+			$messages['post'][4] = esc_html__('Confirmation email has been sent to customer.', 'motopress-hotel-booking' );
+		}
+		return $messages;
 	}
 
 	public function saveMetaBoxes( $postId, $post, $update ){

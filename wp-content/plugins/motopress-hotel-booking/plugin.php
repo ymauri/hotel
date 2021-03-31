@@ -612,6 +612,22 @@ class HotelBookingPlugin {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueuePublicScripts' ), 11 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminScripts' ), 11 );
 		add_action( 'the_post', array( $this, 'setCurrentRoomType' ) );
+
+		/**
+		 *
+		 * @since 3.9.4
+		 */
+		if ( version_compare( get_bloginfo( 'version' ), '5.1', '>=' ) ) {
+			add_action( 'wp_insert_site', array( $this, 'createNewBlog' ) );
+		} else {
+			add_action( 'wpmu_new_blog', array( $this, 'createNewBlog' ) );
+		}
+
+		/**
+		 *
+		 * @since 3.9.4
+		 */
+		add_filter( 'wpmu_drop_tables', array( $this, 'deleteBlog' ), 10, 2 );
 	}
 
 	public function enqueuePublicScripts(){
@@ -851,6 +867,54 @@ class HotelBookingPlugin {
 		if ( !empty( $post->post_type ) && $post->post_type === MPHB()->postTypes()->roomType()->getPostType() ) {
 			$this->currentRoomType = MPHB()->getRoomTypeRepository()->findById( $post->ID );
 		}
+	}
+
+	/**
+	 * When a new Blog is created in multisite, see if plugin is network activated, and run the installer
+	 *
+	 * @param int|WP_Site $blog
+	 *
+	 * @since 3.9.4
+	 */
+	public function createNewBlog( $blog ) {
+
+		/*
+		 * Additional check in case the plugin is not network active.
+		 */
+		if ( !is_plugin_active_for_network( plugin_basename( MPHB_PLUGIN_FILE ) ) ) {
+			return;
+		}
+
+		if ( !is_int( $blog ) ) {
+			$blog = $blog->id;
+		}
+
+		switch_to_blog( $blog );
+		HotelBookingPlugin::install();
+		add_action( 'init', array( 'HotelBookingPlugin', 'afterInstall' ) );
+		restore_current_blog();
+	}
+
+	/**
+	 *
+	 * @param array $tables
+	 * @param int $blog_id
+	 *
+	 * @since 3.9.4
+	 */
+	public function deleteBlog( $tables, $blog_id ) {
+		global $wpdb;
+
+		switch_to_blog( $blog_id );
+
+		$tables[] = $wpdb->prefix . 'mphb_sync_urls';
+		$tables[] = $wpdb->prefix . 'mphb_sync_queue';
+		$tables[] = $wpdb->prefix . 'mphb_sync_stats';
+		$tables[] = $wpdb->prefix . 'mphb_sync_logs';
+
+		restore_current_blog();
+
+		return $tables;
 	}
 
     public function setupRoomTypeMicrodata()
@@ -1171,17 +1235,50 @@ class HotelBookingPlugin {
 		return version_compare( $wp_version, $version, $operator );
 	}
 
-	static public function activate(){
+	/**
+	 *
+	 * @since 3.9.4 bool $network_wide
+	 */
+	static public function activate( $network_wide = false ) {
+
+		if( $network_wide && is_multisite() ) {
+			$sites = get_sites();
+			foreach( $sites as $site ) {
+				$blog_id = $site->blog_id;
+				switch_to_blog( $blog_id );
+				HotelBookingPlugin::install();
+				HotelBookingPlugin::afterInstall();
+				restore_current_blog();
+			}
+		} else {
+			HotelBookingPlugin::install();
+			HotelBookingPlugin::afterInstall();
+		}
+	}
+
+	/**
+	 *
+	 * @since 3.9.4
+	 */
+	static public function install() {
+		HotelBookingPlugin::createTables();
+	}
+
+	/**
+	 *
+	 * @since 3.9.4
+	 */
+	static public function afterInstall() {
 		// This method will be called only once with first activated plugin - Premium or Lite
 		MPHB()->postTypes()->flushRewriteRules();
-
-        HotelBookingPlugin::createTables();
-
-        mphb_create_uploads_dir();
+		mphb_create_uploads_dir();
 
         if ( MPHB()->settings()->main()->deleteSyncLogsOlderThan() != 'never' ) {
             MPHB()->cronManager()->getCron( 'ical_auto_delete' )->schedule();
         }
+
+        /** @since 3.9.4 */
+        do_action('mphb_activated');
 	}
 
     static public function createTables()
@@ -1229,6 +1326,7 @@ class HotelBookingPlugin {
         $wpdb->query($syncQueue);
         $wpdb->query($syncStats);
         $wpdb->query($syncLogs);
+
     }
 
 	static public function deactivate(){

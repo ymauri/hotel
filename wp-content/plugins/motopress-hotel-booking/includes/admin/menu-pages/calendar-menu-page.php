@@ -9,8 +9,6 @@ class CalendarMenuPage extends AbstractMenuPage {
 	public function addActions(){
 		parent::addActions();
 
-		$this->addTitleAction( __( 'New Booking', 'motopress-hotel-booking' ), add_query_arg( 'page', 'mphb_add_new_booking', admin_url( 'admin.php' ) ) );
-
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminScripts' ), 15 );
 	}
 
@@ -25,6 +23,9 @@ class CalendarMenuPage extends AbstractMenuPage {
 	}
 
 	public function render(){
+
+		$this->addTitleAction( __( 'New Booking', 'motopress-hotel-booking' ), add_query_arg( 'page', 'mphb_add_new_booking', admin_url( 'admin.php' ) ) );
+
 		$this->setupCalendar();
 		?>
 		<div class="wrap">

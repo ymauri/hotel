@@ -83,7 +83,7 @@ class BookingRulesMenuPage extends AbstractMenuPage {
 	private function saveCustomRules(){
 		$customRules = !empty( $_POST['mphb_booking_rules_custom'] ) ? $_POST['mphb_booking_rules_custom'] : array();
 		$customRules = $this->sanitize( 'mphb_booking_rules_custom', $customRules );
-		// $this->save( 'mphb_booking_rules_custom', $customRules );
+		$this->save( 'mphb_booking_rules_custom', $customRules );
 	}
 
 	/**
@@ -280,7 +280,7 @@ class BookingRulesMenuPage extends AbstractMenuPage {
 			)
 		), get_option( 'mphb_max_stay_length', array() ) );
 
-		$this->fields['mphb_booking_rules_custom'] = FieldFactory::create( 'mphb_booking_rules_custom_copy', array(
+		$this->fields['mphb_booking_rules_custom'] = FieldFactory::create( 'mphb_booking_rules_custom', array(
 			'type'			 => 'rules-list',
 			'label'			 => __( 'Block accommodation', 'motopress-hotel-booking' ),
 			'empty_label'	 => __( 'There are no blocking accommodation rules.', 'motopress-hotel-booking' ),
@@ -331,7 +331,7 @@ class BookingRulesMenuPage extends AbstractMenuPage {
 					'label'				 => __( 'Comment', 'motopress-hotel-booking' )
 				) )
 			)
-		), get_option( 'mphb_booking_rules_custom_copy', array() ) );
+		), get_option( 'mphb_booking_rules_custom', array() ) );
 
 		$this->fields['mphb_min_advance_reservation'] = FieldFactory::create( 'mphb_min_advance_reservation', array(
 			'type'			 => 'rules-list',

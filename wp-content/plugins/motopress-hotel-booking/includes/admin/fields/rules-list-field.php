@@ -184,7 +184,7 @@ class RulesListField extends InputField {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param \MPHB\Admin\Fields\InputField $field
 	 */
 	protected function renderValue( $field ){

@@ -115,8 +115,8 @@ class StepBooking extends Step {
 		// First delete previously unfinished booking (to free rooms)
 		$this->cleanUnfinished();
 
-        // Generate price breakdown before save: save() will trigger some emails,
-        // which require price breakdown in their text. See MB-1027 for more details
+		// Generate price breakdown before save: save() will trigger some emails,
+		// which require price breakdown in their text. See MB-1027 for more details
 		$this->booking->getPriceBreakdown();
 
 		$isCreated = MPHB()->getBookingRepository()->save( $this->booking );
@@ -164,10 +164,10 @@ class StepBooking extends Step {
 
 	/**
 	 * @return bool
-     *
-     * @since 3.7.0 added new filter - "mphb_sc_checkout_step_booking_rooms_details".
-     * @since 3.7.0 added new filter - "mphb_search_available_rooms".
-     * @since 3.7.0 added new filter - "mphb_sc_checkout_step_booking_booking_details".
+	 *
+	 * @since 3.7.0 added new filter - "mphb_sc_checkout_step_booking_rooms_details".
+	 * @since 3.7.0 added new filter - "mphb_search_available_rooms".
+	 * @since 3.7.0 added new filter - "mphb_sc_checkout_step_booking_booking_details".
 	 */
 	protected function parseBookingData(){
 
@@ -249,12 +249,12 @@ class StepBooking extends Step {
 
 					$serviceId		 = \MPHB\Utils\ValidateUtils::validateInt( $serviceDetails['id'] );
 					$serviceAdults	 = \MPHB\Utils\ValidateUtils::validateInt( $serviceDetails['adults'] );
-                    $quantity        = isset($serviceDetails['quantity']) ? ValidateUtils::validateInt($serviceDetails['quantity']) : 1;
+					$quantity        = isset($serviceDetails['quantity']) ? ValidateUtils::validateInt($serviceDetails['quantity']) : 1;
 					if ( $serviceId !== false && $serviceAdults !== false && in_array( $serviceId, $roomType->getServices() ) && $serviceAdults > 0 && (!isset($serviceDetails['quantity']) || $quantity >= 1) ) {
 						$reservedServiceAtts = array(
 							'id'        => $serviceId,
 							'adults'    => $serviceAdults,
-                            'quantity'  => $quantity
+							'quantity'  => $quantity
 						);
 						$reservedServices[]	 = Entities\ReservedService::create( $reservedServiceAtts );
 					}
@@ -290,18 +290,18 @@ class StepBooking extends Step {
 			if ( $alreadyHave < $roomsCount ) {
 				$lockedRooms = MPHB()->getRulesChecker()->customRules()->getUnavailableRooms( $this->checkInDate, $this->checkOutDate, $roomTypeId );
 
-				$searchAtts = apply_filters('mphb_search_available_rooms', array(
-                    'availability'      => 'free',
-                    'from_date'         => $this->checkInDate,
-                    'to_date'           => $this->checkOutDate,
-                    'count'             => $roomsCount - $alreadyHave,
-                    'room_type_id'      => $roomTypeId,
-                    'exclude_rooms'     => $lockedRooms,
-                    'skip_buffer_rules' => false
-				));
+				$searchAtts = apply_filters( 'mphb_search_available_rooms', array(
+					'availability'      => 'free',
+					'from_date'         => $this->checkInDate,
+					'to_date'           => $this->checkOutDate,
+					'count'             => $roomsCount - $alreadyHave,
+					'room_type_id'      => $roomTypeId,
+					'exclude_rooms'     => $lockedRooms,
+					'skip_buffer_rules' => false
+				) );
 
 				$foundRooms = MPHB()->getRoomPersistence()->searchRooms( $searchAtts );
-				
+
 				if ( $alreadyHave == 0 ) {
 					$availableRooms[$roomTypeId] = $foundRooms;
 				} else {
@@ -324,7 +324,7 @@ class StepBooking extends Step {
 			// "room_type_id" field not required anymore, but leave it for the next filter
 		}
 
-        $bookingRoomsDetails = apply_filters('mphb_sc_checkout_step_booking_booking_details', $bookingRoomsDetails);
+		$bookingRoomsDetails = apply_filters( 'mphb_sc_checkout_step_booking_booking_details', $bookingRoomsDetails );
 
 		$this->reservedRooms = array_filter( array_map( array( 'MPHB\Entities\ReservedRoom', 'create' ), $bookingRoomsDetails ) );
 
@@ -336,13 +336,13 @@ class StepBooking extends Step {
 		$note = !empty( $_POST['mphb_note'] ) ? sanitize_textarea_field( $_POST['mphb_note'] ) : '';
 
 		$bookingAtts = array(
-            'check_in_date'	 => $this->checkInDate,
-            'check_out_date' => $this->checkOutDate,
-            'customer'		 => $this->customer,
-            'note'			 => $note,
-            'status'		 => MPHB()->postTypes()->booking()->statuses()->getDefaultNewBookingStatus(),
-            'reserved_rooms' => $this->reservedRooms,
-            'checkout_id'	 => $this->checkoutId
+			'check_in_date'	 => $this->checkInDate,
+			'check_out_date' => $this->checkOutDate,
+			'customer'		 => $this->customer,
+			'note'			 => $note,
+			'status'		 => MPHB()->postTypes()->booking()->statuses()->getDefaultNewBookingStatus(),
+			'reserved_rooms' => $this->reservedRooms,
+			'checkout_id'	 => $this->checkoutId
 		);
 
 		$booking = Entities\Booking::create( $bookingAtts );
@@ -460,9 +460,9 @@ class StepBooking extends Step {
 
 	public function render(){
 
-        if ( $this->isAlreadyBooked ) {
-            $this->showAlreadyBookedMessage();
-        } else if ( !$this->isCorrectData ) {
+		if ( $this->isAlreadyBooked ) {
+			$this->showAlreadyBookedMessage();
+		} else if ( !$this->isCorrectData ) {
 			$this->showErrorsMessage();
 		} else if ( $this->unableToCreateBooking ) {
 			_e( 'Unable to create booking. Please try again.', 'motopress-hotel-booking' );
@@ -505,7 +505,7 @@ class StepBooking extends Step {
 			return;
 		}
 
-        $paymentId = $this->unfinishedBooking->getExpectPaymentId();
+		$paymentId = $this->unfinishedBooking->getExpectPaymentId();
 		$payment = $paymentId !== false ? MPHB()->getPaymentRepository()->findById( $paymentId ) : null;
 
 		if ( !is_null( $payment ) ) {

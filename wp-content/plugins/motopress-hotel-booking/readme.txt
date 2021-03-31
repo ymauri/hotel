@@ -23,7 +23,7 @@ Manage your hotel booking services. Perfect for hotels, villas, guest houses, ho
 
 == Copyright ==
 
-Hotel Booking plugin, Copyright (C) 2016 - 2020, MotoPress https://motopress.com/
+Hotel Booking plugin, Copyright (C) 2016, MotoPress https://motopress.com/
 Hotel Booking plugin is distributed under the terms of the GNU GPL.
 
 
@@ -40,6 +40,23 @@ Hotel Booking plugin is distributed under the terms of the GNU GPL.
 
 
 == Changelog ==
+
+= 3.9.4, Feb 18 2021 =
+* Improved compatibility with WordPress multisite. Added support for individual sites and network activation.
+* Bug fix: fixed an issue when the date of an internal note was not saved.
+* Bug fix: fixed an issue with payments via Stripe when amount of transaction was not calculated properly.
+* Bug fix: fixed an issue that may cause errors in Sucuri and WP Mail SMTP plugins.
+* Stripe API updated to version 7.72.0.
+
+= 3.9.3, Jan 26 2021 =
+* Added the ability to resend the confirmation email for a booking.
+* Added the ability to create internal notes for a booking visible for site admins only.
+* Improved compatibility with the image lazy-loading feature.
+* Bug fix: fixed an issue when the confirmation link in the confirmation email was redirected to the page in the default language instead of the language of the website.
+* Bug fix: fixed an issue when the cancelled bookings were not handled properly during ical synchronization.
+
+= 3.9.2, Dec 21 2020 =
+* Improved compatibility with image lazy-loading feature.
 
 = 3.9.1, Dec 10 2020 =
 * Bug fix: fixed an issue with the overbooking.

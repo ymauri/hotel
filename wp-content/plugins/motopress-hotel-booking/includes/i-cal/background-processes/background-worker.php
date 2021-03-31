@@ -16,7 +16,7 @@ abstract class BackgroundWorker extends WP_Background_Process {
 	const ACTION_PULL_URLS = 'pull-urls'; // Only for synchronization
 	const ACTION_PARSE     = 'parse';
 	const ACTION_IMPORT    = 'import';
-    const ACTION_CLEAN     = 'clean';
+	const ACTION_CLEAN     = 'clean';
 
 	const MAX_REQUEST_TIMEOUT = 30; // 30 seconds
 
@@ -47,12 +47,12 @@ abstract class BackgroundWorker extends WP_Background_Process {
 
 		parent::__construct();
 
-        // We'll need options to get current item from wp_option in
-        // background-synchronizer.php
+		// We'll need options to get current item from wp_option in
+		// background-synchronizer.php
 		$this->options = new \MPHB\iCal\OptionsHandler( $this->identifier );
 
-        $currentItem = $this->getCurrentItem();
-        $queueId = !empty($currentItem) ? Queue::findId($currentItem) : 0;
+		$currentItem = $this->getCurrentItem();
+		$queueId = !empty($currentItem) ? Queue::findId($currentItem) : 0;
 
 		$this->importer = new \MPHB\iCal\Importer();
 		$this->logger   = new \MPHB\iCal\Logger($queueId);
@@ -87,14 +87,14 @@ abstract class BackgroundWorker extends WP_Background_Process {
 		}
 	}
 
-    /**
-     * Reset only before new start. On finish you'll reset the stats.
-     */
+	/**
+	 * Reset only before new start. On finish you'll reset the stats.
+	 */
 	public function reset(){
 		$this->clearOptions();
 
 		$queueItem = $this->getCurrentItem();
-        $queueId = Queue::findId($queueItem);
+		$queueId = Queue::findId($queueItem);
 
 		$this->logger->setQueueId($queueId);
 		$this->stats->setQueueId($queueId);
@@ -104,18 +104,18 @@ abstract class BackgroundWorker extends WP_Background_Process {
 		}
 	}
 
-    /**
-     * Clear options on start and finish.
-     */
-    public function clearOptions()
-    {
-        $this->options->deleteOption('abort_current');
-    }
+	/**
+	 * Clear options on start and finish.
+	 */
+	public function clearOptions()
+	{
+		$this->options->deleteOption('abort_current');
+	}
 
 	protected function complete(){
 		parent::complete();
 
-        $this->clearOptions();
+		$this->clearOptions();
 
 		do_action( $this->identifier . '_complete' );
 	}
@@ -132,32 +132,32 @@ abstract class BackgroundWorker extends WP_Background_Process {
 		return $this->identifier;
 	}
 
-    public function getOptions()
-    {
-        return $this->options;
-    }
+	public function getOptions()
+	{
+		return $this->options;
+	}
 
 	public function getCurrentItem()
 	{
 		return '';
 	}
 
-    public function getProgress()
-    {
-        $stats = $this->stats->getStats();
+	public function getProgress()
+	{
+		$stats = $this->stats->getStats();
 
-        $total = $stats['total'];
-        $processed = $stats['succeed'] + $stats['skipped'] + $stats['failed'] + $stats['removed'];
+		$total = $stats['total'];
+		$processed = $stats['succeed'] + $stats['skipped'] + $stats['failed'] + $stats['removed'];
 
-        if ($total == 0) {
-            return $this->isInProgress() ? 0 : 100;
-        } else {
-            return min(round($processed / $total * 100), 100);
-        }
-    }
+		if ($total == 0) {
+			return $this->isInProgress() ? 0 : 100;
+		} else {
+			return min(round($processed / $total * 100), 100);
+		}
+	}
 
 	/**
-	 * @param array $task 
+	 * @param array $task
 	 * @return array|false
 	 */
 	protected function task( $task ){
@@ -182,9 +182,9 @@ abstract class BackgroundWorker extends WP_Background_Process {
 			case self::ACTION_PULL_URLS:
 				$task = $this->taskPullUrls( $task );
 				break;
-            case self::ACTION_CLEAN:
-                $task = $this->taskClean( $task );
-                break;
+			case self::ACTION_CLEAN:
+				$task = $this->taskClean( $task );
+				break;
 		}
 
 		return $task;
@@ -194,12 +194,12 @@ abstract class BackgroundWorker extends WP_Background_Process {
 	 * @param array $workload [roomId]
 	 */
 	public function addPullUrlTask( $workload ){
-        $tasks = array(
-            array_merge($workload, array(
-                'action'  => BackgroundWorker::ACTION_PULL_URLS,
-                'queueId' => $this->stats->getQueueId()
-            ) )
-        );
+		$tasks = array(
+			array_merge($workload, array(
+				'action'  => BackgroundWorker::ACTION_PULL_URLS,
+				'queueId' => $this->stats->getQueueId()
+			) )
+		);
 
 		$this->addTasks( $tasks );
 	}
@@ -209,8 +209,8 @@ abstract class BackgroundWorker extends WP_Background_Process {
 	 */
 	public function addParseTasks( $workloads ){
 		$tasks = array_map( function ( $workload ) {
-            $workload['action'] = BackgroundWorker::ACTION_PARSE;
-            return $workload;
+			$workload['action'] = BackgroundWorker::ACTION_PARSE;
+			return $workload;
 		}, $workloads );
 
 		$this->addTasks( $tasks );
@@ -221,41 +221,57 @@ abstract class BackgroundWorker extends WP_Background_Process {
 	 */
 	public function addImportTasks( $workloads ){
 		$tasks = array_map( function ( $workload ) {
-            $workload['action'] = BackgroundWorker::ACTION_IMPORT;
-            return $workload;
+			$workload['action'] = BackgroundWorker::ACTION_IMPORT;
+			return $workload;
 		}, $workloads );
 
 		$this->addTasks( $tasks );
 
-        // Clean all outdated bookings after importing the calendar
-        if (!empty($tasks)) {
-            $syncId  = $tasks[0]['syncId'];
-            $queueId = $tasks[0]['queueId'];
-            $roomId  = $tasks[0]['event']['roomId'];
+		// Clean all outdated bookings after importing the calendar
+		if (!empty($tasks)) {
+			$syncId  = $tasks[0]['syncId'];
+			$queueId = $tasks[0]['queueId'];
+			$roomId  = $tasks[0]['event']['roomId'];
 
-            $oldBookingIds = MPHB()->getBookingRepository()->findAllByCalendar($syncId);
-
-            if (!empty($oldBookingIds)) {
-                $cleanTasks = array_map(function ($bookingId) use ($syncId, $queueId, $roomId) {
-                    return array(
-                        'bookingId' => $bookingId,
-                        'syncId'    => $syncId,
-                        'queueId'   => $queueId,
-                        'roomId'    => $roomId
-                    );
-                }, $oldBookingIds);
-
-                $this->addCleanTasks($cleanTasks);
-
-                $tasksCount = count($cleanTasks);
-                $this->stats->increaseCleansTotal($tasksCount);
-
-                $logMessage = sprintf(_n('We will need to check %d previous booking after importing and remove it if the booking is outdated.', 'We will need to check %d previous bookings after importing and remove the outdated ones.', $tasksCount, 'motopress-hotel-booking'), $tasksCount);
-                $logContext = array('syncId' => $syncId, 'queueId' => $queueId, 'roomId' => $roomId);
-                $this->logger->info($logMessage, $logContext);
-            }
-        }
+			$this->preAddCleanTasks($syncId, $queueId, $roomId);
+		}
 	}
+
+	/**
+	 * @param string $syncId
+	 * @param string $queueId
+	 * @param int $roomId
+	 *
+	 * @since 3.9.3
+	 */
+    protected function preAddCleanTasks($syncId, $queueId, $roomId)
+    {
+        $oldBookingIds = MPHB()->getBookingRepository()->findAllByCalendar($syncId);
+
+        if (!empty($oldBookingIds)) {
+            $cleanTasks = array_map(function ($bookingId) use ($syncId, $queueId, $roomId) {
+                return array(
+                    'bookingId' => $bookingId,
+                    'syncId'    => $syncId,
+                    'queueId'   => $queueId,
+                    'roomId'    => $roomId
+                );
+            }, $oldBookingIds);
+
+            $this->addCleanTasks($cleanTasks);
+
+            $tasksCount = count($cleanTasks);
+            $this->stats->increaseCleansTotal($tasksCount);
+
+            $logMessage = sprintf(
+                _n('We will need to check %d previous booking after importing and remove it if the booking is outdated.', 'We will need to check %d previous bookings after importing and remove the outdated ones.', $tasksCount, 'motopress-hotel-booking'),
+                $tasksCount
+            );
+
+            $logContext = array('syncId' => $syncId, 'queueId' => $queueId, 'roomId' => $roomId);
+            $this->logger->info($logMessage, $logContext);
+        }
+    }
 
     public function addCleanTasks($workloads)
     {
@@ -269,19 +285,19 @@ abstract class BackgroundWorker extends WP_Background_Process {
 
 	/**
 	 * @param array $tasks
-     *
-     * @since 3.7.0 added new filter - "{identifier}_batch_size".
+	 *
+	 * @since 3.7.0 added new filter - "{identifier}_batch_size".
 	 */
 	protected function addTasks( $tasks ){
 		// Save new batches
-        $batchSize = apply_filters("{$this->identifier}_batch_size", self::BATCH_SIZE);
+		$batchSize = apply_filters("{$this->identifier}_batch_size", self::BATCH_SIZE);
 		$batches = array_chunk( $tasks, $batchSize );
 
 		foreach ( $batches as $batch ) {
 			$this->data( $batch )->save();
 		}
 
-        $this->touch();
+		$this->touch();
 	}
 
 	/**
@@ -324,13 +340,13 @@ abstract class BackgroundWorker extends WP_Background_Process {
 				$message = sprintf( _nx( '%1$d event found in calendar %2$s', '%1$d events found in calendar %2$s', $eventsCount, '%s - calendar URI or calendar filename', 'motopress-hotel-booking' ), $eventsCount, $calendarName );
 				$this->logger->info( $message, $logContext );
 
-                $importTasks = array_map( function ( $event ) use ( $task ) {
-                    return array(
-                        'event'   => $event,
-                        'syncId'  => $task['syncId'],
-                        'queueId' => $task['queueId']
-                    );
-                }, $events );
+				$importTasks = array_map( function ( $event ) use ( $task ) {
+					return array(
+						'event'   => $event,
+						'syncId'  => $task['syncId'],
+						'queueId' => $task['queueId']
+					);
+				}, $events );
 				$this->addImportTasks( $importTasks );
 
 				$this->stats->increaseImportsTotal($eventsCount);
@@ -341,6 +357,9 @@ abstract class BackgroundWorker extends WP_Background_Process {
 				} else {
 					$this->logger->warning( sprintf( _x( 'Calendar file is not empty, but there are no events in %s', '%s - calendar URI or calendar filename', 'motopress-hotel-booking' ), $calendarName ), $logContext );
 				}
+
+				// Remove all outdated bookings
+				$this->preAddCleanTasks($task['syncId'], $task['queueId'], $roomId);
 			}
 
 		} catch ( NoEnoughExecutionTimeException $e ) {

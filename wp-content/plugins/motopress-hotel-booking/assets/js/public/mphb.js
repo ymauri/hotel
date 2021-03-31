@@ -240,8 +240,17 @@ MPHB.FlexsliderGallery = can.Control.extend( {}, {
 		$( window ).on( 'load', function() {
 			self.initSliders();
 		} );
+
+		// Load immediately is the window already loaded
+		if ( document.readyState == 'complete' ) {
+			this.initSliders();
+		}
 	},
 	initSliders: function() {
+		if ( this.slidersLoaded ) {
+			return;
+		}
+
 		var sliderAtts = this.sliderEl.data( 'flexslider-atts' );
 
 		if ( this.navSliderEl ) {
@@ -260,6 +269,8 @@ MPHB.FlexsliderGallery = can.Control.extend( {}, {
 		this.sliderEl
 			.addClass( 'flexslider mphb-flexslider mphb-gallery-slider' )
 			.flexslider( sliderAtts );
+
+		this.slidersLoaded = true;
 	}
 } );
 

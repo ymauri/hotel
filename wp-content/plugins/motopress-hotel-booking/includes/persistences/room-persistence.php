@@ -106,7 +106,6 @@ class RoomPersistence extends RoomTypeDependencedPersistence {
 
                 // Force room type ID
                 $modifiedAtts['room_type_id'] = $roomTypeId;
-                //$modifiedAtts['availability'] = 'locked';
 
                 // Expand searched period
                 $bufferDays = mphb_get_buffer_days($atts['from_date'], $roomTypeId);
@@ -121,9 +120,6 @@ class RoomPersistence extends RoomTypeDependencedPersistence {
                 // Find rooms
                 $roomsPack = $this->findLockedRooms($modifiedAtts);
                 $roomIds = array_merge($roomIds, $roomsPack);
-
-
-
             }
         } // If search with buffer rules
 
@@ -186,7 +182,7 @@ class RoomPersistence extends RoomTypeDependencedPersistence {
         }
 
         if (!empty($atts['count'])) {
-          $sql .= " LIMIT " . absint($atts['count']);
+            $sql .= " LIMIT " . absint($atts['count']);
         }
 
         // Prepare SQL
@@ -251,9 +247,9 @@ class RoomPersistence extends RoomTypeDependencedPersistence {
      * @param \DateTime $checkInDate
      * @param \DateTime $checkOutDate
      * @param array $atts Optional. Additional attributes for searchRooms().
-     *     @param int $atts['count']
-     *     @param int|int[] $atts['room_type_id']
-     *     @param bool $atts['skip_buffer_rules'] True by default.
+     * @param int $atts['count']
+     * @param int|int[] $atts['room_type_id']
+     * @param bool $atts['skip_buffer_rules'] True by default.
      * @return bool
      *
      * @since 3.7.0 added new filter - "mphb_is_rooms_exist_query_atts".
@@ -269,7 +265,7 @@ class RoomPersistence extends RoomTypeDependencedPersistence {
 
         $searchAtts = apply_filters('mphb_is_rooms_exist_query_atts', $searchAtts);
 
-		$rooms = $this->searchRooms( $searchAtts );
+        $rooms = $this->searchRooms( $searchAtts );
 
         return count( $rooms ) >= $searchAtts['count'];
 	}

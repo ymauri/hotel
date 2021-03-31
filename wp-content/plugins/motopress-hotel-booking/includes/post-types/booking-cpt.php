@@ -56,16 +56,16 @@ class BookingCPT extends EditableCPT {
 			),
 		);
 
-        $bookingId = mphb_get_editing_post_id();
-        $booking = $bookingId > 0 ? mphb_get_booking($bookingId) : null;
+		$bookingId = mphb_get_editing_post_id();
+		$booking = $bookingId > 0 ? mphb_get_booking($bookingId) : null;
 
-        if (!is_null($booking) && !$booking->isImported()) {
-            $mainGroupFields[] = Fields\FieldFactory::create( 'mphb_edit_dates', array(
-                'type'        => 'link-button',
-                'inner_label' => __( 'Edit Dates', 'motopress-hotel-booking' ),
-                'href'        => MPHB()->getEditBookingMenuPage()->getUrl( array( 'booking_id' => $bookingId ) )
-            ) );
-        }
+		if (!is_null($booking) && !$booking->isImported()) {
+			$mainGroupFields[] = Fields\FieldFactory::create( 'mphb_edit_dates', array(
+				'type'        => 'link-button',
+				'inner_label' => __( 'Edit Dates', 'motopress-hotel-booking' ),
+				'href'        => MPHB()->getEditBookingMenuPage()->getUrl( array( 'booking_id' => $bookingId ) )
+			) );
+		}
 
 		$mainGroup->addFields( $mainGroupFields );
 
@@ -161,10 +161,32 @@ class BookingCPT extends EditableCPT {
 
 		$miscGroup->addFields( $miscGroupFields );
 
+		$internalNoteGroup = new Groups\MetaBoxGroup( 'mphb_internal_notes', __( 'Notes', 'motopress-hotel-booking' ), $this->postType, 'advanced', 'low', array( 'wide' => true ) );
+
+		$internalNoteGroupFields = array(
+			Fields\FieldFactory::create( '_mphb_booking_internal_notes',
+				array(
+					'type' => 'notes-list',
+					'default'	=> array(),
+					'fields' => array(
+						Fields\FieldFactory::create( 'note', array(
+							'type'			 => 'textarea',
+							'default'    => '',
+							'label' => __( 'Note', 'motopress-hotel-booking' )
+						) )
+					),
+					'add_label' => __( 'Add new', 'motopress-hotel-booking' )
+				)
+			)
+		);
+
+		$internalNoteGroup->addFields( $internalNoteGroupFields );
+
 		return array(
 			$mainGroup,
 			$customerGroup,
-			$miscGroup
+			$miscGroup,
+			$internalNoteGroup
 		);
 	}
 

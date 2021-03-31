@@ -128,20 +128,19 @@ class RoomRepository extends AbstractPostRepository {
 	 * @param \DateTime $checkIn
 	 * @param \DateTime $checkOut
 	 * @param int $roomTypeId
-     * @param array $atts Optional.
-     *     @param int|int[] $atts['exclude_bookings']
+	 * @param array $atts Optional.
+	 *     @param int|int[] $atts['exclude_bookings']
 	 * @return int[] IDs of locked rooms. Will always return original IDs because
-     *     of direct query to the DB.
-     *
-     * @since 3.8 added new argument $atts and parameter "exclude_bookings".
+	 *     of direct query to the DB.
+	 *
+	 * @since 3.8 added new argument $atts and parameter "exclude_bookings".
 	 */
 	public function getLockedRooms( \DateTime $checkInDate, \DateTime $checkOutDate, $roomTypeId = 0, $atts = array() ){
 
 		/**
 		 * @since 3.9
 		 */
-		//$bookingPeriod = apply_filters( 'mphb_modify_booking_period', array( $checkInDate, $checkOutDate ), $roomTypeId );
-$bookingPeriod = array( $checkInDate, $checkOutDate );
+		$bookingPeriod = array( $checkInDate, $checkOutDate );
 		$searchAtts = array_merge( array(
 			'availability'	 => 'locked',
 			'from_date'		 => $checkInDate,
@@ -254,11 +253,11 @@ $bookingPeriod = array( $checkInDate, $checkOutDate );
 	 * @param \DateTime $checkOutDate
 	 * @param type $roomTypeId Optional. 0 by default.
 	 * @return array [%Room type ID% => [%Rooms IDs%]] Will always return original
-     *     IDs because of direct query to the DB.
-     *
+	 *     IDs because of direct query to the DB.
+	 *
 	 * @global \wpdb $wpdb
-     *
-     * @since 3.8 added new argument $atts and parameter "exclude_bookings".
+	 *
+	 * @since 3.8 added new argument $atts and parameter "exclude_bookings".
 	 */
 	public function getAvailableRooms( \DateTime $checkInDate, \DateTime $checkOutDate, $roomTypeId = 0, $atts = array() ){
 		global $wpdb;

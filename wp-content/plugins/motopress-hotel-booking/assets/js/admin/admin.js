@@ -15,9 +15,9 @@
 		this.periodEl = this.filtersForm.find( '#mphb-bookings-calendar-filter-period' );
 		this.searchDateFromEl = this.filtersForm.find( '.mphb-search-date-from' );
 		this.searchDateToEl = this.filtersForm.find( '.mphb-search-date-to' );
-        this.popup = new MPHBAdmin.CalendarPopup(this.element.find('#mphb-bookings-calendar-popup'), {
-            clickTargets: this.element.find('.mphb-link-to-booking, .mphb-silent-link-to-booking')
-        });
+		this.popup = new MPHBAdmin.CalendarPopup(this.element.find('#mphb-bookings-calendar-popup'), {
+			clickTargets: this.element.find('.mphb-link-to-booking, .mphb-silent-link-to-booking')
+		});
 		this.initDatepickers();
 	},
 	initDatepickers: function() {
@@ -669,6 +669,9 @@ MPHBAdmin.Plugin = can.Construct.extend( {
 					break;
 				case 'rules-list':
 					ctrl = new MPHBAdmin.RulesListCtrl( $( this ) );
+					break;
+				case 'notes-list':
+					ctrl = new MPHBAdmin.NotesListCtrl( $( this ) );
 					break;
 				case 'variable-pricing':
 					ctrl = new MPHBAdmin.VariablePricingCtrl( $( this ) );
@@ -2116,66 +2119,6 @@ MPHBAdmin.MultipleCheckboxCtrl = MPHBAdmin.Ctrl.extend( {
 } );
 
 /**
- *
- * @requires ./ctrl.js
- */
-MPHBAdmin.NumberCtrl = MPHBAdmin.Ctrl.extend( {
-	renderValue: function( control ) {
-		var input = control.children( 'input[type="number"]' );
-		return input.val() + input.parent().text(); // value + "&nbsp;inner label"
-	}
-}, {
-	input: null,
-	disableOn: [],
-	init: function( element, args ) {
-		this._super( element, args );
-
-		this.input = this.element.children( '[name]' );
-
-		// Init dependency control
-		var dependencyName = this.input.attr( 'data-dependency' );
-		var disableOn = this.input.attr( 'data-disable-on' );
-
-		if ( dependencyName && disableOn ) {
-			this.disableOn = disableOn.split( ',' );
-
-			var self = this;
-			var dependencyCtrl = this.element.closest( 'form' ).find( '[name="' + dependencyName + '"]' );
-			dependencyCtrl.on( 'change', function( event ) {
-				var value = $( this ).val();
-				self.onDependencyChange( value );
-			} );
-		}
-	},
-	onDependencyChange: function( dependencyValue ) {
-		if ( this.disableOn.indexOf( dependencyValue ) != -1 ) {
-			this.input.prop( 'disabled', true );
-		} else {
-			this.input.prop( 'disabled', false );
-		}
-	}
-} );
-
-/**
- *
- * @requires ./ctrl.js
- */
-MPHBAdmin.PriceBreakdownCtrl = MPHBAdmin.Ctrl.extend( {}, {
-	// See also assets/js/public/dev/checkout/checkout-form.js
-	".mphb-price-breakdown-expand click": function( element, event ) {
-		event.preventDefault();
-
-		$( element ).blur(); // Don't save a:focus style on last clicked item
-
-		var tr = $( element ).parents( 'tr.mphb-price-breakdown-group' );
-		tr.find( '.mphb-price-breakdown-rate' ).toggleClass( 'mphb-hide' );
-		tr.nextUntil( 'tr.mphb-price-breakdown-group' ).toggleClass( 'mphb-hide' );
-
-        $(element).children('.mphb-inner-icon').toggleClass('mphb-hide');
-	}
-} );
-
-/**
  * @requires ./ctrl.js
  */
 MPHBAdmin.RulesListCtrl = MPHBAdmin.Ctrl.extend( {}, {
@@ -2432,6 +2375,330 @@ MPHBAdmin.RulesListCtrl = MPHBAdmin.Ctrl.extend( {}, {
 		}
 
 		return result;
+	}
+} );
+
+/**
+ * @requires ./rules-list.js
+ */
+MPHBAdmin.NotesListCtrl = MPHBAdmin.RulesListCtrl.extend( {}, {
+    editClass: 'mphb-notes-list-editing',
+    editText: '',
+	doneText: '',
+	rulesCount: 0,
+	table: null,
+	tbody: null,
+	rulePrototype: null,
+	editingRule: null,
+	noRulesMessage: null,
+	prependNewItems: false, // ... instead of append
+	init: function( element, args ) {
+        this._super( element, args );
+        this.lastIndex = -1;
+        this.editText = MPHBAdmin.Plugin.myThis.data.translations.edit;
+		this.doneText = MPHBAdmin.Plugin.myThis.data.translations.done;
+
+		this.noRulesMessage = element.find( '.mphb-notes-list-empty-message' );
+
+        this.table = element.children( 'table' );
+		this.tbody = this.table.children( 'tbody' );
+
+		if ( this.tbody.hasClass( 'mphb-sortable' ) ) {
+			this.tbody.sortable();
+			this.prependNewItems = true;
+		}
+
+		// Prepare rule prototype
+		var prototypeElement = this.tbody.children( '.mphb-notes-list-prototype' );
+		var rulePrototype = prototypeElement.clone();
+
+		prototypeElement.remove();
+
+		rulePrototype.removeClass( 'mphb-notes-list-prototype mphb-hide' );
+		rulePrototype.find( '.mphb-ctrl:not(.mphb-keep-disabled) [name]:not(.mphb-keep-disabled)' ).each( function() {
+			// Enable all controls
+			$( this ).prop( 'disabled', false );
+		} );
+
+		this.rulePrototype = rulePrototype;
+
+        // Find max (last) index
+		var rules = this.tbody.children( 'tr' );
+		var maxIndex = this.lastIndex; // -1
+
+		rules.each( function() {
+			var ruleIndex = parseInt( $( this ).attr( 'data-id' ) );
+			maxIndex = Math.max( maxIndex, ruleIndex );
+		} );
+
+		this.lastIndex = maxIndex;
+		this.rulesCount = rules.length;
+	},
+	".mphb-notes-list-add-button click": function() {
+		this.addRule();
+	},
+	".mphb-notes-list-edit-button click": function( button, event ) {
+		var rule = this.getRuleByButton( button );
+		this.toggleEdit( rule );
+	},
+	".mphb-notes-list-delete-button click": function( button, event ) {
+		var rule = this.getRuleByButton( button );
+		this.deleteRule( rule );
+	},
+    addRule: function() {
+		var rule = this.rulePrototype.clone();
+		var nextIndex = this.nextIndex();
+
+		// Set ID for new rule
+		rule.attr( 'data-id', nextIndex );
+
+		// Change ID in all names
+		rule.find( '[name*="[$index$]"]' ).each( function() {
+			var element = $( this );
+
+			var name = element.attr( 'name' );
+			name = name.replace( '$index$', nextIndex );
+			element.attr( 'name', name );
+
+			var id = element.attr( 'id' );
+			if ( id ) {
+				id = id.replace( '$index$', nextIndex );
+				element.attr( 'id', id );
+			}
+		} );
+
+		// Change ID in dependencies
+		rule.find( '[data-dependency*="[$index$]"]' ).each( function() {
+			var element = $( this );
+
+			var dependency = element.attr( 'data-dependency' );
+			dependency = dependency.replace( '$index$', nextIndex );
+
+			element.attr( 'data-dependency', dependency );
+		} );
+
+		if ( this.prependNewItems ) {
+			this.tbody.prepend( rule );
+		} else {
+			this.tbody.append( rule );
+		}
+
+		this.increaseRulesCount();
+
+		// Init new controls
+		var newControls = rule.find( '.mphb-ctrl:not([data-inited])' );
+		MPHBAdmin.Plugin.myThis.setControls( newControls );
+
+		this.toggleEdit( rule );
+	},
+	/**
+	 * @param {Object} rule &lt;tr&gt; element.
+	 */
+	toggleEdit: function( rule ) {
+		if ( this.editingRule != null ) {
+			// Toggle with active editing rule means maximize new rule or
+			// minimize the current one. In both cases current rule will be
+			// minimized
+			this.renderValues( this.editingRule );
+			this.editingRule.removeClass( this.editClass );
+
+			// Change text from "Done" to "Edit"
+			this.editingRule.find( '.mphb-notes-list-edit-button' ).text( this.editText );
+		}
+
+		if ( this.isEditingRule( rule ) ) {
+			this.editingRule = null; // Already removed the class
+		} else {
+			this.editingRule = rule;
+			rule.addClass( this.editClass );
+
+			// Change text from "Edit" to "Done"
+			rule.find( '.mphb-notes-list-edit-button' ).text( this.doneText );
+		}
+	},
+    /**
+	 * @param {Object} rule &lt;tr&gt; element.
+	 */
+	deleteRule: function( rule ) {
+		if ( this.isEditingRule( rule ) ) {
+			this.editingRule = null;
+		}
+
+		rule.remove();
+
+		this.decreaseRulesCount();
+	},
+	/**
+	 * @param {Object} rule &lt;tr&gt; element.
+	 */
+	isEditingRule: function( rule ) {
+		// rule.hasClass( this.editClass ) - at this time, the class can be
+		// removed, see toggleEdit()
+		return ( this.editingRule != null && rule[0] === this.editingRule[0] );;
+	},
+	/**
+	 * @param {Object} button "Edit" or "Delete" button.
+	 */
+	getRuleByButton: function( button ) {
+		return button.closest( 'tr' );
+	},
+	increaseRulesCount: function() {
+		if ( this.rulesCount == 0 ) {
+			this.noRulesMessage.addClass( 'mphb-hide' );
+			this.table.removeClass( 'mphb-hide' );
+		}
+
+		this.rulesCount++;
+	},
+	decreaseRulesCount: function() {
+		this.rulesCount--;
+
+		if ( this.rulesCount == 0 ) {
+			this.table.addClass( 'mphb-hide' );
+			this.noRulesMessage.removeClass( 'mphb-hide' );
+		}
+	},
+	nextIndex: function() {
+		this.lastIndex++;
+
+		return this.lastIndex;
+	},
+	/**
+	 * @param {Object} rule &lt;tr&gt; element.
+	 */
+	renderValues: function( rule ) {
+		var self = this;
+
+		rule.children( 'td' ).each( function() {
+			var td = $( this );
+			var control = td.children( '.mphb-ctrl' );
+
+			if ( control.length == 0 ) {
+				return;
+			}
+
+			var result = self.renderValue( control );
+			td.children( '.mphb-notes-list-rendered-value' ).html( result );
+		} );
+	},
+
+	renderValue: function( control ) {
+        var type = control.attr( 'data-type' );
+        var result = '';
+
+        switch ( type ) {
+            case 'text':
+                result = MPHBAdmin.Ctrl.renderValue( control );
+                break;
+
+            case 'username':
+                result = control.find( '.mphb-ctrl-user-name' ).text();
+                break;
+
+            case 'timestamp':
+                result = control.find( '.mphb-ctrl-date-val' ).text();
+                break;
+
+            case 'datepicker':
+                result = MPHBAdmin.DatePickerCtrl.renderValue( control );
+                break;
+
+            case 'textarea':
+                result = control.find( 'textarea' ).val();
+                break;
+
+            case 'number':
+                result = MPHBAdmin.NumberCtrl.renderValue( control );
+                break;
+
+            case 'select':
+            case 'dynamic-select':
+                var select = control.children( 'select' );
+                var value = select.val();
+
+                if ( value != undefined ) {
+                    var option = select.children( 'option[value="' + value + '"]' );
+                    result = option.text();
+                } else {
+                    result = MPHBAdmin.Plugin.myThis.data.translations.none;
+                }
+
+                break;
+
+            case 'multiple-checkbox':
+                result = MPHBAdmin.MultipleCheckboxCtrl.renderValue( control );
+                break;
+
+            case 'amount':
+                result = MPHBAdmin.AmountCtrl.renderValue( control );
+                break;
+
+            case 'placeholder':
+                result = '-';
+                break;
+        }
+
+        return result;
+    }
+} );
+
+/**
+ *
+ * @requires ./ctrl.js
+ */
+MPHBAdmin.NumberCtrl = MPHBAdmin.Ctrl.extend( {
+	renderValue: function( control ) {
+		var input = control.children( 'input[type="number"]' );
+		return input.val() + input.parent().text(); // value + "&nbsp;inner label"
+	}
+}, {
+	input: null,
+	disableOn: [],
+	init: function( element, args ) {
+		this._super( element, args );
+
+		this.input = this.element.children( '[name]' );
+
+		// Init dependency control
+		var dependencyName = this.input.attr( 'data-dependency' );
+		var disableOn = this.input.attr( 'data-disable-on' );
+
+		if ( dependencyName && disableOn ) {
+			this.disableOn = disableOn.split( ',' );
+
+			var self = this;
+			var dependencyCtrl = this.element.closest( 'form' ).find( '[name="' + dependencyName + '"]' );
+			dependencyCtrl.on( 'change', function( event ) {
+				var value = $( this ).val();
+				self.onDependencyChange( value );
+			} );
+		}
+	},
+	onDependencyChange: function( dependencyValue ) {
+		if ( this.disableOn.indexOf( dependencyValue ) != -1 ) {
+			this.input.prop( 'disabled', true );
+		} else {
+			this.input.prop( 'disabled', false );
+		}
+	}
+} );
+
+/**
+ *
+ * @requires ./ctrl.js
+ */
+MPHBAdmin.PriceBreakdownCtrl = MPHBAdmin.Ctrl.extend( {}, {
+	// See also assets/js/public/dev/checkout/checkout-form.js
+	".mphb-price-breakdown-expand click": function( element, event ) {
+		event.preventDefault();
+
+		$( element ).blur(); // Don't save a:focus style on last clicked item
+
+		var tr = $( element ).parents( 'tr.mphb-price-breakdown-group' );
+		tr.find( '.mphb-price-breakdown-rate' ).toggleClass( 'mphb-hide' );
+		tr.nextUntil( 'tr.mphb-price-breakdown-group' ).toggleClass( 'mphb-hide' );
+
+        $(element).children('.mphb-inner-icon').toggleClass('mphb-hide');
 	}
 } );
 

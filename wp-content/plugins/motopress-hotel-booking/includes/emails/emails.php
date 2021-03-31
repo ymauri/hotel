@@ -132,6 +132,7 @@ class Emails {
 	private function addActions(){
 
 		add_action( 'mphb_booking_status_changed', array( $this, 'sendBookingMails' ), 10, 2 );
+		add_action( 'mphb_resend_confirm', array( $this, 'resendConfirmationEmail' ), 10 );
 
 		add_action( 'mphb_booking_confirmed_with_payment', array( $this, 'sendBookingConfirmedWithPaymentEmail' ), 10, 2 );
 		add_action( 'mphb_customer_confirmed_booking', array( $this->getEmail( 'admin_customer_confirmed_booking' ), 'trigger' ) );
@@ -198,6 +199,27 @@ class Emails {
 				break;
 		}
 	}
+
+	/**
+	 *
+	 * @since 3.9.3
+	 */
+	public function resendConfirmationEmail( $booking ) {
+		if( $booking->getStatus() == BookingCPT\Statuses::STATUS_CONFIRMED ) {
+			if ( MPHB()->settings()->main()->getConfirmationMode() == 'payment' ) {
+					$expectPayment = $booking->getExpectPaymentId();
+					$payment = $expectPayment !== false ? MPHB()->getPaymentRepository()->findById( $expectPayment ) : null;
+					if ( !is_null( $payment ) ) {
+							$this->getEmail( 'customer_approved_booking' )->trigger( $booking, array( 'payment' => $payment ) );
+					} else {
+							$this->getEmail( 'customer_approved_booking' )->trigger( $booking );
+					}
+			} else {
+					$this->getEmail( 'customer_approved_booking' )->trigger( $booking );
+			}
+		}
+	}
+
 
 	/**
 	 * @return \MPHB\Emails\Mailer

@@ -18,12 +18,16 @@ class MetaBoxGroup extends InputGroup {
 	 * @param string $postType
 	 * @param string $context Optional. The context within the screen where the boxes should display ('normal', 'side', and 'advanced'). Default: 'advanced'
 	 * @param string $priority Optional. The priority within the context where the boxes should show ('high', 'default', 'low'). Default: 'default'
+	 *
+	 * @since 3.9.1
+	 * @param array $atts Optional. Additional attributes for rendering.
 	 */
-	public function __construct( $name, $label = '', $postType, $context = 'advanced', $priority = 'default' ){
+	public function __construct( $name, $label = '', $postType, $context = 'advanced', $priority = 'default', $atts = array() ){
 		parent::__construct( $name, $label );
 		$this->postType	 = $postType;
 		$this->context	 = $context;
 		$this->priority	 = $priority;
+		$this->atts = $atts;
 	}
 
 	public function getPostId(){
@@ -53,7 +57,11 @@ class MetaBoxGroup extends InputGroup {
 
 		switch ( $this->context ) {
 			case 'advanced':
-				$this->renderRegularMetaBox();
+				if( isset( $this->atts['wide'] ) && $this->atts['wide'] ) {
+					$this->renderFullWideTableMetaBox();
+				} else {
+					$this->renderRegularMetaBox();
+				}
 				break;
 			case 'side':
 				$this->renderSideMetaBox();
@@ -90,6 +98,23 @@ class MetaBoxGroup extends InputGroup {
 		echo $result;
 	}
 
+	/**
+	 *
+	 * @since 3.9.3
+	 */
+	private function renderFullWideTableMetaBox() {
+		$result = '';
+		foreach ( $this->fields as $field ) {
+			// Prevent render untranslatable field on non-default languages
+			if ( MPHB()->translation()->isTranslationPage() && MPHB()->translation()->isTranslatablePostType( $this->postType ) && !$field->isTranslatable() ) {
+				continue;
+			}
+
+			$result .= $field->render();
+		}
+		echo $result;
+	}
+
 	private function renderSideMetaBox(){
 		$result = '<div class="mphb-side-meta-box">';
 		foreach ( $this->fields as $field ) {
@@ -121,6 +146,8 @@ class MetaBoxGroup extends InputGroup {
 	/**
 	 *
 	 * @return bool
+	 *
+	 * @since 3.9.4 Deletes post meta if it has an empty array of fields.
 	 */
 	public function save(){
 
@@ -129,8 +156,15 @@ class MetaBoxGroup extends InputGroup {
 		}
 
 		$metaValues = $this->getAttsFromRequest( $_POST );
-		foreach ( $metaValues as $name => $value ) {
-			update_post_meta( $this->postId, $name, $value );
+
+		if( !empty( $metaValues ) ) {
+			foreach ( $metaValues as $name => $value ) {
+				update_post_meta( $this->postId, $name, $value );
+			}
+		} else {
+			foreach( $this->getFields() as $field ) {
+				delete_post_meta( $this->postId, $field->getName() );
+			}
 		}
 	}
 

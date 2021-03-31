@@ -117,6 +117,21 @@ table.wp-list-table.posts tbody td.column-handle {
 .mphb-ctrl-rules-list button + button {
   margin-left: 4px;
 }
+.mphb-ctrl-notes-list .mphb-notes-list-add-button {
+  margin-left: 0;
+}
+.mphb-ctrl-notes-list .mphb-ctrl-wrapper {
+  display: none;
+}
+.mphb-ctrl-notes-list .mphb-notes-list-editing .mphb-notes-list-rendered-value {
+  display: none;
+}
+.mphb-ctrl-notes-list .mphb-notes-list-editing .mphb-ctrl-wrapper {
+  display: block;
+}
+.mphb-ctrl-notes-list button + button {
+  margin-left: 4px;
+}
 .mphb-ctrl-variable-pricing .mphb-pricing-table {
   border-collapse: collapse;
 }
@@ -193,7 +208,7 @@ table.wp-list-table.posts tbody td.column-handle {
   width: 90%;
 }
 .mphb-preloader {
-  background-image: url("../../images/loading.gif?ver=3.9.1");
+  background-image: url("../../images/loading.gif?ver=3.9.4");
   width: 20px;
   height: 20px;
   display: inline-block;
@@ -395,8 +410,7 @@ div[data-group="mphb_season_prices"] > table .mphb-ctrl-variable-pricing {
 }
 .mphb-bookings-calendar-wrapper table.mphb-bookings-date-table > tbody > tr > td.mphb-date-room-locked.mphb-date-buffer {
   background: #ffd0d0;
-  background: linear-gradient(135deg, #ffffff 40%, #d9d9d9 40%, #d9d9d9 50%, #ffffff 50%, #ffffff 90%, #d9d9d9 90%, #d9d9d9 100%);
-  background-size: 5px 5px;
+  background: url("data:image/svg+xml,%3Csvg width='11' height='11' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cmask id='mask0' mask-type='alpha' maskUnits='userSpaceOnUse' x='0' y='0' width='20' height='20'%3E%3Crect width='20' height='20' fill='%23C4C4C4'/%3E%3C/mask%3E%3Cg mask='url(%23mask0)'%3E%3Cline x1='-10.3536' y1='17.9307' x2='17.9307' y2='-10.3536' stroke='%23CBCBCB'/%3E%3Cline x1='-4.35355' y1='21.9307' x2='23.9307' y2='-6.35355' stroke='%23CBCBCB'/%3E%3Cline x1='2.64645' y1='24.9307' x2='30.9307' y2='-3.35355' stroke='%23CBCBCB'/%3E%3Cline x1='8.64645' y1='28.9307' x2='36.9307' y2='0.646447' stroke='%23CBCBCB'/%3E%3C/g%3E%3C/svg%3E%0A");
 }
 .mphb-bookings-calendar-wrapper table.mphb-bookings-date-table > tbody > tr > td.mphb-date-check-out-booked {
   background: #cef093;
@@ -710,6 +724,15 @@ body.wp-admin .mphb-checkout-section + .mphb-checkout-section {
 .mphb-extensions .mphb-extension .mphb-extension-link {
   margin-top: auto;
 }
+#mphb_internal_notes table tr td:first-child .mphb-notes-list-rendered-value {
+  white-space: pre-wrap;
+}
+#mphb_internal_notes table tr td:last-child {
+  white-space: nowrap;
+}
+#mphb_internal_notes table tr td:not(:first-child) {
+  width: 10%;
+}
 @media screen and (max-width: 720px) {
   .mphb-extensions {
     flex-direction: column;
@@ -723,6 +746,44 @@ body.wp-admin .mphb-checkout-section + .mphb-checkout-section {
     object-position: center;
     max-height: 300px;
   }
+}
+.mphb-upgrade-to-premium {
+  max-width: 1000px;
+}
+.mphb-upgrade-to-premium .mphb-column-title {
+  width: 30%;
+}
+.mphb-upgrade-to-premium .mphb-column-title .mphb-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 5px;
+  display: block;
+}
+.mphb-upgrade-to-premium .mphb-column-lite {
+  width: 15%;
+  text-align: center;
+}
+.mphb-upgrade-to-premium .mphb-column-pro {
+  width: 30%;
+  text-align: center;
+}
+.mphb-upgrade-to-premium .mphb-icon-no,
+.mphb-upgrade-to-premium .mphb-icon-yes {
+  font-size: 30px;
+  width: 30px;
+  height: 30px;
+}
+.mphb-upgrade-to-premium .mphb-icon-yes {
+  color: #64d519;
+}
+.mphb-upgrade-to-premium .mphb-icon-no {
+  color: #eb4c3f;
+}
+.mphb-upgrade-to-premium .mphb-comparison-table th,
+.mphb-upgrade-to-premium .mphb-comparison-table td {
+  padding: 10px 15px;
+  vertical-align: middle;
+  font-size: 16px;
 }
 .mphb-popup .mphb-popup-backdrop {
   position: fixed;

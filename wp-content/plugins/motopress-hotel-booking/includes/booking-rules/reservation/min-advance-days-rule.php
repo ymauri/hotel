@@ -7,14 +7,14 @@ use MPHB\Utils\DateUtils;
 
 class MinAdvanceDaysRule extends AbstractRule {
 
-  /**
+	/**
 	 * @var int
 	 */
 	private $minAdvanceDays;
 
-  public function __construct( $atts ) {
+	public function __construct( $atts ) {
 		parent::__construct( $atts );
-		$this->minAdvanceDays = is_admin() ? 0 : $atts['min_advance_reservation'];
+		$this->minAdvanceDays = is_admin() && !wp_doing_ajax() ? 0 : $atts['min_advance_reservation'];
 	}
 
 	/**
@@ -24,18 +24,18 @@ class MinAdvanceDaysRule extends AbstractRule {
 	 *
 	 * @return mixed
 	 */
-  public function verify( \DateTime $checkInDate, \DateTime $checkOutDate = null, $roomTypeId = 0 ) {
+	 public function verify( \DateTime $checkInDate, \DateTime $checkOutDate = null, $roomTypeId = 0 ) {
 
-		if( is_admin() ) { // Don't apply the rule if it's a booking from admin
+		if( is_admin() && !wp_doing_ajax() ) { // Don't apply the rule if it's a booking from admin
 			return true;
 		}
 
-		$nightsSinceToday = DateUtils::calcNightsSinceToday($checkInDate);
+		$nightsSinceToday = DateUtils::calcNightsSinceToday( $checkInDate );
 
 		return $nightsSinceToday >= $this->minAdvanceDays;
-  }
+	}
 
-  /**
+	/**
 	 * @return array
 	 */
 	public function toArray() {
@@ -44,7 +44,7 @@ class MinAdvanceDaysRule extends AbstractRule {
 		) );
 	}
 
-  /**
+	/**
 	 * @return int
 	 */
 	public function getMinAdvanceDays() {

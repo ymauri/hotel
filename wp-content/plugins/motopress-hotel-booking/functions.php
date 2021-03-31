@@ -184,12 +184,12 @@ function mphb_format_price( $price, $atts = array() ){
 		$formattedPrice = ( $negative ? '-' : '' ) . sprintf( $priceFormat, $price );
 	}
 
-    if ( $atts['as_html'] ) {
-        $priceClassesStr = join( ' ', $priceClasses );
-        $price = sprintf( '<span class="%s">%s</span>', esc_attr( $priceClassesStr ), $formattedPrice );
-    } else {
-        $price = $formattedPrice;
-    }
+	if ( $atts['as_html'] ) {
+		$priceClassesStr = join( ' ', $priceClasses );
+		$price = sprintf( '<span class="%s">%s</span>', esc_attr( $priceClassesStr ), $formattedPrice );
+	} else {
+		$price = $formattedPrice;
+	}
 
 	if ( $atts['period'] ) {
 
@@ -197,9 +197,9 @@ function mphb_format_price( $price, $atts = array() ){
 		$priceDescription	 = sprintf( $priceDescription, $atts['period_nights'] );
 		$priceDescription	 = apply_filters( 'mphb_price_period_description', $priceDescription, $atts['period_nights'] );
 
-        if ( $atts['as_html'] ) {
-            $priceDescription = sprintf( '<span class="mphb-price-period" title="%1$s">%2$s</span>', esc_attr( $atts['period_title'] ), $priceDescription );
-        }
+		if ( $atts['as_html'] ) {
+			$priceDescription = sprintf( '<span class="mphb-price-period" title="%1$s">%2$s</span>', esc_attr( $atts['period_title'] ), $priceDescription );
+		}
 
 		$price = sprintf( '%1$s %2$s', $price, $priceDescription );
 	}
@@ -1511,7 +1511,7 @@ function mphb_today($modifier = '')
  */
 function mphb_has_buffer_days()
 {
-    return MPHB()->getRulesChecker()->bufferRules()->hasRules();
+	return MPHB()->getRulesChecker()->bufferRules()->hasRules();
 }
 
 /**
@@ -1523,9 +1523,9 @@ function mphb_has_buffer_days()
  */
 function mphb_get_buffer_days($date, $roomTypeId = 0)
 {
-    $actualRule = MPHB()->getRulesChecker()->bufferRules()->findActualRule($date, $roomTypeId);
+	$actualRule = MPHB()->getRulesChecker()->bufferRules()->findActualRule($date, $roomTypeId);
 
-    return $actualRule->getBufferDays();
+	return $actualRule->getBufferDays();
 }
 
 /**
@@ -1540,12 +1540,12 @@ function mphb_modify_buffer_period( $startDate, $endDate, $bufferDays = 0 )
 {
 		if( $bufferDays > 0 ) {
 			$beforeStart = DateUtils::cloneModify($startDate, "-{$bufferDays} days");
-	    $afterEnd    = DateUtils::cloneModify($endDate, "+{$bufferDays} days");
+			$afterEnd    = DateUtils::cloneModify($endDate, "+{$bufferDays} days");
 
 			return array( $beforeStart, $afterEnd );
 		}
 
-    return array( $startDate, $endDate );
+	return array( $startDate, $endDate );
 }
 
 /**
@@ -1561,29 +1561,29 @@ function mphb_modify_buffer_period( $startDate, $endDate, $bufferDays = 0 )
  */
 function mphb_modify_booking_buffer_period($booking, $bufferDays, $extendDates = false)
 {
-    $checkInDate = $booking->getCheckInDate();
-    $checkOutDate = $booking->getCheckOutDate();
+	$checkInDate = $booking->getCheckInDate();
+	$checkOutDate = $booking->getCheckOutDate();
 
-    $offsetDays = $extendDates ? $bufferDays + 1 : $bufferDays;
+	$offsetDays = $extendDates ? $bufferDays + 1 : $bufferDays;
 
-    // Find the buffer range
-    list($beforeCheckIn, $afterCheckOut) = mphb_modify_buffer_period($checkInDate, $checkOutDate, $bufferDays);
+	// Find the buffer range
+	list($beforeCheckIn, $afterCheckOut) = mphb_modify_buffer_period($checkInDate, $checkOutDate, $bufferDays);
 
-    if ($extendDates) {
-        $afterCheckOut->modify('+1 day');
-    }
+	if ($extendDates) {
+		$afterCheckOut->modify('+1 day');
+	}
 
-    // Build the full period
-    $fullPeriod = DateUtils::createDatePeriod($beforeCheckIn, $afterCheckOut);
+	// Build the full period
+	$fullPeriod = DateUtils::createDatePeriod($beforeCheckIn, $afterCheckOut);
 
-    // Split period to dates
-    $bufferDates = iterator_to_array($fullPeriod);
-    array_splice($bufferDates, $offsetDays, -$offsetDays); // Remove booking inner dates
+	// Split period to dates
+	$bufferDates = iterator_to_array($fullPeriod);
+	array_splice($bufferDates, $offsetDays, -$offsetDays); // Remove booking inner dates
 
-    $dateFormat  = MPHB()->settings()->dateTime()->getDateTransferFormat();
-    $dateStrings = array_map(function ($date) use ($dateFormat) { return $date->format($dateFormat); }, $bufferDates);
+	$dateFormat  = MPHB()->settings()->dateTime()->getDateTransferFormat();
+	$dateStrings = array_map(function ($date) use ($dateFormat) { return $date->format($dateFormat); }, $bufferDates);
 
-    return array_combine($dateStrings, $bufferDates);
+	return array_combine($dateStrings, $bufferDates);
 }
 
 /**
@@ -1657,13 +1657,4 @@ function mphb_filter_checkin_checkout_dates( $datesArray, $roomsTotal ) {
 
 	return array( $checkIns, $checkOuts );
 
-}
-
-/*
- * @return boolean
- *
- * @since 3.8.4
- */
-function mphb_sliders_lazy_load_enabled(){
-    return false;
 }

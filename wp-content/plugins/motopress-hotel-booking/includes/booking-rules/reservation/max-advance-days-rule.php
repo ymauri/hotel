@@ -7,14 +7,14 @@ use MPHB\Utils\DateUtils;
 
 class MaxAdvanceDaysRule extends AbstractRule {
 
-  /**
+	/**
 	 * @var int
 	 */
 	private $maxAdvanceDays;
 
-  public function __construct( $atts ) {
+	public function __construct( $atts ) {
 		parent::__construct( $atts );
-		$this->maxAdvanceDays = is_admin() ? 0 : $atts['max_advance_reservation'];
+		$this->maxAdvanceDays = is_admin() && !wp_doing_ajax() ? 0 : $atts['max_advance_reservation'];
 	}
 
 	/**
@@ -24,18 +24,18 @@ class MaxAdvanceDaysRule extends AbstractRule {
 	 *
 	 * @return mixed
 	 */
-  public function verify( \DateTime $checkInDate = null, \DateTime $checkOutDate, $roomTypeId = 0 ) {
+	 public function verify( \DateTime $checkInDate = null, \DateTime $checkOutDate, $roomTypeId = 0 ) {
 		// Max advance days unlimited
-		if ($this->maxAdvanceDays == 0 || is_admin()) {
+		if ( $this->maxAdvanceDays == 0 || is_admin() && !wp_doing_ajax() ) {
 			return true;
 		}
 
-		$nightsSinceToday = DateUtils::calcNightsSinceToday($checkInDate);
+		$nightsSinceToday = DateUtils::calcNightsSinceToday( $checkInDate );
 
 		return $nightsSinceToday <= $this->maxAdvanceDays;
-  }
+	}
 
-  /**
+	/**
 	 * @return array
 	 */
 	public function toArray() {
@@ -44,7 +44,7 @@ class MaxAdvanceDaysRule extends AbstractRule {
 		) );
 	}
 
-  /**
+	/**
 	 * @return int
 	 */
 	public function getMaxAdvanceDays() {

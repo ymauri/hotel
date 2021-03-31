@@ -44,9 +44,9 @@ abstract class ScriptManager {
 		if ( is_null( $locale ) ) {
 			$locale = get_locale();
 		}
-        if ( $locale == 'nb_NO' || $locale == 'nn_NO' ) {
-            $locale = 'no';
-        }
+		if ( $locale == 'nb_NO' || $locale == 'nn_NO' ) {
+			$locale = 'no';
+		}
 		if ( !in_array( $locale, $availableLocales ) ) {
 			$locale = substr( $locale, 0, 2 );
 			if ( !in_array( $locale, $availableLocales ) ) {

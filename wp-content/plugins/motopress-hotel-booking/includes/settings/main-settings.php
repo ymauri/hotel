@@ -7,9 +7,9 @@ class MainSettings {
 	private $defaultUserApprovalTime = 20;
 	private $defaultConfirmationMode = 'auto';
 	private $countriesBundle;
-    private $customerBundle = null;
+	private $customerBundle = null;
 
-    /**
+	/**
 	 *
 	 * @var array
 	 */
@@ -150,8 +150,8 @@ class MainSettings {
 	 */
 	public function getChildrenAgeText(){
 		$text = get_option( 'mphb_children_age', '' );
-        $text = apply_filters( 'mphb_translate_string', $text, 'mphb_children_age' );
-        return $text;
+		$text = apply_filters( 'mphb_translate_string', $text, 'mphb_children_age' );
+		return $text;
 	}
 
 	/**
@@ -161,35 +161,35 @@ class MainSettings {
 		return $this->isDirectRoomBooking() || $this->isDirectSearchResultsBooking();
 	}
 
-    /**
-     * @return bool
-     *
-     * @since 3.7.3
-     */
-    public function isDirectRoomBooking()
-    {
-        return (bool)get_option('mphb_direct_booking', false);
-    }
+	/**
+	 * @return bool
+	 *
+	 * @since 3.7.3
+	 */
+	public function isDirectRoomBooking()
+	{
+		return (bool) get_option( 'mphb_direct_booking', false );
+	}
 
-    /**
-     * @return string "disabled"|"enabled"|"capacity"
-     *
-     * @since 3.8.3
-     */
-    public function getDirectBookingPricing()
-    {
-        return get_option('mphb_direct_booking_price', 'disabled');
-    }
+	/**
+	 * @return string "disabled"|"enabled"|"capacity"
+	 *
+	 * @since 3.8.3
+	 */
+	public function getDirectBookingPricing()
+	{
+		return get_option( 'mphb_direct_booking_price', 'disabled' );
+	}
 
-    /**
-     * @return bool
-     *
-     * @since 3.7.3
-     */
-    public function isDirectSearchResultsBooking()
-    {
-        return (bool)get_option('mphb_direct_search_results', false);
-    }
+	/**
+	 * @return bool
+	 *
+	 * @since 3.7.3
+	 */
+	public function isDirectSearchResultsBooking()
+	{
+		return (bool) get_option( 'mphb_direct_search_results', false );
+	}
 
 	/**
 	 * Check whether to use templates from plugin
@@ -248,9 +248,9 @@ class MainSettings {
 		if ( $page ) {
 			$content = apply_filters( 'the_content', $page->post_content );
 
-            // Fix the filter "wpautop" for future blocks. Otherwise the filter
-            // will break the markup of those blocks
-            mphb_fix_blocks_autop();
+			// Fix the filter "wpautop" for future blocks. Otherwise the filter
+			// will break the markup of those blocks
+			mphb_fix_blocks_autop();
 		}
 
 		return $content;
@@ -355,14 +355,14 @@ class MainSettings {
 		return (bool) get_option( 'mphb_require_full_address', false );
 	}
 
-    /**
-     * @return bool
-     *
-     * @since 3.6.1
-     */
-    public function isCustomerRequiredOnAdmin(){
-        return (bool) get_option( 'mphb_require_customer_on_admin', false );
-    }
+	/**
+	 * @return bool
+	 *
+	 * @since 3.6.1
+	 */
+	public function isCustomerRequiredOnAdmin(){
+		return (bool) get_option( 'mphb_require_customer_on_admin', false );
+	}
 
 	/**
 	 *
@@ -388,19 +388,19 @@ class MainSettings {
 		return get_option( 'mphb_default_country', '' );
 	}
 
-    /**
-     * @return \MPHB\Bundles\CustomerBundle
-     *
-     * @since 3.7.2
-     */
-    public function getCustomerBundle()
-    {
-        if (is_null($this->customerBundle)) {
-            $this->customerBundle = new \MPHB\Bundles\CustomerBundle();
-        }
+	/**
+	 * @return \MPHB\Bundles\CustomerBundle
+	 *
+	 * @since 3.7.2
+	 */
+	public function getCustomerBundle()
+	{
+		if ( is_null( $this->customerBundle ) ) {
+			$this->customerBundle = new \MPHB\Bundles\CustomerBundle();
+		}
 
-        return $this->customerBundle;
-    }
+		return $this->customerBundle;
+	}
 
 	/**
 	 *
@@ -465,68 +465,68 @@ class MainSettings {
 		return !$this->isChildrenAllowed() || $this->isGuestsHiddenInSearch();
 	}
 
-    public function useBlockEditorForRoomTypes()
-    {
-        return (bool)get_option('mphb_use_block_editor_for_room_types', false);
-    }
+	public function useBlockEditorForRoomTypes()
+	{
+		return (bool) get_option( 'mphb_use_block_editor_for_room_types', false );
+	}
 
-    public function useBlockEditorForServices()
-    {
-        return (bool)get_option('mphb_use_block_editor_for_services', false);
-    }
+	public function useBlockEditorForServices()
+	{
+		return (bool) get_option( 'mphb_use_block_editor_for_services', false );
+	}
 
-    public function isPriceBreakdownUnfoldedByDefault()
-    {
-        return (bool)get_option('mphb_unfold_price_breakdown', false);
-    }
+	public function isPriceBreakdownUnfoldedByDefault()
+	{
+		return (bool) get_option( 'mphb_unfold_price_breakdown', false );
+	}
 
-    /**
-     * @return bool
-     */
-    public function showExtensionLinks()
-    {
-        return apply_filters('mphb_show_extension_links', true);
-    }
+	/**
+	 * @return bool
+	 */
+	public function showExtensionLinks()
+	{
+		return apply_filters( 'mphb_show_extension_links', true );
+	}
 
-    public function exportBlockedAccommodations()
-    {
-        return (bool)get_option('mphb_ical_export_blocks', false);
-    }
+	public function exportBlockedAccommodations()
+	{
+		return (bool) get_option( 'mphb_ical_export_blocks', false );
+	}
 
-    public function exportImportedBookings()
-    {
-        return !(bool)get_option('mphb_ical_dont_export_imports', true);
-    }
+	public function exportImportedBookings()
+	{
+		return ! (bool) get_option( 'mphb_ical_dont_export_imports', true );
+	}
 
-    /**
-     * @param null|int $userId Optional. Current user by default.
-     * @param null|bool $setValue Optional. If set, will update the value.
-     * @return bool
-     */
-    public function displayImportedBookings($userId = null, $setValue = null)
-    {
-        if (is_null($userId)) {
-            $userId = get_current_user_id();
-        }
+	/**
+	 * @param null|int $userId Optional. Current user by default.
+	 * @param null|bool $setValue Optional. If set, will update the value.
+	 * @return bool
+	 */
+	public function displayImportedBookings( $userId = null, $setValue = null )
+	{
+		if ( is_null( $userId ) ) {
+			$userId = get_current_user_id();
+		}
 
-        $displayImport = get_user_meta($userId, 'mphb_display_imported_bookings', true);
+		$displayImport = get_user_meta( $userId, 'mphb_display_imported_bookings', true );
 
-        if (is_null($setValue)) {
-            return (bool)$displayImport;
-        } else {
-            update_user_meta($userId, 'mphb_display_imported_bookings', $setValue, $displayImport);
-            return $setValue;
-        }
-    }
+		if ( is_null( $setValue ) ) {
+			return (bool) $displayImport;
+		} else {
+			update_user_meta( $userId, 'mphb_display_imported_bookings', $setValue, $displayImport );
+			return $setValue;
+		}
+	}
 
-    /**
-     * @return string
-     *
-     * @since 3.6.1
-     */
-    public function deleteSyncLogsOlderThan()
-    {
-        return get_option('mphb_ical_auto_delete_period', 'quarter');
-    }
+	/**
+	 * @return string
+	 *
+	 * @since 3.6.1
+	 */
+	public function deleteSyncLogsOlderThan()
+	{
+		return get_option( 'mphb_ical_auto_delete_period', 'quarter' );
+	}
 
 }

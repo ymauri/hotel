@@ -42,7 +42,7 @@ class EmailTemplater extends AbstractTemplater {
 		$defaultTagGroups = array(
 			'global'			 => true,
 			'booking'			 => false,
-            'booking_details'    => false,
+			'booking_details'    => false,
 			'user_confirmation'	 => false,
 			'user_cancellation'	 => false,
 			'payment'			 => false
@@ -67,9 +67,9 @@ class EmailTemplater extends AbstractTemplater {
 			$this->_fillBookingTags( $tags );
 		}
 
-        if ($this->tagGroups['booking_details']) {
-            $this->_fillBookingDetailsTags($tags);
-        }
+		if ($this->tagGroups['booking_details']) {
+			$this->_fillBookingDetailsTags($tags);
+		}
 
 		if ( $this->tagGroups['user_confirmation'] ) {
 			$this->_fillUserConfirmationTags( $tags );
@@ -98,7 +98,7 @@ class EmailTemplater extends AbstractTemplater {
 			)
 		);
 
-        $globalTags = apply_filters( 'mphb_email_global_tags', $globalTags );
+		$globalTags = apply_filters( 'mphb_email_global_tags', $globalTags );
 
 		$tags = array_merge( $tags, $globalTags );
 	}
@@ -151,26 +151,26 @@ class EmailTemplater extends AbstractTemplater {
 				'name'			 => 'customer_phone',
 				'description'	 => __( 'Customer Phone', 'motopress-hotel-booking' ),
 			),
-            array(
-                'name'           => 'customer_country',
-                'description'    => __( 'Customer Country', 'motopress-hotel-booking' )
-            ),
-            array(
-                'name'           => 'customer_address1',
-                'description'    => __( 'Customer Address', 'motopress-hotel-booking' )
-            ),
-            array(
-                'name'           => 'customer_city',
-                'description'    => __( 'Customer City', 'motopress-hotel-booking' )
-            ),
-            array(
-                'name'           => 'customer_state',
-                'description'    => __( 'Customer State/County', 'motopress-hotel-booking' )
-            ),
-            array(
-                'name'           => 'customer_zip',
-                'description'    => __( 'Customer Postcode', 'motopress-hotel-booking' )
-            ),
+			array(
+				'name'           => 'customer_country',
+				'description'    => __( 'Customer Country', 'motopress-hotel-booking' )
+			),
+			array(
+				'name'           => 'customer_address1',
+				'description'    => __( 'Customer Address', 'motopress-hotel-booking' )
+			),
+			array(
+				'name'           => 'customer_city',
+				'description'    => __( 'Customer City', 'motopress-hotel-booking' )
+			),
+			array(
+				'name'           => 'customer_state',
+				'description'    => __( 'Customer State/County', 'motopress-hotel-booking' )
+			),
+			array(
+				'name'           => 'customer_zip',
+				'description'    => __( 'Customer Postcode', 'motopress-hotel-booking' )
+			),
 			array(
 				'name'			 => 'customer_note',
 				'description'	 => __( 'Customer Note', 'motopress-hotel-booking' ),
@@ -180,34 +180,34 @@ class EmailTemplater extends AbstractTemplater {
 				'name'			 => 'reserved_rooms_details',
 				'description'	 => __( 'Reserved Accommodations Details', 'motopress-hotel-booking' ),
 			),
-            // Other
-            array(
-                'name'           => 'price_breakdown',
-                'description'    => __( 'Price Breakdown', 'motopress-hotel-booking' )
-            )
+			// Other
+			array(
+				'name'           => 'price_breakdown',
+				'description'    => __( 'Price Breakdown', 'motopress-hotel-booking' )
+			)
 		);
 
-        $bookingTags = apply_filters( 'mphb_email_booking_tags', $bookingTags );
+		$bookingTags = apply_filters( 'mphb_email_booking_tags', $bookingTags );
 
 		$tags = array_merge( $tags, $bookingTags );
 	}
 
-    /**
-     * @since 3.7.0
-     */
-    private function _fillBookingDetailsTags(&$tags)
-    {
-        $orderViewTags = array(
-            array(
-                'name'        => 'view_booking_link',
-                'description' => __('Booking Details', 'motopress-hotel-booking')
-            )
-        );
+	/**
+	* @since 3.7.0
+	*/
+	private function _fillBookingDetailsTags(&$tags)
+	{
+		$orderViewTags = array(
+			array(
+				'name'        => 'view_booking_link',
+				'description' => __('Booking Details', 'motopress-hotel-booking')
+			)
+		);
 
-        $orderViewTags = apply_filters('mphb_email_booking_details_tags', $orderViewTags);
+		$orderViewTags = apply_filters('mphb_email_booking_details_tags', $orderViewTags);
 
-        $tags = array_merge($tags, $orderViewTags);
-    }
+		$tags = array_merge($tags, $orderViewTags);
+	}
 
 	private function _fillUserConfirmationTags( &$tags ){
 		$userConfirmationTags = array(
@@ -221,7 +221,7 @@ class EmailTemplater extends AbstractTemplater {
 			)
 		);
 
-        $userConfirmationTags = apply_filters( 'mphb_email_user_confirmation_tags', $userConfirmationTags );
+		$userConfirmationTags = apply_filters( 'mphb_email_user_confirmation_tags', $userConfirmationTags );
 
 		$tags = array_merge( $tags, $userConfirmationTags );
 	}
@@ -234,7 +234,7 @@ class EmailTemplater extends AbstractTemplater {
 			),
 		);
 
-        $userCancellationTags = apply_filters( 'mphb_email_user_cancellation_tags', $userCancellationTags );
+		$userCancellationTags = apply_filters( 'mphb_email_user_cancellation_tags', $userCancellationTags );
 
 		$tags = array_merge( $tags, $userCancellationTags );
 	}
@@ -253,13 +253,13 @@ class EmailTemplater extends AbstractTemplater {
 				'name'			 => 'payment_method',
 				'description'	 => __( 'The method of payment', 'motopress-hotel-booking' )
 			),
-            array(
-                'name'           => 'payment_instructions',
-                'description'    => __( 'Payment instructions', 'motopress-hotel-booking' )
-            )
+			array(
+				'name'           => 'payment_instructions',
+				'description'    => __( 'Payment instructions', 'motopress-hotel-booking' )
+			)
 		);
 
-        $paymentTags = apply_filters( 'mphb_email_payment_tags', $paymentTags );
+		$paymentTags = apply_filters( 'mphb_email_payment_tags', $paymentTags );
 
 		$tags = array_merge( $tags, $paymentTags );
 	}
@@ -284,14 +284,14 @@ class EmailTemplater extends AbstractTemplater {
 	 * @param array $match
 	 * @param string $match[0] The tag.
 	 * @return string
-     *
-     * @since 3.6.1 added new macros - %customer_country%.
-     * @since 3.6.1 added new macros - %customer_address1%.
-     * @since 3.6.1 added new macros - %customer_city%.
-     * @since 3.6.1 added new macros - %customer_state%.
-     * @since 3.6.1 added new macros - %customer_zip%.
-     * @since 3.6.1 added new macros - %price_breakdown%.
-     * @since 3.6.1 added new macros - %payment_instructions%.
+	 *
+	 * @since 3.6.1 added new macros - %customer_country%.
+	 * @since 3.6.1 added new macros - %customer_address1%.
+	 * @since 3.6.1 added new macros - %customer_city%.
+	 * @since 3.6.1 added new macros - %customer_state%.
+	 * @since 3.6.1 added new macros - %customer_zip%.
+	 * @since 3.6.1 added new macros - %price_breakdown%.
+	 * @since 3.6.1 added new macros - %payment_instructions%.
 	 */
 	public function replaceTag( $match ){
 
@@ -320,7 +320,7 @@ class EmailTemplater extends AbstractTemplater {
 				break;
 			case 'booking_edit_link':
 				if ( isset( $this->booking ) ) {
-					$replaceText = mphb_get_edit_post_link_for_everyone( $this->booking->getId() );
+					$replaceText = apply_filters( 'wpml_permalink', mphb_get_edit_post_link_for_everyone( $this->booking->getId() ), apply_filters( 'wpml_current_language', NULL ) );
 				}
 				break;
 			case 'booking_total_price':
@@ -349,30 +349,30 @@ class EmailTemplater extends AbstractTemplater {
 					$replaceText = MPHB()->emails()->getReservedRoomsTemplater()->process( $this->booking );
 				}
 				break;
-            case 'price_breakdown':
-                if ( isset( $this->booking ) ) {
-                    $priceDetails = $this->booking->getLastPriceBreakdown();
-                    if ( !empty( $priceDetails ) ) {
-                        $replaceText = Views\BookingView::generatePriceBreakdownArray( $priceDetails, array(
-                            'title_expandable' => false,
-                            'coupon_removable' => false,
-                            'force_unfold'     => true
-                        ) );
-                    }
-                }
-                break;
+			case 'price_breakdown':
+				if ( isset( $this->booking ) ) {
+					$priceDetails = $this->booking->getLastPriceBreakdown();
+					if ( !empty( $priceDetails ) ) {
+						$replaceText = Views\BookingView::generatePriceBreakdownArray( $priceDetails, array(
+							'title_expandable' => false,
+							'coupon_removable' => false,
+							'force_unfold'     => true
+						) );
+					}
+				}
+				break;
 
-            // Booking Details
-            case 'view_booking_link':
-                $args = array();
-                if (isset($this->payment)) {
-                    $args['payment'] = $this->payment;
-                }
-                if (isset($this->booking)) {
-                    $args['booking'] = $this->booking;
-                }
-                $replaceText = (string)MPHB()->userActions()->getBookingViewAction()->generateLink($args);
-                break;
+			// Booking Details
+			case 'view_booking_link':
+				$args = array();
+				if (isset($this->payment)) {
+					$args['payment'] = $this->payment;
+				}
+				if (isset($this->booking)) {
+					$args['booking'] = $this->booking;
+				}
+				$replaceText = (string)apply_filters( 'wpml_permalink', MPHB()->userActions()->getBookingViewAction()->generateLink($args), apply_filters( 'wpml_current_language', NULL ) );
+				break;
 
 			// Customer
 			case 'customer_first_name':
@@ -395,32 +395,32 @@ class EmailTemplater extends AbstractTemplater {
 					$replaceText = $this->booking->getCustomer()->getPhone();
 				}
 				break;
-            case 'customer_country':
-                if ( isset( $this->booking ) ) {
-                    $countryCode = $this->booking->getCustomer()->getCountry();
-                    $replaceText = MPHB()->settings()->main()->getCountriesBundle()->getCountryLabel( $countryCode );
-                }
-                break;
-            case 'customer_address1':
-                if ( isset( $this->booking ) ) {
-                    $replaceText = $this->booking->getCustomer()->getAddress1();
-                }
-                break;
-            case 'customer_city':
-                if ( isset( $this->booking ) ) {
-                    $replaceText = $this->booking->getCustomer()->getCity();
-                }
-                break;
-            case 'customer_state':
-                if ( isset( $this->booking ) ) {
-                    $replaceText = $this->booking->getCustomer()->getState();
-                }
-                break;
-            case 'customer_zip':
-                if ( isset( $this->booking ) ) {
-                    $replaceText = $this->booking->getCustomer()->getZip();
-                }
-                break;
+			case 'customer_country':
+				if ( isset( $this->booking ) ) {
+					$countryCode = $this->booking->getCustomer()->getCountry();
+					$replaceText = MPHB()->settings()->main()->getCountriesBundle()->getCountryLabel( $countryCode );
+				}
+				break;
+			case 'customer_address1':
+				if ( isset( $this->booking ) ) {
+					$replaceText = $this->booking->getCustomer()->getAddress1();
+				}
+				break;
+			case 'customer_city':
+				if ( isset( $this->booking ) ) {
+					$replaceText = $this->booking->getCustomer()->getCity();
+				}
+				break;
+			case 'customer_state':
+				if ( isset( $this->booking ) ) {
+					$replaceText = $this->booking->getCustomer()->getState();
+				}
+				break;
+			case 'customer_zip':
+				if ( isset( $this->booking ) ) {
+					$replaceText = $this->booking->getCustomer()->getZip();
+				}
+				break;
 			case 'customer_note':
 				if ( isset( $this->booking ) ) {
 					$replaceText = $this->booking->getNote();
@@ -428,7 +428,7 @@ class EmailTemplater extends AbstractTemplater {
 				break;
 			case 'user_confirm_link':
 				if ( isset( $this->booking ) ) {
-					$replaceText = MPHB()->userActions()->getBookingConfirmationAction()->generateLink( $this->booking );
+					$replaceText = apply_filters( 'wpml_permalink', MPHB()->userActions()->getBookingConfirmationAction()->generateLink( $this->booking ), apply_filters( 'wpml_current_language', NULL ) );
 				}
 				break;
 			case 'user_confirm_link_expire':
@@ -463,19 +463,19 @@ class EmailTemplater extends AbstractTemplater {
 					$replaceText = $gateway ? $gateway->getTitle() : '';
 				}
 				break;
-            case 'payment_instructions':
-                if ( isset( $this->payment ) ) {
-                    $gateway = MPHB()->gatewayManager()->getGateway( $this->payment->getGatewayId() );
-                    if ($gateway) {
-                        $instructions = $gateway->getInstructions();
-                        $replaceText  = wp_kses_post(wpautop(wptexturize($instructions)));
-                    }
-                }
-                break;
+			case 'payment_instructions':
+				if ( isset( $this->payment ) ) {
+					$gateway = MPHB()->gatewayManager()->getGateway( $this->payment->getGatewayId() );
+					if ($gateway) {
+						$instructions = $gateway->getInstructions();
+						$replaceText  = wp_kses_post(wpautop(wptexturize($instructions)));
+					}
+				}
+				break;
 			// Deprecated
 		}
 
-        /** @since 3.0.3 Has 3rd and 4th arguments - booking and payment. */
+		/** @since 3.0.3 Has 3rd and 4th arguments - booking and payment. */
 		$replaceText = apply_filters( 'mphb_email_replace_tag', $replaceText, $tag, $this->booking, $this->payment );
 
 		return $replaceText;
