@@ -45,6 +45,22 @@ class Calendar
             }
         }
 
+        //When we want to update a reservation and the final listing_id is not in BD 
+        //we must delete the booking
+        else {
+            if (!empty($bookingId)) {
+                wp_delete_post($bookingId, true);
+            }
+            if (
+                isset($oldReservation['listingId']) &&
+                isset($oldReservation['checkInDateLocalized']) &&
+                isset($oldReservation['checkOutDateLocalized'])
+            ) {
+                $oldCheckout =  date("Y-m-d", strtotime($oldReservation['checkOutDateLocalized'] . " -1 day"));
+                $this->deleteBlockedRoom($oldReservation['listingId'], $oldReservation['checkInDateLocalized'], $oldCheckout);
+            }
+        }
+
         $this->log($bookingId, $reservation["_id"]);
 
         return $bookingId;
@@ -285,7 +301,6 @@ class Calendar
             //Search booking by dates
             $bookings = get_posts([
                 'post_type'  => 'mphb_booking',
-                'post_status' => 'confirmed',
                 'meta_query' => [
                     [
                         'key'   => 'mphb_check_in_date',
@@ -355,8 +370,8 @@ class Calendar
     {
         $blockedRooms = $this->getBlockedRooms();
         foreach ($blockedRooms as $key => $blockedRoom) {
-            if (strtotime($blockedRoom['date_from']) < strtotime('-1 day') && strtotime($blockedRoom['date_to']) < strtotime('-1 day') && empty($blockedRoom['comment'])) {
-                unset($blokedRoom[$key]);
+            if (strtotime($blockedRoom['date_from']) < strtotime('-1 day') && strtotime($blockedRoom['date_to']) < strtotime('-1 day')) {
+                unset($blockedRooms[$key]);
             }
         }
 
@@ -439,6 +454,8 @@ class Calendar
             }
         }
 
+        //El problema es que cuando hace la búsqueda de los bloqueos, cuenta los que están también por encima de la reserva
+        //No puede pasar que yo tenga un bloqueo de depto reserva encima de la reserva 
         if ($listingCalendar[$first]['status'] != 'available') {
             $this->syncOtherRooms($listingCalendar[$first]['listingId'], $bookedRoomId, $data);
         } else {
@@ -482,5 +499,36 @@ class Calendar
         }
 
         return $status;
+    }
+
+    /**
+     * Fill calendar with guesty data
+     * @return void
+     */
+    public function populateCalendar() {
+        $guesty = new Guesty();
+        $reservationsCounter = $reservationsAvailable = 0;
+    
+        while ($reservationsCounter == 0 || $reservationsCounter < $reservationsAvailable) {
+            $response = $guesty->reservations([
+                'fields' => 'listingId guestsCount checkInDateLocalized checkOutDateLocalized status guest.firstName guest.lastName guest.email guest.phone customFields',
+                'filter' => '[{"field":"status", "operator":"$in", "value":["confirmed"]}',
+                'limit' => 100,
+                'skip' => $reservationsCounter
+            ]);
+            if ($response['status'] == 200 && count($response['result']['results']) > 0) {
+                $reservations = $response['result']['results'];
+                $reservationsAvailable = $response['result']['count'];
+                $reservationsCounter +=  $response['result']['limit'];
+    
+                foreach ($reservations as $reservation) {
+                    $this->syncCalendar($reservation);
+                    echo $reservation['_id'] . " done </br>";
+                }
+            } else {
+                break;
+            }
+        }
+    
     }
 }
