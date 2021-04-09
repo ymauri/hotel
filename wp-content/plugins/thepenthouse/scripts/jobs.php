@@ -1,20 +1,19 @@
 <?php
-function delete_old_blocked_deactivate() {
-    wp_clear_scheduled_hook( 'delete_old_blocked' );
-}
- 
-add_action('init', function() {
-    add_action( 'delete_old_blocked', 'delete_old_blocked_run' );
-    register_deactivation_hook( __FILE__, 'delete_old_blocked_deactivate' );
- 
-    if (! wp_next_scheduled ( 'delete_old_blocked' )) {
-        wp_schedule_event( strtotime('11:02:00'), 'daily', 'delete_old_blocked' );
-    }
+add_action('rest_api_init', function () {
+    register_rest_route('tphapi', '/job/deleteBlocked/', ['methods' => 'GET', 'callback' => 'delete_old_blocked_run', 'permission_callback' => '__return_true']);
+    register_rest_route('tphapi', '/job/syncReservations/', ['methods' => 'GET', 'callback' => 'sync_calendar_auto', 'permission_callback' => '__return_true']);
+
 });
  
 function delete_old_blocked_run() {
     $calendar  = new Calendar();
-    $calendar->deletePast();
+    // $calendar->deletePast();
     $seasons = new SeasonsRates();
     $seasons->deleteOldSeasons();
+}
+
+function sync_calendar_auto (){
+    $calendar = new Calendar();
+    $calendar->populateCalendar();
+    exit();
 }

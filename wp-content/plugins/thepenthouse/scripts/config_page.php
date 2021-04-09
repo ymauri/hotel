@@ -37,35 +37,12 @@ function booking_rules()
     $configs->datatable_content();
 }
 
-// Sync calendar. Get calendars from guesty and fill the plugin calendar
+// Sync calendar. Get calendars from guesty and fill the local calendar
 add_action('admin_action_thphsynccalendar', 'thphsynccalendar');
 function thphsynccalendar()
-{
-    $guesty = new Guesty();
-    $reservationsCounter = $reservationsAvailable = 0;
-
-    while ($reservationsCounter == 0 || $reservationsCounter < $reservationsAvailable) {
-        $response = $guesty->reservations([
-            'fields' => 'listingId guestsCount checkInDateLocalized checkOutDateLocalized status guest.firstName guest.lastName guest.email guest.phone customFields',
-            'filter' => '[{"field":"status", "operator":"$in", "value":["confirmed"]}',
-            'limit' => 50,
-            'skip' => $reservationsCounter
-        ]);
-        if ($response['status'] == 200 && count($response['result']['results']) > 0) {
-            $reservations = $response['result']['results'];
-            $reservationsAvailable = $response['result']['count'];
-            $reservationsCounter +=  $response['result']['limit'];
-
-            foreach ($reservations as $reservation) {
-                $calendar = new Calendar();
-                $calendar->syncCalendar($reservation);
-                echo $reservation['_id'] . " done </br>";
-            }
-        } else {
-            break;
-        }
-    }
-
+{    
+    $calendar = new Calendar();
+    $calendar->populateCalendar();
     exit();
 }
 
