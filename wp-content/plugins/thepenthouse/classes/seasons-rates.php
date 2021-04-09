@@ -266,14 +266,21 @@ class SeasonsRates
      */
     public function deleteOldSeasons()
     {
-        $date = date("Y-m-d", strtotime(" -1 day"));
-        $seasons = get_posts([
-            'post_type' => 'mphb_season',
-            "post_name" => 'season' . $date . 'to' . $date,
-        ]);
+        for ($i = 1; $i <= 100; $i++) {            
+            $date = date("Y-m-d", strtotime("-$i day"));
+            $postTitle = 'season' . $date . 'to' . $date;
+            $seasons = get_posts([
+                'post_type' => 'mphb_season',
+                "s" => $postTitle, //Search in title field
+                'post_status' => 'publish',
+                'posts_per_page'      => -1
+            ]);
 
-        foreach ($seasons as $season) {
-            wp_delete_post($season->ID, true);
+            if (count($seasons) == 0) break;
+            
+            foreach ($seasons as $season) {
+                wp_delete_post($season->ID, true);
+            }
         }
     }
 
