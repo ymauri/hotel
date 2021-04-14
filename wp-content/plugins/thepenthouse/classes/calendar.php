@@ -297,18 +297,24 @@ class Calendar
     public function addBlockedRoom(int $roomId, string $checkin, string $checkout, string $comment = "", $key = false)
     {
         if (strtotime($checkout) >= strtotime($checkin)) {
-            // Do not add new blocked room if there is any reservation for the same dates
+            // Do not add new blocked room if there is any reservation which start_date is on the range
             //Search booking by dates
             $bookings = get_posts([
                 'post_type'  => 'mphb_booking',
+                'posts_per_page' => -1,
+                'post_status' => 'confirmed',
                 'meta_query' => [
                     [
                         'key'   => 'mphb_check_in_date',
-                        'value' => $checkin
+                        'value' => $checkin,
+                        'compare'   => '>=',
+                        'type'      => 'DATE',
                     ],
                     [
-                        'key'   => 'mphb_check_out_date',
-                        'value' => $checkout
+                        'key'   => 'mphb_check_in_date',
+                        'value' => $checkout,
+                        'compare'   => '<',
+                        'type'      => 'DATE',
                     ]
                 ]
             ]);
@@ -317,6 +323,7 @@ class Calendar
             foreach ($bookings as $booking) {
                 $rooms = get_posts([
                     'post_type'  => 'mphb_reserved_room',
+                    'posts_per_page' => -1,
                     'post_parent' => $booking->ID,
                     'meta_query' => [
                         [
@@ -326,10 +333,11 @@ class Calendar
                     ]
                 ]);
                 if (count($rooms)) {
-                    //If i found any room i cant add the blocked room             
+                    //If i found any room i cant add the blocked room 
+                    //There is at least one reservation starting on the range date you gave            
                     return false;
                 }
-            }
+            } 
 
             $blockedRooms = $this->getBlockedRooms();
             if (strtotime($checkout) > strtotime($checkin)) {
@@ -428,11 +436,13 @@ class Calendar
             "checkOutDateLocalized" => $checkout,
             "status" =>  'confirmed'
         ];
+        $bookedRoomId = '';
         //Search bookedRoom before sync
         if (!empty($listingCalendar[$first]['reservationId'])) {
             $bookings = get_posts([
                 'post_type'  => 'mphb_booking',
                 'post_status' => 'confirmed',
+                'posts_per_page' => -1,
                 'meta_query' => [
                     [
                         'key'   => 'mphb_reservation_id',
@@ -440,11 +450,12 @@ class Calendar
                     ]
                 ]
             ]);
-            $bookedRoomId = '';
+           
             foreach ($bookings as $booking) {
                 $bookedRooms = get_posts([
                     'post_type'  => 'mphb_reserved_room',
                     'post_parent' => $booking->ID,
+                    'posts_per_page' => -1
                 ]);
                 foreach ($bookedRooms as $bookedRoom) {
                     $bookedRoomId = $bookedRoom->ID;

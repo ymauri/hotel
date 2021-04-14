@@ -7,7 +7,7 @@ add_action('rest_api_init', function () {
  
 function delete_old_blocked_run() {
     $calendar  = new Calendar();
-    // $calendar->deletePast();
+    $calendar->deletePast();
     $seasons = new SeasonsRates();
     $seasons->deleteOldSeasons();
 }
