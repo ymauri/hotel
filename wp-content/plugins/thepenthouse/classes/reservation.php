@@ -3,12 +3,12 @@
 class Reservation
 {
     private $booking;
-    private $calendar;
+    private $blockedRooms;
 
     public function __construct()
     {
         $this->guesty = new Guesty();
-        $this->calendar = new Calendar();
+        $this->blockedRooms = new BlockedRoom();
     }
 
     public function setBooking($booking)
@@ -63,10 +63,10 @@ class Reservation
                 }
 
                 // if ($status == 'canceled') {
-                //     $this->calendar->deleteBlockedRoom($listingId, $checkin, $checkout);
+                //     $this->blockedRooms->delete($listingId, $checkin, $checkout);
                 // } else {
                 //     $data['_id'] = get_post_meta($this->booking->getId(), 'mphb_reservation_id') ?? "";
-                //     $this->calendar->syncOtherRooms($listingId, $item->getRoomId(), $data);
+                //     $this->blockedRooms->syncOtherRooms($listingId, $item->getRoomId(), $data);
                 // }    
             }
         }
@@ -123,7 +123,7 @@ class Reservation
             foreach ($children as $child) {
                 $roomId = get_post_meta( $child->ID, '_mphb_room_id', true);
                 if (!empty($roomId)) {
-                    $this->calendar->deleteBlockedRoom($roomId, $checkin, $checkout);
+                    $this->blockedRooms->delete($roomId, $checkin, $checkout);
                 }
                 wp_delete_post($child->ID, true);
             }

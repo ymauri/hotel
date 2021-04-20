@@ -14,7 +14,7 @@ function sync_calendar($request)
         if (isset($reservation['reservation'])) {
             $oldReservation = isset($reservation['reservationBefore']) ? $reservation['reservationBefore'] : [];
             $calendar = new Calendar();
-            $calendar->syncCalendar($reservation['reservation'], $oldReservation);
+            $calendar->sync($reservation['reservation'], $oldReservation);
             
             $response = new WP_REST_Response(["message" => "Reservation updated"]);
             $response->set_status(200);

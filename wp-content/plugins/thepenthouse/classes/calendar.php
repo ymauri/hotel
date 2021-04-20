@@ -2,8 +2,11 @@
 
 class Calendar
 {
+    private $blockedRooms;
+
     public function __construct()
     {
+        $this->blockedRooms = new BlockedRoom();
     }
 
     /**
@@ -15,7 +18,7 @@ class Calendar
      * 
      * @return int $bookingId
      */
-    public function syncCalendar(array $reservation, array $oldReservation = []) //, bool $isFromGuesty = true, bool $isFromPackage = false, int $roomId = null, int $parentBooking = 0, bool $syncOtherRooms = true)
+    public function sync(array $reservation, array $oldReservation = []) //, bool $isFromGuesty = true, bool $isFromPackage = false, int $roomId = null, int $parentBooking = 0, bool $syncOtherRooms = true)
     {
         global $wpdb;
         $bookingId = $roomId = "";
@@ -29,6 +32,7 @@ class Calendar
         $booking = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}postmeta where meta_key like 'mphb_reservation_id' and meta_value like '{$reservation['_id']}' order by post_id desc");
         if (!empty($booking)) {
             $bookingStatus = get_post_status($booking->post_id);
+            // $bookingId = $booking->post_id;
             $bookingId = !in_array($bookingStatus, ['cancelled', 'canceled']) ? $booking->post_id : "";
         }
 
@@ -41,7 +45,18 @@ class Calendar
                 $bookingId = $this->createBookingPost($reservation);
                 // Create new reserved room
                 $this->createReservedRoomPost($bookingId, $roomId, $reservation);
-                $this->populateChanges($reservation, $roomId, $status);
+            }
+
+            $this->populateChanges($reservation, $roomId, $status);
+
+            if ($status == 'confirmed') {
+                //Delete blocked room if the reservation is overlaped with a booking rule
+                $checkin = $reservation['checkInDateLocalized'];
+                $checkout = $reservation['checkOutDateLocalized'];
+                if (strtotime($checkout) > strtotime($checkin)) {
+                    $checkout = date("Y-m-d", strtotime($checkout . " -1 day"));
+                }            
+                $this->blockedRooms->deleteByRoomId($roomId, $checkin, $checkout);
             }
         }
 
@@ -51,15 +66,9 @@ class Calendar
             if (!empty($bookingId)) {
                 wp_delete_post($bookingId, true);
             }
-            if (
-                isset($oldReservation['listingId']) &&
-                isset($oldReservation['checkInDateLocalized']) &&
-                isset($oldReservation['checkOutDateLocalized'])
-            ) {
-                $oldCheckout =  date("Y-m-d", strtotime($oldReservation['checkOutDateLocalized'] . " -1 day"));
-                $this->deleteBlockedRoom($oldReservation['listingId'], $oldReservation['checkInDateLocalized'], $oldCheckout);
-            }
         }
+        
+        $this->resolveConflicts($oldReservation);
 
         $this->log($bookingId, $reservation["_id"]);
 
@@ -80,7 +89,7 @@ class Calendar
         $checkout =  date("Y-m-d", strtotime($reservation['checkOutDateLocalized'] . " -1 day"));
 
         if ($status == 'cancelled') {
-            $this->deleteBlockedRoom($reservation['listingId'], $reservation['checkInDateLocalized'], $checkout);
+            $this->blockedRooms->delete($reservation['listingId'], $reservation['checkInDateLocalized'], $checkout);
         } else {
             $this->syncOtherRooms($reservation['listingId'], $roomId, $reservation);
         }
@@ -146,28 +155,17 @@ class Calendar
         }
 
         //Delete old blocked rooms if there is any change on dates or listing
-        if (
-            count($oldReservation) > 0 &&
-            isset($oldReservation['listingId']) &&
-            isset($oldReservation['checkInDateLocalized']) &&
-            isset($oldReservation['checkOutDateLocalized'])
-        ) {
-            $oldCheckout =  date("Y-m-d", strtotime($oldReservation['checkOutDateLocalized'] . " -1 day"));
-            $this->deleteBlockedRoom($oldReservation['listingId'], $oldReservation['checkInDateLocalized'], $oldCheckout);
+        if (count($oldReservation)) {
+            $this->resolveConflicts($oldReservation);
         }
 
         //Delete any blocked room associated to the current reservation
-        //This is because Guesty generates many bloks before change on reservation from a listing to another.
+        //This is because Guesty generates many bloks before change the reservation from one listing to another.
         $checkout = $reservation['checkOutDateLocalized'];
         if (strtotime($reservation['checkOutDateLocalized']) > strtotime($reservation['checkInDateLocalized'])) {
-            $checkout =  date("Y-m-d", strtotime($reservation['checkOutDateLocalized'] . " -1 day"));
+            $checkout = date("Y-m-d", strtotime($reservation['checkOutDateLocalized'] . " -1 day"));
         }
-        $currentBlockedKey = $this->isBlocked($roomId, $reservation['checkInDateLocalized'], $checkout);
-        if ($currentBlockedKey !== -1) {
-            $blockedRooms = $this->getBlockedRooms();
-            unset($blockedRooms[$currentBlockedKey]);
-            update_option('mphb_booking_rules_custom', $blockedRooms);
-        }
+        $this->blockedRooms->deleteByRoomId($roomId, $reservation['checkInDateLocalized'], $checkout);
     }
 
     /**
@@ -243,176 +241,10 @@ class Calendar
 
         foreach ($rooms as $room) {
             if (empty($reservedRoom) || $room->ID != $reservedRoom) {
-                $this->addBlockedRoom($room->ID, $reservation['checkInDateLocalized'], $reservation['checkOutDateLocalized'], "");
+                $this->blockedRooms->add($room->ID, $reservation['checkInDateLocalized'], $reservation['checkOutDateLocalized'], "");
             }
         }
     }
-
-    /**
-     * Get bloked rooms from configuration variable
-     * 
-     * @return array
-     */
-    public function getBlockedRooms()
-    {
-        return  get_option('mphb_booking_rules_custom', array());
-    }
-
-    /**
-     * Get true or false if a room is blocked or not
-     * 
-     * @param int $roomId
-     * @param string $checkin
-     * @param string $checkout
-     * @param string $comment
-     * 
-     * @return int
-     */
-    public function isBlocked(int $roomId, string $checkin, string $checkout, string $comment = null)
-    {
-        $blockedRooms = $this->getBlockedRooms();
-        foreach ($blockedRooms as $key => $blokedRoom) {
-            if (
-                $blokedRoom['room_id'] == $roomId &&
-                $blokedRoom['date_from'] == $checkin &&
-                $blokedRoom['date_to'] == $checkout
-            ) {
-                return $key;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * create blocked room or update it if it exists
-     * 
-     * @param int $roomId
-     * @param string $checkin
-     * @param string $checkout
-     * @param string $comment
-     * @param int $key
-     * 
-     * @return int
-     */
-    public function addBlockedRoom(int $roomId, string $checkin, string $checkout, string $comment = "", $key = false)
-    {
-        if (strtotime($checkout) >= strtotime($checkin)) {
-            // Do not add new blocked room if there is any reservation which start_date is on the range
-            //Search booking by dates
-            $bookings = get_posts([
-                'post_type'  => 'mphb_booking',
-                'posts_per_page' => -1,
-                'post_status' => 'confirmed',
-                'meta_query' => [
-                    [
-                        'key'   => 'mphb_check_in_date',
-                        'value' => $checkin,
-                        'compare'   => '>=',
-                        'type'      => 'DATE',
-                    ],
-                    [
-                        'key'   => 'mphb_check_in_date',
-                        'value' => $checkout,
-                        'compare'   => '<',
-                        'type'      => 'DATE',
-                    ]
-                ]
-            ]);
-
-            //Search rooms include into this bookings
-            foreach ($bookings as $booking) {
-                $rooms = get_posts([
-                    'post_type'  => 'mphb_reserved_room',
-                    'posts_per_page' => -1,
-                    'post_parent' => $booking->ID,
-                    'meta_query' => [
-                        [
-                            'key'   => '_mphb_room_id',
-                            'value' => $roomId
-                        ]
-                    ]
-                ]);
-                if (count($rooms)) {
-                    //If i found any room i cant add the blocked room 
-                    //There is at least one reservation starting on the range date you gave            
-                    return false;
-                }
-            } 
-
-            $blockedRooms = $this->getBlockedRooms();
-            if (strtotime($checkout) > strtotime($checkin)) {
-                $checkout = date("Y-m-d", strtotime($checkout . " -1 day"));
-            }
-
-            $roomTypeId = get_post_meta($roomId, 'mphb_room_type_id', true);
-            if (!empty($roomTypeId)) {
-                $dataToUpdate = [
-                    'room_type_id' => $roomTypeId,
-                    'room_id' => (string) $roomId,
-                    'date_from' => $checkin,
-                    'date_to' => $checkout,
-                    'restrictions' => ['stay-in'],
-                    'comment' => $comment
-                ];
-                if ($key === false) {
-                    $key = $this->isBlocked($roomId, $checkin, $checkout);
-                }
-                if ($key < 0) {
-                    $blockedRooms[] = $dataToUpdate;
-                } else {
-                    $blockedRooms[$key] = $dataToUpdate;
-                }
-                update_option('mphb_booking_rules_custom', $blockedRooms);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Delete past blocked rooms
-     * 
-     * @return int
-     */
-    public function deletePast()
-    {
-        $blockedRooms = $this->getBlockedRooms();
-        foreach ($blockedRooms as $key => $blockedRoom) {
-            if (strtotime($blockedRoom['date_from']) < strtotime('-1 day') && strtotime($blockedRoom['date_to']) < strtotime('-1 day')) {
-                unset($blockedRooms[$key]);
-            }
-        }
-
-        update_option('mphb_booking_rules_custom', $blockedRooms);
-    }
-
-    /**
-     * Delete blocked room by listingId, checkin and checkout dates
-     * 
-     * @param string $listingId
-     * @param string $checkin
-     * @param string $checkout
-     * 
-     * @return int
-     */
-    public function deleteBlockedRoom(string $listingId, string $checkin, string $checkout)
-    {
-        $rooms = get_posts([
-            'post_type'     => 'mphb_room',
-            'meta_key'      => 'guesty_id',
-            'posts_per_page' => -1,
-            'meta_value'    => $listingId
-        ]);
-        $blockedRooms = $this->getBlockedRooms();
-        foreach ($rooms as $room) {
-            $keyBlocked = $this->isBlocked($room->ID, $checkin, $checkout);
-            if ($keyBlocked !== -1) {
-                unset($blockedRooms[$keyBlocked]);
-            }
-        }
-        update_option('mphb_booking_rules_custom', $blockedRooms);
-    }
-
 
     /**
      * Update blocked rooms by status 
@@ -470,26 +302,7 @@ class Calendar
         if ($listingCalendar[$first]['status'] != 'available') {
             $this->syncOtherRooms($listingCalendar[$first]['listingId'], $bookedRoomId, $data);
         } else {
-            $this->deleteBlockedRoom($listingCalendar[$first]['listingId'], $listingCalendar[$first]['date'], $listingCalendar[$last]['date']);
-        }
-    }
-
-    /**
-     * Delete blocked room from datatable 
-     * 
-     * @param int $room_id
-     * @param string $from
-     * @param string $to
-     * 
-     */
-    public function deleteBlockedRoomById($room_id, $from, $to)
-    {
-        $blockedRooms = $this->getBlockedRooms();
-
-        $keyBlocked = $this->isBlocked($room_id, $from, $to);
-        if ($keyBlocked !== -1) {
-            unset($blockedRooms[$keyBlocked]);
-            update_option('mphb_booking_rules_custom', $blockedRooms);
+            $this->blockedRooms->delete($listingCalendar[$first]['listingId'], $listingCalendar[$first]['date'], $listingCalendar[$last]['date']);
         }
     }
 
@@ -533,13 +346,36 @@ class Calendar
                 $reservationsCounter +=  $response['result']['limit'];
     
                 foreach ($reservations as $reservation) {
-                    $this->syncCalendar($reservation);
+                    $this->sync($reservation);
                     echo $reservation['_id'] . " done </br>";
                 }
             } else {
                 break;
             }
+        }    
+    }
+
+
+    /**
+     * Delete blocked rule if we have a oldReservation 
+     * @param array $reservation
+     * 
+     * @return void
+     */
+    private function resolveConflicts(array $reservation) : void
+    {
+        //Verificar si hay conflictos con el cambio de reserva de un día a otra o de un depto a otro
+        if (
+            isset($reservation['listingId']) &&
+            isset($reservation['checkInDateLocalized']) &&
+            isset($reservation['checkOutDateLocalized'])
+        ) {
+            $checkin = $reservation['checkInDateLocalized'];
+            $checkout = $reservation['checkOutDateLocalized'];
+            if (strtotime($checkout) > strtotime($checkin)) {
+                $checkout =  date("Y-m-d", strtotime($checkout . " -1 day"));
+            }
+            $this->blockedRooms->delete($reservation['listingId'], $checkin, $checkout);
         }
-    
     }
 }

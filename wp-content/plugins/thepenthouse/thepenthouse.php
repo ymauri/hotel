@@ -13,6 +13,7 @@
  */
 
 include(plugin_dir_path(__FILE__) . 'classes/guesty.php');
+include(plugin_dir_path(__FILE__) . 'classes/blocked-rooms.php');
 include(plugin_dir_path(__FILE__) . 'classes/reservation-notifier.php');
 include(plugin_dir_path(__FILE__) . 'classes/reservation.php');
 include(plugin_dir_path(__FILE__) . 'classes/calendar.php');
