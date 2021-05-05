@@ -119,8 +119,19 @@ class CustomRules implements RuleVerifyInterface {
 				$unavailableRooms[] = $roomId;
 			}
 		}
-
+		//Begin Cutomized by Yolanda
+		$searchArgs = apply_filters('mphb_search_available_rooms', array(
+			'availability'	 => 'free',
+			'from_date'		 => $checkIn,
+			'to_date'		 => $checkOut,
+			'room_type_id'	 => $typeId,
+			'skip_buffer_rules'=> false
+		));
+		$availableRooms = MPHB()->getRoomPersistence()->searchRooms($searchArgs);
 		$unavailableRooms = array_unique( $unavailableRooms );
+		$unavailableRooms = array_intersect( $availableRooms, $unavailableRooms ); // Filter not available rooms
+		//Begin Cutomized by Yolanda
+		
 		sort( $unavailableRooms ); // Will also reset keys after array_unique()
 
 		return $unavailableRooms;
