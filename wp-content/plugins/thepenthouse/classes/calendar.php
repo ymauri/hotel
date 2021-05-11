@@ -12,10 +12,10 @@ class Calendar
     /**
      * Sync calendar with reservation object
      * https://docs.guesty.com/#reservations
-     * 
+     *
      * @param array $reservation
-     * @param array $oldReservation 
-     * 
+     * @param array $oldReservation
+     *
      * @return int $bookingId
      */
     public function sync(array $reservation, array $oldReservation = []) //, bool $isFromGuesty = true, bool $isFromPackage = false, int $roomId = null, int $parentBooking = 0, bool $syncOtherRooms = true)
@@ -41,7 +41,7 @@ class Calendar
                 // Update reservation metadata
                 $this->updateBookingMetdata($reservation, $bookingId, $status, $roomId, $oldReservation);
             } else {
-                // Create new booking 
+                // Create new booking
                 $bookingId = $this->createBookingPost($reservation);
                 // Create new reserved room
                 $this->createReservedRoomPost($bookingId, $roomId, $reservation);
@@ -55,19 +55,19 @@ class Calendar
                 $checkout = $reservation['checkOutDateLocalized'];
                 if (strtotime($checkout) > strtotime($checkin)) {
                     $checkout = date("Y-m-d", strtotime($checkout . " -1 day"));
-                }            
+                }
                 $this->blockedRooms->deleteByRoomId($roomId, $checkin, $checkout);
             }
         }
 
-        //When we want to update a reservation and the final listing_id is not in BD 
+        //When we want to update a reservation and the final listing_id is not in BD
         //we must delete the booking
         else {
             if (!empty($bookingId)) {
                 wp_delete_post($bookingId, true);
             }
         }
-        
+
         $this->resolveConflicts($oldReservation);
 
         $this->log($bookingId, $reservation["_id"]);
@@ -77,11 +77,11 @@ class Calendar
 
     /**
      * Populate changes after create reservation
-     * 
+     *
      * @param array $reservation
      * @param int $roomId
      * @param string $reservation
-     * 
+     *
      * @return void
      */
     private function populateChanges(array $reservation, int $roomId, string $status)
@@ -97,11 +97,11 @@ class Calendar
 
     /**
      * Create reserved room post
-     * 
+     *
      * @param int $bookingId
      * @param int $roomId
      * @param array $reservation
-     * 
+     *
      * @return void
      */
     private function createReservedRoomPost(int $bookingId, int $roomId, array $reservation)
@@ -126,13 +126,13 @@ class Calendar
 
     /**
      * update booking metadata if it exists
-     * 
+     *
      * @param array $reservation
      * @param int $bookingId
      * @param string $status
      * @param int $roomId
-     * @param array $oldReservation 
-     * 
+     * @param array $oldReservation
+     *
      * @return void
      */
     private function updateBookingMetdata(array $reservation, int $bookingId, string $status, int $roomId, array $oldReservation)
@@ -169,10 +169,10 @@ class Calendar
     }
 
     /**
-     * create booking and save its 
-     * 
+     * create booking and save its
+     *
      * @param array $reservation
-     * 
+     *
      * @return int
      */
     private function createBookingPost(array $reservation)
@@ -205,10 +205,10 @@ class Calendar
 
     /**
      * Log reservation data
-     * 
+     *
      * @param int $bookingId
      * @param int $reservationId
-     * 
+     *
      * @return void
      */
     public function log($bookingId, $reservationId)
@@ -223,11 +223,11 @@ class Calendar
 
     /**
      * Sync other rooms with the same listing ID
-     * 
+     *
      * @param string $listingId
      * @param int $reservedRoom
      * @param array $reservation
-     * 
+     *
      * @return void
      */
     public function syncOtherRooms($listingId, $reservedRoom, $reservation)
@@ -247,13 +247,13 @@ class Calendar
     }
 
     /**
-     * Update blocked rooms by status 
+     * Update blocked rooms by status
      * https://docs.guesty.com/#retrieve-multiple-calendars
-     * 
+     *
      * @param string $listingId
      * @param string $checkin
      * @param string $checkout
-     * 
+     *
      * @return int
      */
     public function update($listingCalendar)
@@ -282,7 +282,7 @@ class Calendar
                     ]
                 ]
             ]);
-           
+
             foreach ($bookings as $booking) {
                 $bookedRooms = get_posts([
                     'post_type'  => 'mphb_reserved_room',
@@ -298,7 +298,7 @@ class Calendar
         }
 
         //El problema es que cuando hace la búsqueda de los bloqueos, cuenta los que están también por encima de la reserva
-        //No puede pasar que yo tenga un bloqueo de depto reserva encima de la reserva 
+        //No puede pasar que yo tenga un bloqueo de depto reserva encima de la reserva
         if ($listingCalendar[$first]['status'] != 'available') {
             $this->syncOtherRooms($listingCalendar[$first]['listingId'], $bookedRoomId, $data);
         } else {
@@ -307,16 +307,16 @@ class Calendar
     }
 
      /**
-     * Get status well formated 
-     * 
+     * Get status well formated
+     *
      * @param string $status
-     * @return string 
-     * 
+     * @return string
+     *
      */
     public function parseStatus(string $status) : string {
         if (in_array($status, ['cancelled', 'canceled', 'checked_out', 'inquiry', 'closed', 'awaiting_payment'])) {
             return 'cancelled';
-        } 
+        }
 
         if (in_array($status, ['reserved', 'confirmed', 'checked_in', 'booked'])) {
             return 'confirmed';
@@ -332,7 +332,7 @@ class Calendar
     public function populateCalendar() {
         $guesty = new Guesty();
         $reservationsCounter = $reservationsAvailable = 0;
-    
+
         while ($reservationsCounter == 0 || $reservationsCounter < $reservationsAvailable) {
             $response = $guesty->reservations([
                 'fields' => 'listingId guestsCount checkInDateLocalized checkOutDateLocalized status guest.firstName guest.lastName guest.email guest.phone customFields',
@@ -344,7 +344,7 @@ class Calendar
                 $reservations = $response['result']['results'];
                 $reservationsAvailable = $response['result']['count'];
                 $reservationsCounter +=  $response['result']['limit'];
-    
+
                 foreach ($reservations as $reservation) {
                     $this->sync($reservation);
                     echo $reservation['_id'] . " done </br>";
@@ -352,14 +352,14 @@ class Calendar
             } else {
                 break;
             }
-        }    
+        }
     }
 
 
     /**
-     * Delete blocked rule if we have a oldReservation 
+     * Delete blocked rule if we have a oldReservation
      * @param array $reservation
-     * 
+     *
      * @return void
      */
     private function resolveConflicts(array $reservation) : void
@@ -376,6 +376,105 @@ class Calendar
                 $checkout =  date("Y-m-d", strtotime($checkout . " -1 day"));
             }
             $this->blockedRooms->delete($reservation['listingId'], $checkin, $checkout);
+        }
+    }
+
+    public function deleteBookings(array $roomIds, string $checkin, string $checkout) {
+        $bookings = get_posts([
+            'post_type'  => 'mphb_booking',
+            'posts_per_page' => -1,
+            'post_status' => 'confirmed',
+            'meta_query' => [
+                [
+                    'key'   => 'mphb_check_in_date',
+                    'value' => $checkin,
+                    'compare'   => '>=',
+                    'type'      => 'DATE',
+                ],
+                [
+                    'key'   => 'mphb_check_in_date',
+                    'value' => $checkout,
+                    'compare'   => '<=',
+                    'type'      => 'DATE',
+                ]
+            ]
+        ]);
+
+        //Search rooms included into this bookings
+        foreach ($bookings as $booking) {
+            $canDeleteThisBooking = false;
+            $rooms = get_posts([
+                'post_type'  => 'mphb_reserved_room',
+                'posts_per_page' => -1,
+                'post_parent' => $booking->ID
+            ]);
+            foreach ($rooms as $room) {
+                if (in_array($room->ID, $roomIds)){
+                    $canDeleteThisBooking = true;
+                }
+            }
+            if ($canDeleteThisBooking) {
+                wp_delete_post( $booking->ID, true);
+            }
+        }
+    }
+
+    /**
+     * Retrieve calendar from guesty
+     * @param string $listingId
+     * @param string $from
+     * @param string $to
+     *
+     * @return void
+     */
+    public function retrieveCalendarDays(string $listingId, string $from, string $to)
+    {
+        $guesty = new Guesty();
+        $response = $guesty->getListingCalendar($listingId, $from, $to);
+        $calendars = $response['result']['data']['days'] ?? [];
+        $blockRefId = $reservationId = $initDate = "";
+        global $wpdb;
+        foreach ($calendars as $key => $day) {
+            $details = $day['blockRefs'][0] ?? [];
+            if (in_array($day['status'], ['unavailable', 'reserved'])
+                && isset($details['_id'])
+                && $blockRefId != $details['_id']){
+                //Crear bloqueo en calendario
+                $startDate = explode("T",$details["startDate"]);
+                $endDate = explode("T",$details["endDate"]);
+                $endDate = date('Y-m-d', strtotime($endDate[0] . " +1 day"));
+                $data = [
+                    'checkInDateLocalized' => $startDate[0],
+                    'checkOutDateLocalized' => $endDate,
+                ];
+                $this->syncOtherRooms($listingId, null, $data);
+                $initDate = $endDate;
+            } else if ($day['status'] == 'booked'
+                        && isset($day['reservation'])
+                        && $reservationId != $day['reservation']['_id']) {
+                //Crear o sincronizar la reserva
+                $this->sync($day['reservation']);
+                $initDate = $day['reservation']['checkOutDateLocalized'];
+            } else {
+                //noche libre
+
+                $nextCalendarDay = $calendars[$key+1] ?? $day;
+                if (!empty($nextCalendarDay['status'])
+                    && strtotime($nextCalendarDay['date']) > strtotime($initDate) // Proxima fecha mayor q el inicio
+                    && (in_array($nextCalendarDay['status'], ['unavailable', 'reserved', 'booked']) || $day['date'] == $nextCalendarDay['date'])) { //Proxima fecha ocupada
+                    //Eliminar los bloqueos en el rango de fechas
+                    $this->blockedRooms->deleteByRange($listingId, $initDate, $day['date']);
+                    //Eliminar las reservas en el rango de fechas
+                    $roomsIds = $wpdb->get_results("SELECT post_id FROM {$wpdb->prefix}postmeta WHERE meta_key = 'guesty_id' AND meta_value = '$listingId';", ARRAY_A);
+                    $roomsIds = array_values($roomsIds);
+                    if (count($roomsIds)) {
+                        $this->deleteBookings($roomsIds, $initDate, $day['date']);
+                    }
+
+                }
+            }
+            $blockRefId = $details['_id'] ?? "";
+            $reservationId = $day['reservation']['_id'] ?? "";
         }
     }
 }

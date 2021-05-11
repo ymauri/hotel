@@ -14,6 +14,21 @@ function delete_old_blocked_run() {
 
 function sync_calendar_auto (){
     $calendar = new Calendar();
-    $calendar->populateCalendar();
+    global $wpdb;
+    $listingIdParam = $_GET['listingId'] ?? null;
+
+    if (empty($listingIdParam)) {
+        $listings = $wpdb->get_results("SELECT guesty_id FROM {$wpdb->prefix}listings;", ARRAY_A);
+    } else {
+        $listings = [['guesty_id' => $listingIdParam]];
+    }
+    
+    $from = date('Y-m-d');
+    $to = date('Y-m-d', strtotime(date('Y-m-d') . " +1 year"));
+
+    foreach ($listings as $listing) {
+        $calendar->retrieveCalendarDays($listing['guesty_id'], $from, $to);
+        sleep(30);
+    }    
     exit();
 }
