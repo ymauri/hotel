@@ -592,12 +592,16 @@ class SearchResultsShortcode extends AbstractShortcode {
 			return false;
 		}
 
-		if ( isset( $this->checkInDate ) &&
-			!MPHB()->getRulesChecker()->verify( $this->checkInDate, $checkOutDateObj )
-		) {
-			$this->errors[] = __( 'Nothing found. Please try again with different search parameters.', 'motopress-hotel-booking' );
-			return false;
-		}
+		//I comment this section of code because the verify method call is wrong.
+		//The last param of the method is the roomTypeID and it is not pased, so it always return false.
+		// I saw this error whenever i configure a Maximum stay rule
+
+		// if ( isset( $this->checkInDate ) &&
+		// 	!MPHB()->getRulesChecker()->verify( $this->checkInDate, $checkOutDateObj )
+		// ) {
+		// 	$this->errors[] = __( 'Nothing found. Please try again with different search parameters.', 'motopress-hotel-booking' );
+		// 	return false;
+		// }
 
 		$this->checkOutDate = $checkOutDateObj;
 		return true;
