@@ -8,7 +8,7 @@ class BlockedRoom
 
     /**
      * Get bloked rooms from configuration variable
-     * 
+     *
      * @return array
      */
     public function getAll()
@@ -18,12 +18,12 @@ class BlockedRoom
 
     /**
      * Get true or false if a room is blocked or not
-     * 
+     *
      * @param int $roomId
      * @param string $checkin
      * @param string $checkout
      * @param string $comment
-     * 
+     *
      * @return int
      */
     public function isBlocked(int $roomId, string $checkin, string $checkout, string $comment = null)
@@ -43,13 +43,13 @@ class BlockedRoom
 
     /**
      * create blocked room or update it if it exists
-     * 
+     *
      * @param int $roomId
      * @param string $checkin
      * @param string $checkout
      * @param string $comment
      * @param int $key
-     * 
+     *
      * @return int
      */
     public function add(int $roomId, string $checkin, string $checkout, string $comment = "", $key = false)
@@ -91,11 +91,11 @@ class BlockedRoom
                     ]
                 ]);
                 if (count($rooms)) {
-                    //If i found any room i cant add the blocked room 
-                    //There is at least one reservation starting on the range date you gave            
+                    //If i found any room i cant add the blocked room
+                    //There is at least one reservation starting on the range date you gave
                     return false;
                 }
-            } 
+            }
 
             $blockedRooms = $this->getAll();
             if (strtotime($checkout) > strtotime($checkin)) {
@@ -129,7 +129,7 @@ class BlockedRoom
 
     /**
      * Delete past blocked rooms
-     * 
+     *
      * @return int
      */
     public function deletePast()
@@ -146,11 +146,11 @@ class BlockedRoom
 
     /**
      * Delete blocked room by listingId, checkin and checkout dates
-     * 
+     *
      * @param string $listingId
      * @param string $checkin
      * @param string $checkout
-     * 
+     *
      * @return int
      */
     public function delete(string $listingId, string $checkin, string $checkout)
@@ -173,12 +173,12 @@ class BlockedRoom
 
 
     /**
-     * Delete blocked room from datatable 
-     * 
+     * Delete blocked room from datatable
+     *
      * @param int $room_id
      * @param string $from
      * @param string $to
-     * 
+     *
      */
     public function deleteByRoomId($room_id, $from, $to)
     {
@@ -189,5 +189,30 @@ class BlockedRoom
             unset($blockedRooms[$keyBlocked]);
             update_option('mphb_booking_rules_custom', $blockedRooms);
         }
+    }
+
+     /**
+     * Delete by range
+     *
+     * @return int
+     */
+    public function deleteByRange($listingId, $start, $end)
+    {
+        $rooms = get_posts([
+            'post_type'     => 'mphb_room',
+            'meta_key'      => 'guesty_id',
+            'posts_per_page' => -1,
+            'meta_value'    => $listingId
+        ]);
+        $blockedRooms = $this->getAll();
+        foreach ($rooms as $room) {
+            foreach ($blockedRooms as $key => $blockedRoom) {
+                if ($room->ID == $blockedRoom['room_id'] && strtotime($blockedRoom['date_from']) >= strtotime($start) && strtotime($blockedRoom['date_to']) <= strtotime($end)) {
+                    unset($blockedRooms[$key]);
+                }
+            }
+        }
+
+        update_option('mphb_booking_rules_custom', $blockedRooms);
     }
 }
