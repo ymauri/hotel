@@ -40,7 +40,7 @@ function booking_rules()
 // Sync calendar. Get calendars from guesty and fill the local calendar
 add_action('admin_action_thphsynccalendar', 'thphsynccalendar');
 function thphsynccalendar()
-{    
+{
     $calendar = new Calendar();
     $calendar->populateCalendar();
     exit();
@@ -60,7 +60,7 @@ function delete_calendar()
     wp_die(); // this is required to terminate immediately and return a proper response
 }
 
-// Fill blocked rooms datatable 
+// Fill blocked rooms datatable
 add_action('wp_ajax_fill_datatable', 'fill_datatable');
 function fill_datatable()
 {
@@ -120,8 +120,9 @@ function list_seasons_rates() {
     $startDate = $_POST['startDate'] ?? null;
     $endDate = $_POST['endDate'] ?? null;
     $price = $_POST['price'] ?? null;
+    $days = $_POST['days'] ?? [];
     if (!empty($roomTypes) && !empty($startDate) && !empty($endDate) && !empty($price)) {
-        $seasonsRates->syncSeasons($roomTypes, $price, $startDate, $endDate);
+        $seasonsRates->syncSeasons($roomTypes, $price, $startDate, $endDate, $days);
     }
 }
 
@@ -129,7 +130,7 @@ function retrieve_guesty_calendar() {
     $year = $_POST['year'] ?? null;
     $listingsId = $_POST['listingsId'] ?? null;
     if (!empty($year) && !empty($listingsId)) {
-        foreach ($listingsId as $listingId) {            
+        foreach ($listingsId as $listingId) {
             $seasonsRates = new SeasonsRates();
             $seasonsRates->retrievePrices($listingId, $year);
             sleep(30);

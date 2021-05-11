@@ -10,7 +10,7 @@ class SeasonsRates
     /**
      * Generate season post
      * @param string $date
-     * 
+     *
      * @return int
      */
     public function cresteSeason(string $date)
@@ -38,7 +38,7 @@ class SeasonsRates
      * @param int $roomType
      * @param string $seasonId
      * @param int $price
-     * 
+     *
      * @return void
      */
     private function createRates(int $roomType, string $seasonId, int $price)
@@ -87,7 +87,7 @@ class SeasonsRates
      * Search season by dates
      * @param string $startDate
      * @param string $endDate
-     * 
+     *
      * @return int
      */
     private function searchSeason(string $startDate, string $endDate)
@@ -124,7 +124,7 @@ class SeasonsRates
     /**
      * Search rates by post_title (accommodation_type_id)
      * @param int $roomType
-     * 
+     *
      * @return [type]
      */
     private function searchRate(int $roomType)
@@ -151,7 +151,7 @@ class SeasonsRates
             'posts_per_page' => -1
         ]);
 ?>
-        <form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
+        <form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>" autocomplete="off">
             <h4>Use this section for generating the seasons and them prices</h4>
             <label>Accommodations Types <a href="#" class="check-all" data-field="accommodations-types">Select/Unselect all</a></label>
 
@@ -162,16 +162,21 @@ class SeasonsRates
                 <?php } ?>
             </ul>
             <label>Select the initial date</label>
-            <input class="datepicker" name="startDate" id="startDate">
+            <input class="datepicker" name="startDate" id="startDate" placeholder="<?php echo date('Y-m-d'); ?>">
 
             <label>Select the end date</label>
-            <input class="datepicker" name="endDate" id="endDate">
-            <br /><br />
+            <input class="datepicker" name="endDate" id="endDate" placeholder="<?php echo date('Y-m-d'); ?>">
 
             <label>Price €</label>
-            <input name="price" id="price">
+            <input name="price" id="price" placeholder="99">
             <br /><br />
 
+            <?php
+            foreach ([0,1,2,3,4,5,6] as $key=> $day) {?>
+                <input name="days[]" id="days" type="checkbox" value="<?php echo $key; ?>"> <?php echo jddayofweek($key, 1)?> &nbsp;&nbsp;
+            <?php }?>
+
+            <br /><br />
             <input type='hidden' name="action" value='tph_seasons_rates_create' class='button'>
             <input type='submit' name="update" value='Update seasons' class='button'>
         </form>
@@ -208,15 +213,20 @@ class SeasonsRates
      * @param int $price
      * @param string $startDate
      * @param string $endDate
-     * 
+     * @param array $days
      * @return void
      */
-    public function syncSeasons(array $roomTypes, int $price, string $startDate, string $endDate)
+    public function syncSeasons(array $roomTypes, int $price, string $startDate, string $endDate, array $days = [])
     {
         $loopStartDate = $startDate;
         $seasonsIds = [];
         while (new DateTime($loopStartDate) <= new DateTime($endDate)) {
-            $seasonsIds[] = $this->cresteSeason($loopStartDate);
+            $day = date('w', strtotime($loopStartDate));
+            // If ther is not restriction for any day of the week
+            //Or if the day of the week is on the allowed days
+            if (count($days) == 0 || in_array($day, $days)) {
+                $seasonsIds[] = $this->cresteSeason($loopStartDate);
+            }
             $loopStartDate = date('Y-m-d', strtotime($loopStartDate . ' +1 day'));
         }
 
@@ -230,7 +240,7 @@ class SeasonsRates
     /**
      * Update prices that came from guesty platform
      * @param array $dataCalendar
-     * 
+     *
      * @return void
      */
     public function updatePrice(array $dataCalendar)
@@ -266,7 +276,7 @@ class SeasonsRates
      */
     public function deleteOldSeasons()
     {
-        for ($i = 1; $i <= 100; $i++) {            
+        for ($i = 1; $i <= 100; $i++) {
             $date = date("Y-m-d", strtotime("-$i day"));
             $postTitle = 'season' . $date . 'to' . $date;
             $seasons = get_posts([
@@ -277,7 +287,7 @@ class SeasonsRates
             ]);
 
             if (count($seasons) == 0) break;
-            
+
             foreach ($seasons as $season) {
                 wp_delete_post($season->ID, true);
             }
@@ -287,16 +297,16 @@ class SeasonsRates
     /**
      * Retrieve prices from guesty calendar
      * @param string $listingId
-     * 
+     *
      * @return void
      */
     public function retrievePrices(string $listingId, string $year)
     {
         $guesty = new Guesty();
         if ($year >= date('Y')) {
-            $startDate = $year == date('Y') ? date("Y-m-d") : $year . "-01-01";
+            $startDate = $year == date('Y') ? date("Y-m")."-01" : $year . "-01-01";
             $endDate = date("Y-m-d", strtotime($startDate . " + 1 month"));
-            do {
+            while (date("Y",strtotime($endDate)) == $year || (int)date("m",strtotime($endDate)) == "01") {
                 $response = $guesty->getListingCalendar($listingId, $startDate, $endDate);
                 $calendars = !empty($response['result']['data']['days']) ? $response['result']['data']['days'] : [];
                 if (count($calendars)) {
@@ -304,7 +314,7 @@ class SeasonsRates
                 }
                 $startDate = $endDate;
                 $endDate = date("Y-m-d", strtotime($startDate . " + 1 month"));
-            } while (date("m",strtotime($endDate)) <= 12 && date("Y",strtotime($endDate)) == $year);
+            }
         }
     }
 }
