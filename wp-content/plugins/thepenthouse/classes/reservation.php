@@ -20,8 +20,24 @@ class Reservation
     {
         $status = $this->booking->getStatus() == "confirmed" ? "confirmed" : "canceled";
         $reservationId = get_post_meta($this->booking->getId(), 'mphb_reservation_id', true);
+
         foreach ($this->booking->getReservedRooms() as $item) {
             $listingId = get_post_meta($item->getRoomId(), 'guesty_id', true);
+            $roomTypeId = get_post_meta($item->getRoomId(), 'mphb_room_type_id', true);
+            $isPackage = !empty(wp_get_post_terms($roomTypeId, 'mphb_ra_package'));
+            $services = get_post_meta($item->getId(), '_mphb_services');
+            $note = "";
+
+            if ($status == 'confirmed') {
+                if ($isPackage) {
+                    $note = " Reserved Package: " . get_the_title($roomTypeId).".\n";
+                }
+                if (count($services)) {
+                    foreach ( $services[0] as $service) {
+                        $note .= " Service: ". get_the_title($service['id']).", Quantity: ".$service['quantity'].".\n";
+                    }
+                }
+            }
 
             if (!empty($listingId)) {
                 $checkin = $this->booking->getCheckInDate()->format('Y-m-d');
@@ -42,6 +58,9 @@ class Reservation
                         "lastName" => $this->booking->getCustomer()->getLastName(),
                         "email" => $this->booking->getCustomer()->getEmail(),
                         "phone" => $this->booking->getCustomer()->getPhone(),
+                    ],
+                    "notes" => [
+                        "other" => $note
                     ]
                 ];
 
@@ -59,7 +78,7 @@ class Reservation
                             update_post_meta($this->booking->getId(), 'mphb_reservation_id', $response['result']['id']);
                         }
                         $this->log($response['result']['id'], $this->booking->getId());
-                    }                    
+                    }
                 }
 
                 // if ($status == 'canceled') {
@@ -67,7 +86,7 @@ class Reservation
                 // } else {
                 //     $data['_id'] = get_post_meta($this->booking->getId(), 'mphb_reservation_id') ?? "";
                 //     $this->blockedRooms->syncOtherRooms($listingId, $item->getRoomId(), $data);
-                // }    
+                // }
             }
         }
     }
@@ -112,7 +131,7 @@ class Reservation
         $children = get_posts([
             'post_type'      => 'mphb_booking',
             'post_parent'    => $bookingId,
-            'posts_per_page' => -1 
+            'posts_per_page' => -1
         ]);
 
         $checkin = get_post_meta( $bookingId, 'mphb_check_in_date', true );
@@ -128,7 +147,7 @@ class Reservation
                 wp_delete_post($child->ID, true);
             }
         }
-            
+
         $reservationId = get_post_meta($bookingId, 'mphb_reservation_id', true);
         if (!empty($reservationId)) {
             $this->guesty->updateReservation($reservationId, [
