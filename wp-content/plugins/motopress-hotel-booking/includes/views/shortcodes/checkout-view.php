@@ -284,7 +284,7 @@ class CheckoutView
 						<br>
 						<?php echo esc_html($rate->getDescription()); ?>
 					</p>
-				<?php } // For each allowed rate 
+				<?php } // For each allowed rate
 				?>
 			</section>
 		<?php } else { ?>
@@ -324,7 +324,7 @@ class CheckoutView
 			</h4>
 
 			<div class="mphb_sc_checkout-services-list mphb_checkout-services-list">
-				<?php foreach ($services as $index => $service) {
+				<?php foreach ($services as $index => $service):
 					$serviceId = $service->getOriginalId();
 					$presetAdults = apply_filters('mphb_sc_checkout_preset_service_adults', $roomType->getAdultsCapacity(), $service, $reservedRoom, $roomType);
 
@@ -341,10 +341,8 @@ class CheckoutView
 							<div class="col-md-4">
 								<?php echo get_the_post_thumbnail($service->getId(), 'post-thumbnail') ?>
 							</div>
-							<div class="col-md-8">
-								<?php else : ?>
-								<div class="col-md-12">
-								<?php endif; ?>
+						<?php endif; ?>
+							<div class="<?php echo (has_post_thumbnail($service->getId())) ? "col-md-8" : "col-md-12" ?>">
 								<label for="<?php echo $idPrefix; ?>-id" class="mphb-checkbox-label">
 									<input type="checkbox" id="<?php echo $idPrefix; ?>-id" name="<?php echo $namePrefix; ?>[id]" class="mphb_sc_checkout-service mphb_checkout-service" value="<?php echo $serviceId; ?>" <?php checked($isSelected); ?>>
 									<?php echo $service->getTitle(); ?>
@@ -382,20 +380,17 @@ class CheckoutView
 									$presetQuantity = mphb_limit($presetQuantity, $minQuantity, $maxQuantity);
 									?>
 									&#215; <input type="number" name="<?php echo $namePrefix; ?>[quantity]" class="mphb_sc_checkout-service-quantity mphb_checkout-service-quantity" value="<?php echo esc_attr($presetQuantity); ?>" min="<?php echo esc_attr($minQuantity); ?>" <?php echo !$service->isUnlimited() ? 'max="' . esc_attr($maxQuantity) . '"' : ''; ?> step="1"> <?php _e('time(s)', 'motopress-hotel-booking'); ?>
-								<?php } // Is flexible pay? 
+								<?php } // Is flexible pay?
 								?>
 								<p></p>
 								<div style="font-size: 12px;">
 									<?php echo get_post_field('post_content',  $service->getId()); ?>
 								</div>
 
-								</div>
 							</div>
-
-
-							<!-- </li> -->
-						<?php } ?>
 					</div>
+					<!-- </li> -->
+				<?php endforeach; ?>
 			</div>
 		</section>
 	<?php
@@ -518,7 +513,7 @@ class CheckoutView
 						<?php } ?>
 					</select>
 				</p>
-			<?php endif; // country		  
+			<?php endif; // country
 			?>
 			<?php if (MPHB()->settings()->main()->isRequireFullAddress()) : ?>
 				<p class="mphb-customer-address1">
@@ -553,7 +548,7 @@ class CheckoutView
 					<br />
 					<input type="text" name="mphb_zip" <?php echo $requiredAttr; ?> id="mphb_zip" />
 				</p>
-			<?php endif; // full address			
+			<?php endif; // full address
 			?>
 			<p class="mphb-customer-note">
 				<label for="mphb_note"><?php _e('Notes', 'motopress-hotel-booking'); ?></label><br />
@@ -633,7 +628,7 @@ class CheckoutView
 				<fieldset class="<?php echo esc_attr($fieldsetClasses); ?>">
 					<?php $gateways[$defaultGateway]->renderPaymentFields($booking); ?>
 				</fieldset>
-			<?php } // if $gateways not empty 
+			<?php } // if $gateways not empty
 			?>
 		</section>
 	<?php
