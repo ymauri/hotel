@@ -172,8 +172,8 @@ class SeasonsRates
             <br /><br />
 
             <?php
-            foreach ([0,1,2,3,4,5,6] as $key=> $day) {?>
-                <input name="days[]" id="days" type="checkbox" value="<?php echo $key; ?>"> <?php echo jddayofweek($key, 1)?> &nbsp;&nbsp;
+            foreach (['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $key=> $day) {?>
+                <input name="days[]" id="days" type="checkbox" value="<?php echo $key; ?>"> <?php echo $day?> &nbsp;&nbsp;
             <?php }?>
 
             <br /><br />
@@ -224,7 +224,7 @@ class SeasonsRates
             $day = date('w', strtotime($loopStartDate));
             // If ther is not restriction for any day of the week
             //Or if the day of the week is on the allowed days
-            if (count($days) == 0 || in_array($day, $days)) {
+            if (count($days) == 0 || count($days) == 7 || in_array($day, $days)) {
                 $seasonsIds[] = $this->cresteSeason($loopStartDate);
             }
             $loopStartDate = date('Y-m-d', strtotime($loopStartDate . ' +1 day'));
