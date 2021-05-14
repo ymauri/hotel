@@ -33,8 +33,9 @@ class Reservation
                     $note = " Reserved Package: " . get_the_title($roomTypeId).".\n";
                 }
                 if (count($services)) {
+                    $note .= " Services: ";
                     foreach ( $services[0] as $service) {
-                        $note .= " Service: ". get_the_title($service['id']).", Quantity: ".$service['quantity'].".\n";
+                        $note .= get_the_title($service['id'])." [".$service['quantity']."x], ";
                     }
                 }
             }
