@@ -41,7 +41,7 @@ function datatbase_structure()
         updated timestamp NOT NULL default CURRENT_TIMESTAMP,
         UNIQUE KEY id (id)
       ) $charset_collate;
-      
+
       CREATE TABLE $calendars (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         booking_id mediumint(9) NOT NULL,
@@ -50,7 +50,7 @@ function datatbase_structure()
         updated timestamp NOT NULL default CURRENT_TIMESTAMP,
         UNIQUE KEY id (id)
       ) $charset_collate;
-      
+
       CREATE TABLE $listings (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         number mediumint(9) NOT NULL,
@@ -108,8 +108,28 @@ function mphb_booking_table_filter($query)
     if (empty($_GET['post_status']) && (!isset($_GET['page']) || $_GET['page'] != 'mphb_calendar')) {
       $qv['post_status'] = "confirmed";
     }
-  } 
+  }
 }
+
+//Add metatag description
+function thph_meta_description() {
+  global $post;
+  if ( is_singular() ) {
+      $des_post = strip_tags( $post->post_content );
+      $des_post = strip_shortcodes( $des_post );
+      $des_post = str_replace( array("\n", "\r", "\t"), ' ', $des_post );
+      $des_post = mb_substr( $des_post, 0, 300, 'utf8' );
+      echo '<meta name="description" content="' . $des_post . '" />' . "\n";
+  }
+  if ( is_home() ) {
+      echo '<meta name="description" content="' . get_bloginfo( "description" ) . '" />' . "\n";
+  }
+  if ( is_category() ) {
+      $des_cat = strip_tags(category_description());
+      echo '<meta name="description" content="' . $des_cat . '" />' . "\n";
+  }
+}
+add_action( 'wp_head', 'thph_meta_description');
 
 //Delete option view all reservations
 // add_filter("views_edit-mphb_booking", 'mphb_booking_filter_text');
@@ -119,4 +139,8 @@ function mphb_booking_table_filter($query)
 //   return $views;
 // }
 
-
+add_filter( 'allowed_http_origins', 'add_allowed_origins' );
+function add_allowed_origins( $origins ) {
+    $origins[] = 'https://thepenthouse-apartments.nl';
+    return $origins;
+}
