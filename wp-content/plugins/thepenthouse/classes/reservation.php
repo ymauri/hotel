@@ -30,13 +30,16 @@ class Reservation
 
             if ($status == 'confirmed') {
                 if ($isPackage) {
-                    $note = " Reserved Package: " . get_the_title($roomTypeId).".\n";
+                    $note = " Package: " . get_the_title($roomTypeId).".\n";
                 }
                 if (count($services)) {
                     $note .= " Services: ";
                     foreach ( $services[0] as $service) {
                         $note .= get_the_title($service['id'])." [".$service['quantity']."x], ";
                     }
+                }
+                if (!empty($this->booking->getTotalPrice())) {
+                    $note .= "PAID: €". $this->booking->getTotalPrice();
                 }
             }
 
