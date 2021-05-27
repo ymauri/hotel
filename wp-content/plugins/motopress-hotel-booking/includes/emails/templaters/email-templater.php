@@ -184,7 +184,14 @@ class EmailTemplater extends AbstractTemplater {
 			array(
 				'name'           => 'price_breakdown',
 				'description'    => __( 'Price Breakdown', 'motopress-hotel-booking' )
+			),
+
+			// Customized by yolanda
+			array(
+				'name'           => 'booked_room',
+				'description'    => __( 'Booked rooms', 'motopress-hotel-booking' )
 			)
+			// Customized by yolanda
 		);
 
 		$bookingTags = apply_filters( 'mphb_email_booking_tags', $bookingTags );
@@ -318,6 +325,20 @@ class EmailTemplater extends AbstractTemplater {
 					$replaceText = $this->booking->getId();
 				}
 				break;
+
+			//Begin Customized by Yolanda
+			case 'booked_room':
+				if ( isset( $this->booking ) ) {
+					$arrayForReplace = [];
+					$replaceText = "";
+					foreach ($this->booking->getReservedRooms() as $reservedRoom) {
+						$arrayForReplace[] =  get_the_title($reservedRoom->getRoomId());
+					}
+					$replaceText = implode(', ', $arrayForReplace);
+				}
+				break;
+			//end Customized by Yolanda
+
 			case 'booking_edit_link':
 				if ( isset( $this->booking ) ) {
 					$replaceText = apply_filters( 'wpml_permalink', mphb_get_edit_post_link_for_everyone( $this->booking->getId() ), apply_filters( 'wpml_current_language', NULL ) );
