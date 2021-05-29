@@ -153,13 +153,15 @@ class SeasonsRates
 ?>
         <form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>" autocomplete="off">
             <h4>Use this section for generating the seasons and them prices</h4>
-            <label>Accommodations Types <a href="#" class="check-all" data-field="accommodations-types">Select/Unselect all</a></label>
+            <label>Packages <a href="#" class="check-all" data-field="accommodations-types">Select/Unselect all</a></label>
 
             <ul>
                 <?php while ($roomTypes->have_posts()) {
-                    $roomTypes->the_post(); ?>
-                    <li style="list-style: none;"><input class="accommodations-types" type="checkbox" name="roomTypes[]" checked value="<?php echo get_the_ID(); ?>"><?php echo get_the_title(); ?></li>
-                <?php } ?>
+                    $roomTypes->the_post();
+                    if (!empty(wp_get_post_terms(get_the_ID(), 'mphb_ra_package'))){?>
+                        <li style="list-style: none;"><input class="accommodations-types" type="checkbox" name="roomTypes[]" checked value="<?php echo get_the_ID(); ?>"><?php echo get_the_title(); ?></li>
+                <?php }
+                } ?>
             </ul>
             <label>Select the initial date</label>
             <input class="datepicker" name="startDate" id="startDate" placeholder="<?php echo date('Y-m-d'); ?>">
