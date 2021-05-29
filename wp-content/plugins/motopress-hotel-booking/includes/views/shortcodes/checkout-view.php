@@ -188,7 +188,7 @@ class CheckoutView
 				<select name="<?php echo esc_attr($namePrefix); ?>[adults]" id="<?php echo esc_attr($idPrefix); ?>-adults" class="mphb_sc_checkout-guests-chooser mphb_checkout-guests-chooser" required="required" data-max-allowed="<?php echo esc_attr($adultsCapacity); ?>" data-max-total="<?php echo esc_attr($totalCapacity); ?>">
 					<option value=""><?php _e('— Select —', 'motopress-hotel-booking'); ?></option>
 					<?php for ($i = 1; $i <= $maxAdults; $i++) { ?>
-						<option value="<?php echo $i; ?>" <?php selected($i, $presetAdults); ?>>
+						<option value="<?php echo $i; ?>" <?php selected($i, 2); ?>>
 							<?php echo $i; ?>
 						</option>
 					<?php } ?>
