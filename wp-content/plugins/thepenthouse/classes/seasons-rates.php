@@ -51,7 +51,7 @@ class SeasonsRates
                 "comment_status" => "closed",
                 "ping_status" => "closed",
                 "post_name" => 'roomType-' . $roomType,
-                "post_title" => 'roomType-' . $roomType
+                "post_title" => ('Rate ' . get_the_title($roomType))
             ], false, false);
 
             add_post_meta($rateId, 'mphb_room_type_id', $roomType);
@@ -131,7 +131,7 @@ class SeasonsRates
     {
         $rates = get_posts([
             'post_type'      => 'mphb_rate',
-            'title'          => 'roomType-' . $roomType,
+            'name'          => 'roomType-' . $roomType,
             'posts_per_page' => -1
         ]);
         foreach ($rates as $rate) {
@@ -316,6 +316,26 @@ class SeasonsRates
                 }
                 $startDate = $endDate;
                 $endDate = date("Y-m-d", strtotime($startDate . " + 1 month"));
+            }
+        }
+    }
+
+
+    /**
+     * @return void
+     */
+    public function updateRatesPostName() {      
+        $rates = get_posts([
+            'post_type'      => 'mphb_rate',
+            'posts_per_page' => -1
+        ]);
+        foreach ($rates as $rate) {
+            $roomType = explode('roomtype-', $rate->post_name);
+            if ((int)$roomType[1] > 0) {
+                wp_update_post([
+                    'ID'         => $rate->ID,
+                    'post_title' => ('Rate ' . get_the_title($roomType[1]))
+                ]);
             }
         }
     }

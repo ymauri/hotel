@@ -121,6 +121,8 @@ function list_seasons_rates() {
     $endDate = $_POST['endDate'] ?? null;
     $price = $_POST['price'] ?? null;
     $days = $_POST['days'] ?? [];
+    // $seasonsRates->updateRatesPostName();
+    // die;
     if (!empty($roomTypes) && !empty($startDate) && !empty($endDate) && !empty($price)) {
         $seasonsRates->syncSeasons($roomTypes, $price, $startDate, $endDate, $days);
     }
