@@ -574,10 +574,13 @@ class BookingManageCPTPage extends ManageCPTPage {
         // Filter imported bookings
         if ($this->isImportedView()) {
             // Show only imported bookings
-            $where .= " AND (mphb_sync_ids.meta_value IS NOT NULL AND mphb_sync_ids.meta_value != '')";
+			$where .= " AND (mphb_guesty.meta_value IS NOT NULL AND mphb_guesty.meta_value = 1)";
+            // $where .= " AND (mphb_sync_ids.meta_value IS NOT NULL AND mphb_sync_ids.meta_value != '')";
         } else if (!MPHB()->settings()->main()->displayImportedBookings()) {
             // Remove imported bookings from the booking list table
-            $where .= " AND (mphb_sync_ids.meta_value IS NULL OR mphb_sync_ids.meta_value = '')";
+            $where .= " AND (mphb_guesty.meta_value IS NULL OR mphb_guesty.meta_value != 1)";
+
+            // $where .= " AND (mphb_sync_ids.meta_value IS NULL OR mphb_sync_ids.meta_value = '')";
         }
 
 		return $where;
@@ -618,7 +621,8 @@ class BookingManageCPTPage extends ManageCPTPage {
 
         // Add joins to remove imported bookings from bookings list table or show only imported bookings
         if (!MPHB()->settings()->main()->displayImportedBookings() || $this->isImportedView()) {
-            $join .= " LEFT JOIN {$wpdb->postmeta} AS mphb_sync_ids ON {$wpdb->posts}.ID = mphb_sync_ids.post_id AND mphb_sync_ids.meta_key = '_mphb_sync_id'";
+            // $join .= " LEFT JOIN {$wpdb->postmeta} AS mphb_sync_ids ON {$wpdb->posts}.ID = mphb_sync_ids.post_id AND mphb_sync_ids.meta_key = '_mphb_sync_id'";
+            $join .= " LEFT JOIN {$wpdb->postmeta} AS mphb_guesty ON {$wpdb->posts}.ID = mphb_guesty.post_id AND mphb_guesty.meta_key = 'mphb_is_from_guesty'";
         }
 
 		return $join;

@@ -92,7 +92,7 @@ class AdminScriptManager extends ScriptManager {
 					'removePeriod'			 => __( 'Remove', 'motopress-hotel-booking' ),
                     'bookingId'              => __( 'Booking #%s', 'motopress-hotel-booking' ),
                     'bookingStatuses'        => MPHB()->postTypes()->booking()->statuses()->getLabels(),
-                    'displayImport'          => __( 'Display imported bookings.', 'motopress-hotel-booking' ),
+                    'displayImport'          => __( 'Display Guesty bookings.', 'motopress-hotel-booking' ),
                     'processing'             => __( 'Processing...', 'motopress-hotel-booking' ),
                     'cancelling'             => __( 'Cancelling...', 'motopress-hotel-booking' )
 				),
