@@ -662,7 +662,7 @@ class SearchResultsShortcode extends AbstractShortcode {
 				   value="<?php echo esc_attr( $this->checkOutDate->format( MPHB()->settings()->dateTime()->getDateTransferFormat() ) ); ?>"/>
 				   <?php wp_nonce_field( \MPHB\Shortcodes\CheckoutShortcode::NONCE_ACTION_CHECKOUT, \MPHB\Shortcodes\CheckoutShortcode::NONCE_NAME, true ); ?>
 			<div class="mphb-reservation-details">
-				<p class="mphb-empty-cart-message"><?php _e( 'Select from available accommodations.', 'motopress-hotel-booking' ); ?></p>
+				<p class="mphb-empty-cart-message"><?php _e( 'Select from available apartments.', 'motopress-hotel-booking' ); ?></p>
 				<p class="mphb-cart-message"></p>
 				<p class="mphb-cart-total-price">
 					<span class="mphb-cart-total-price-title">
@@ -829,7 +829,7 @@ class SearchResultsShortcode extends AbstractShortcode {
 					<?php } ?>
 				</select>
 				<span class="mphb-available-rooms-count"><?php
-					echo sprintf( _n( 'of %d accommodation available.', 'of %d accommodations available.', $maxRoomsCount, 'motopress-hotel-booking' ), $maxRoomsCount );
+					echo sprintf( _n( 'of %d apartment available.', 'of %d apartments available.', $maxRoomsCount, 'motopress-hotel-booking' ), $maxRoomsCount );
 					?></span>
 			</p>
 			<div class="mphb-rooms-reservation-message-wrapper">
