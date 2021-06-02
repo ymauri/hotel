@@ -52,6 +52,9 @@ function save_custom_posts_meta($post_id)
 
     $updatePrice = isset($_POST['update_price']);
     update_post_meta($post_id, 'update_price', $updatePrice);
+    
+    $showInXML = isset($_POST['show_in_xml']);
+    update_post_meta($post_id, 'mphb_show_in_xml', $showInXML);
 
 }
 
@@ -100,4 +103,24 @@ function show_guesty_reservation_id_meta_box()
     } else {
         echo '<p>There is not Guesty ID register for this reservation</p>';
     }
+}
+
+function add_show_in_xml_checkbox()
+{
+    add_meta_box(
+        'show_in_xml_report', // $id
+        'Show this service in XML report', // $title
+        'show_show_in_xml_checkbox', // $callback
+        'mphb_room_service', // $screen
+        'normal', // $context
+        'high' // $priority
+    );
+}
+add_action('add_meta_boxes', 'add_show_in_xml_checkbox');
+
+function show_show_in_xml_checkbox()
+{
+    global $post;
+    $meta = get_post_meta($post->ID, 'mphb_show_in_xml', true);
+    echo '<input type="checkbox" name="show_in_xml" id="show_in_xml" '. (!empty($meta) ? " checked " : "") . "> Yes";
 }

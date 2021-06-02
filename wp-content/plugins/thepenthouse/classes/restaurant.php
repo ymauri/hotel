@@ -36,7 +36,7 @@ class Restaurant
                     'posts_per_page' => -1
                 ]);
                 $reservedRoomText = "";
-                
+
                 foreach ($reservedRooms as $reservedRoom) {
                     $roomId = get_post_meta($reservedRoom->ID, '_mphb_room_id', true);
                     $reservedRoomText = get_the_title($roomId);
@@ -50,22 +50,24 @@ class Restaurant
 
                     if (count($services)) {
                         foreach ( $services[0] as $service) {
-                            $serviceText = get_the_title($service['id']);
-                            $arrayToXML[] =  [
-                                'ticketid' => "web_".$booking->ID,
-                                'ticketname' => "15:00 ".htmlspecialchars($serviceText). " in " .htmlspecialchars($reservedRoomText) . " ". $shortDate . " price per guest",
-                                'productid' => "web_" . $booking->ID,
-                                'startdate' => $date,
-                                'orderid' => "web_" . $booking->ID,
-                                'eventid' => "web_" . $booking->ID,
-                                'code' => "web_" . $booking->ID,
-                                'orderinfo' => $orderInfo,
-                                'remarks' => htmlspecialchars(get_post_meta( $booking->ID, 'mphb_note', true )),
-                                'name' => htmlspecialchars(get_post_meta( $booking->ID, 'mphb_first_name', true )  . " " . get_post_meta( $booking->ID, 'mphb_last_name', true )),
-                                'email' => htmlspecialchars(get_post_meta( $booking->ID, 'mphb_email', true )),
-                                'phone' => htmlspecialchars(get_post_meta( $booking->ID, 'mphb_phone', true )),
-                                'ordertotal' => htmlspecialchars(get_post_meta( $booking->ID, 'mphb_total_price', true )),
-                            ];
+                            if (!empty(get_post_meta($service['id'], "mphb_show_in_xml", true))) {
+                                $serviceText = get_the_title($service['id']);
+                                $arrayToXML[] =  [
+                                    'ticketid' => "web_".$booking->ID,
+                                    'ticketname' => "15:00 ".htmlspecialchars($serviceText). " in " .htmlspecialchars($reservedRoomText) . " ". $shortDate . " price per guest",
+                                    'productid' => "web_" . $booking->ID,
+                                    'startdate' => $date,
+                                    'orderid' => "web_" . $booking->ID,
+                                    'eventid' => "web_" . $booking->ID,
+                                    'code' => "web_" . $booking->ID,
+                                    'orderinfo' => $orderInfo,
+                                    'remarks' => htmlspecialchars(get_post_meta( $booking->ID, 'mphb_note', true )),
+                                    'name' => htmlspecialchars(get_post_meta( $booking->ID, 'mphb_first_name', true )  . " " . get_post_meta( $booking->ID, 'mphb_last_name', true )),
+                                    'email' => htmlspecialchars(get_post_meta( $booking->ID, 'mphb_email', true )),
+                                    'phone' => htmlspecialchars(get_post_meta( $booking->ID, 'mphb_phone', true )),
+                                    'ordertotal' => htmlspecialchars(get_post_meta( $booking->ID, 'mphb_total_price', true )),
+                                ];
+                            }
                         }
                     } else if ($isPackage){
                         $arrayToXML[] =  [
