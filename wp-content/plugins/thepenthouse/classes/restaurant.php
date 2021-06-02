@@ -42,7 +42,7 @@ class Restaurant
                     $reservedRoomText = get_the_title($roomId);
                     $date = get_post_meta( $booking->ID, 'mphb_check_in_date', true )." 15:00:00";
                     $shortDate = date("(m-d)", strtotime($date));
-                    $orderInfo = strtolower("order-".date("M-d-Y-Hi-a", strtotime(get_the_date('Y-m-d H:i:s', $booking->ID))));
+                    $orderInfo = strtolower("order-".date("M-d-Y-hi-a", strtotime(get_the_date('Y-m-d H:i:s', $booking->ID))));
                     $roomTypeId = get_post_meta($roomId, 'mphb_room_type_id', true);
                     $isPackage = !empty(wp_get_post_terms($roomTypeId, 'mphb_ra_package'));
                    
