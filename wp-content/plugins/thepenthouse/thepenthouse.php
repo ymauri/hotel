@@ -13,6 +13,7 @@
  */
 
 include(plugin_dir_path(__FILE__) . 'classes/guesty.php');
+include(plugin_dir_path(__FILE__) . 'classes/restaurant.php');
 include(plugin_dir_path(__FILE__) . 'classes/blocked-rooms.php');
 include(plugin_dir_path(__FILE__) . 'classes/reservation-notifier.php');
 include(plugin_dir_path(__FILE__) . 'classes/reservation.php');
@@ -63,6 +64,7 @@ function datatbase_structure()
 }
 
 include(plugin_dir_path(__FILE__) . 'scripts/sync_reservations.php');
+include(plugin_dir_path(__FILE__) . 'scripts/sync_restaurant.php');
 include(plugin_dir_path(__FILE__) . 'scripts/custom_fields.php');
 include(plugin_dir_path(__FILE__) . 'scripts/sync_calendar.php');
 include(plugin_dir_path(__FILE__) . 'scripts/scripts_hotelchamp.php');
