@@ -32,7 +32,7 @@ class Reservation
                 if ($isPackage) {
                     $note = " Package: " . get_the_title($roomTypeId).".\n";
                 }
-                if (count($services)) {
+                if (isset($services[0]) && count($services[0])) {
                     $note .= " Services: ";
                     foreach ( $services[0] as $service) {
                         $note .= get_the_title($service['id'])." [".$service['quantity']."x], ";
