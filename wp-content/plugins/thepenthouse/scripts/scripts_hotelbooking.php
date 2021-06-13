@@ -14,6 +14,19 @@ function guest_select_behaviour() {
             </script>
         <?php
     }
+
+    ?>  
+        <script>
+        if (jQuery('.mphb-rooms-quantity').length > 0) {
+            jQuery('.mphb-rooms-quantity').each(function() {
+                
+                let parent = jQuery(this).parent();
+                parent.find('select').first().hide().before("<b>1 </>");
+            });
+        }
+        </script>
+    <?php
+
 }
 add_action('wp_footer', 'guest_select_behaviour');
 
