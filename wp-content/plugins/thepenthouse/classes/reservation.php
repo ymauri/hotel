@@ -61,7 +61,7 @@ class Reservation
                 $checkin = $this->booking->getCheckInDate()->format('Y-m-d');
                 $checkout = $this->booking->getCheckOutDate()->format('Y-m-d');
                 $isFromGuesty = get_post_meta($this->booking->getId(), 'mphb_is_from_guesty', true);
-                $guestsCount = get_post_meta($this->booking->getId(), '_mphb_adults', true);
+                $guestsCount = get_post_meta($item->getId(), '_mphb_adults', true);
 
                 $data = [
                     "listingId" => $listingId,

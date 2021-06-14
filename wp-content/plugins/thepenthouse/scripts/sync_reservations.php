@@ -20,11 +20,11 @@ function update_payment_detail($payment)
 {
     $postId = $payment->getId();
     try {
-            $bookingID = get_post_meta($postId, '_mphb_booking_id', true);            
-            $reservation = new Reservation();
-            $booking = MPHB()->getBookingRepository()->findById($bookingID);  
-            $reservation->setBooking($booking);
-            $reservation->put();
+        $bookingID = get_post_meta($postId, '_mphb_booking_id', true);            
+        $reservation = new Reservation();
+        $booking = MPHB()->getBookingRepository()->findById($bookingID);  
+        $reservation->setBooking($booking);
+        $reservation->put();
     } catch (Exception $e) {
         throw $e;
     }
