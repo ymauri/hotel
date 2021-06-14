@@ -38,21 +38,37 @@ class Reservation
                         $note .= get_the_title($service['id'])." [".$service['quantity']."x], ";
                     }
                 }
-                if (!empty($this->booking->getTotalPrice())) {
-                    $note .= "PAID: €". $this->booking->getTotalPrice();
+
+                $payments = get_posts([
+                    'post_type'  => 'mphb_payment',
+                    'posts_per_page' => -1,
+                    'meta_key'      => '_mphb_booking_id',
+                    'meta_value'    => $this->booking->getId(),
+                    'post_status'   => 'mphb-p-completed'
+                ]);
+
+                $paid = 0;
+                foreach ($payments as $payment) {
+                    $paid += get_post_meta( $payment->ID, '_mphb_amount', true);
                 }
+                if ($paid < $this->booking->getTotalPrice()) {
+                    $note.= "DEPOSIT ";
+                }
+                $note .= "PAID: €". $paid;    
             }
 
             if (!empty($listingId)) {
                 $checkin = $this->booking->getCheckInDate()->format('Y-m-d');
                 $checkout = $this->booking->getCheckOutDate()->format('Y-m-d');
                 $isFromGuesty = get_post_meta($this->booking->getId(), 'mphb_is_from_guesty', true);
+                $guestsCount = get_post_meta($this->booking->getId(), '_mphb_adults', true);
 
                 $data = [
                     "listingId" => $listingId,
                     "checkInDateLocalized" => $checkin,
                     "checkOutDateLocalized" => $checkout,
                     "status" =>  $status,
+                    "guestsCount" => $guestsCount,
                     "money" => [
                         "fareAccommodation" => 1,
                         "currency" => "EUR"
