@@ -11,6 +11,7 @@ wp-content/*
 !wp-content/plugins/
 wp-content/plugins/*
 !wp-content/plugins/motopress-hotel-booking/
+!wp-content/plugins/mphb-request-payment/
 !wp-content/plugins/thepenthouse/
 
 # ignore log files and databases
