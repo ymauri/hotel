@@ -63,17 +63,19 @@ class RequestUtils
 
         // Check the dates
         $checkIn = $booking->getCheckInDate();
-        
-        $checkInTime = MPHB()->settings()->dateTime()->getCheckInTime(true);
-        $checkIn->setTime($checkInTime[0], $checkInTime[1], $checkInTime[2]);
 
-        $now = new \DateTime('now');
+        if (!empty($checkIn)) {
+            $checkInTime = MPHB()->settings()->dateTime()->getCheckInTime(true);
+            $checkIn->setTime($checkInTime[0], $checkInTime[1], $checkInTime[2]);
 
-        $daysToCheckIn     = DateUtils::calcNights($now, $checkIn);
-        $daysBeforeCheckIn = Settings::getDaysBeforeCheckIn();
+            $now = new \DateTime('now');
 
-        if ($daysToCheckIn <= $daysBeforeCheckIn) {
-            $itsTime = true;
+            $daysToCheckIn     = DateUtils::calcNights($now, $checkIn);
+            $daysBeforeCheckIn = Settings::getDaysBeforeCheckIn();
+
+            if ($daysToCheckIn <= $daysBeforeCheckIn) {
+                $itsTime = true;
+            }
         }
 
         return $itsTime;
