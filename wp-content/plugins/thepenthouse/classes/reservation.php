@@ -24,13 +24,13 @@ class Reservation
         foreach ($this->booking->getReservedRooms() as $item) {
             $listingId = get_post_meta($item->getRoomId(), 'guesty_id', true);
             $roomTypeId = get_post_meta($item->getRoomId(), 'mphb_room_type_id', true);
-            $isPackage = !empty(wp_get_post_terms($roomTypeId, 'mphb_ra_package'));
+            $isPackage = count(wp_get_post_terms($roomTypeId, 'mphb_ra_package', true)) > 0;
             $services = get_post_meta($item->getId(), '_mphb_services');
             $note = "";
 
             if ($status == 'confirmed') {
                 if ($isPackage) {
-                    $note = " Package: " . get_the_title($roomTypeId).".\n";
+                    $note .= " Package: " . get_the_title($roomTypeId).". ";
                 }
                 if (isset($services[0]) && count($services[0])) {
                     $note .= " Services: ";
