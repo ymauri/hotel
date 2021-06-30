@@ -55,7 +55,7 @@ function delete_calendar()
     $date_to = $_POST['date_to'];
 
     $blockedRoom = new BlockedRoom();
-    $blockedRoom->deleteByRoomId($room_id, $date_from, $date_to);
+    $blockedRoom->deleteByRoomId($room_id, $date_from, $date_to, true);
 
     wp_die(); // this is required to terminate immediately and return a proper response
 }
@@ -84,7 +84,7 @@ function register_blocked_room()
         $blockedRoom = new BlockedRoom();
         $resutl = false;
         if (!empty($_POST['room_id']) && !empty($_POST['date_from']) && !empty($_POST['date_to'])) {
-            $resutl = $blockedRoom->add($_POST['room_id'], $_POST['date_from'], $_POST['date_to'], "");
+            $resutl = $blockedRoom->add($_POST['room_id'], $_POST['date_from'], $_POST['date_to'], "by admin");
         }
         echo $resutl ? 'ok' : "ko";
     } catch (Exception $e) {

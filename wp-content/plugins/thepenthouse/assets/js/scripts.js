@@ -46,6 +46,10 @@ jQuery(document).ready(function() {
                 "orderable": false,
             },
             {
+                "data": "comment",
+                "orderable": false,
+            },
+            {
                 "orderable": false,
                 "render": function(data, type, row, meta) {
                     return ` <a href="#"

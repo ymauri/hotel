@@ -150,10 +150,11 @@ class BlockedRoom
      * @param string $listingId
      * @param string $checkin
      * @param string $checkout
+     * @param bool $deletWithComment
      *
      * @return int
      */
-    public function delete(string $listingId, string $checkin, string $checkout)
+    public function delete(string $listingId, string $checkin, string $checkout, bool $deletWithComment = false)
     {
         $rooms = get_posts([
             'post_type'     => 'mphb_room',
@@ -164,7 +165,11 @@ class BlockedRoom
         $blockedRooms = $this->getAll();
         foreach ($rooms as $room) {
             $keyBlocked = $this->isBlocked($room->ID, $checkin, $checkout);
-            if ($keyBlocked !== -1) {
+            $itemHasComment = !empty($blockedRooms[$keyBlocked]['comment']);
+            if ($keyBlocked !== -1 && //Key found
+            (($deletWithComment && $itemHasComment)|| //borrar todos, incluido hasta los que tienen comentarios
+                (!$deletWithComment && !$itemHasComment))) // borrar todos excepto los que tienen comentario 
+            {
                 unset($blockedRooms[$keyBlocked]);
             }
         }
@@ -178,14 +183,19 @@ class BlockedRoom
      * @param int $room_id
      * @param string $from
      * @param string $to
+     * @param bool $deletWithComment
      *
      */
-    public function deleteByRoomId($room_id, $from, $to)
+    public function deleteByRoomId($room_id, $from, $to, bool $deletWithComment = false )
     {
         $blockedRooms = $this->getAll();
 
         $keyBlocked = $this->isBlocked($room_id, $from, $to);
-        if ($keyBlocked !== -1) {
+        $itemHasComment = !empty($blockedRooms[$keyBlocked]['comment']);
+        if ($keyBlocked !== -1 && //Key found
+            (($deletWithComment && $itemHasComment)|| //borrar todos, incluido hasta los que tienen comentarios
+            (!$deletWithComment && !$itemHasComment))) // borrar todos excepto los que tienen comentario 
+        {
             unset($blockedRooms[$keyBlocked]);
             update_option('mphb_booking_rules_custom', $blockedRooms);
         }

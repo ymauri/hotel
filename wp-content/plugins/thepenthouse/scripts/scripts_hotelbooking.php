@@ -55,7 +55,7 @@ function phone_field() {
                 }
             }
        </style>
-       
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput.min.js" integrity="sha512-QMUqEPmhXq1f3DnAVdXvu40C8nbTgxvBGvNruP6RFacy3zWKbNTmx7rdQVVM2gkd2auCWhlPYtcW2tHwzso4SA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
         <script>
@@ -77,7 +77,7 @@ function phone_field() {
                 });
                 jQuery('form.mphb_sc_checkout-form').on('submit', function (e){
                     if (iti.isValidNumber()) {
-                        jQuery("#mphb_phone").val(phoneField.getNumber(intlTelInputUtils.numberFormat.E164));
+                        jQuery("#mphb_phone").val(phoneField.getNumber(intlTelInputUtils.numberFormat.E164).replace("+", ''));
                         return true; 
                     } else {
                         return false;
