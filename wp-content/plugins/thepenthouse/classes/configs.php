@@ -14,13 +14,15 @@ class Configs {
                             <th>Accommodation</th>
                             <th>From</th>
                             <th>To</th>
+                            <th>Comment</th>
                             <th>Action</th>
                         </tr>
                         <tr>
-                            <th><input type="text" name="room_type_id" placeholder="Accommodation Type"></th>
-                            <th><input type="text" name="room_id" placeholder="Accommodation"></th>
-                            <th><input type="text" name="date_from" placeholder="From"></th>
-                            <th><input type="text" name="date_to" placeholder="To"></th>
+                            <th><input type="text" name="room_type_id" placeholder="Accommodation Type" style="width: 90%;"></th>
+                            <th><input type="text" name="room_id" placeholder="Accommodation" style="width: 90%;"></th>
+                            <th><input type="text" name="date_from" placeholder="From" style="width: 90%;"></th>
+                            <th><input type="text" name="date_to" placeholder="To" style="width: 90%;"></th>
+                            <th></th>
                             <th><button id="search-btn" >Search</button></th>
                         </tr>
                     </thead>
@@ -97,7 +99,10 @@ class Configs {
         if ($at->have_posts()) {
             while ($at->have_posts()) {
                 $at->the_post();
-                $select .= ("<option value='".get_the_ID()."'>".get_the_title()."</option>");
+                $isPackage = count(wp_get_post_terms(get_the_ID(), 'mphb_ra_package', true)) > 0;
+                if ($isPackage) {                    
+                    $select .= ("<option value='".get_the_ID()."'>".get_the_title()."</option>");
+                }
             }
         }
         wp_reset_query();
