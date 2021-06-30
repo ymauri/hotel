@@ -91,6 +91,7 @@ jQuery(document).ready(function() {
         e.preventDefault();
         var data = {
             'action': 'register_blocked_room',
+            'room_type': jQuery('#room_type').val(),
             'room_id': jQuery('#room_id').val(),
             'date_from': jQuery('#date_from').val(),
             'date_to': jQuery('#date_to').val()

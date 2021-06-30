@@ -99,10 +99,12 @@ class Configs {
         if ($at->have_posts()) {
             while ($at->have_posts()) {
                 $at->the_post();
-                $isPackage = count(wp_get_post_terms(get_the_ID(), 'mphb_ra_package', true)) > 0;
-                if ($isPackage) {                    
-                    $select .= ("<option value='".get_the_ID()."'>".get_the_title()."</option>");
-                }
+                $select .= ("<option value='".get_the_ID()."'>".get_the_title()."</option>");
+
+                // $isPackage = count(wp_get_post_terms(get_the_ID(), 'mphb_ra_package', true)) > 0;
+                // if ($isPackage) {                    
+                //     $select .= ("<option value='".get_the_ID()."'>".get_the_title()."</option>");
+                // }
             }
         }
         wp_reset_query();

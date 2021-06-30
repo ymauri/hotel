@@ -83,7 +83,18 @@ function register_blocked_room()
     try {
         $blockedRoom = new BlockedRoom();
         $resutl = false;
-        if (!empty($_POST['room_id']) && !empty($_POST['date_from']) && !empty($_POST['date_to'])) {
+        if (empty($_POST['room_id']) && !empty($_POST['room_type']) && !empty($_POST['date_from']) && !empty($_POST['date_to'])) {
+            $rooms = get_posts([
+                'post_type'     => 'mphb_room',
+                'meta_key'      => 'mphb_room_type_id',
+                'posts_per_page' => -1,
+                'meta_value'    => $_POST['room_type']
+            ]);
+            foreach ($rooms as $room) {
+                $resutl =& $blockedRoom->add($room->ID, $_POST['date_from'], $_POST['date_to'], "by admin");
+            }
+        }
+        else if (!empty($_POST['room_id']) && !empty($_POST['date_from']) && !empty($_POST['date_to'])) {
             $resutl = $blockedRoom->add($_POST['room_id'], $_POST['date_from'], $_POST['date_to'], "by admin");
         }
         echo $resutl ? 'ok' : "ko";
