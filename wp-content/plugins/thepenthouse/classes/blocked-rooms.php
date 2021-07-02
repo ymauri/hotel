@@ -165,13 +165,10 @@ class BlockedRoom
         $blockedRooms = $this->getAll();
         foreach ($rooms as $room) {
             $keyBlocked = $this->isBlocked($room->ID, $checkin, $checkout);
-            $itemHasComment = !empty($blockedRooms[$keyBlocked]['comment']);
-            if ($keyBlocked !== -1 && //Key found
-            (($deletWithComment && $itemHasComment)|| //borrar todos, incluido hasta los que tienen comentarios
-                (!$deletWithComment && !$itemHasComment))) // borrar todos excepto los que tienen comentario 
+            if ($keyBlocked !== -1 && strlen($blockedRooms[$keyBlocked]['comment']) == 0)//Key found
             {
                 unset($blockedRooms[$keyBlocked]);
-            }
+            } 
         }
         update_option('mphb_booking_rules_custom', $blockedRooms);
     }
@@ -191,14 +188,11 @@ class BlockedRoom
         $blockedRooms = $this->getAll();
 
         $keyBlocked = $this->isBlocked($room_id, $from, $to);
-        $itemHasComment = !empty($blockedRooms[$keyBlocked]['comment']);
-        if ($keyBlocked !== -1 && //Key found
-            (($deletWithComment && $itemHasComment)|| //borrar todos, incluido hasta los que tienen comentarios
-            (!$deletWithComment && !$itemHasComment))) // borrar todos excepto los que tienen comentario 
+        if ($keyBlocked !== -1 && strlen($blockedRooms[$keyBlocked]['comment']) == 0)//Key found
         {
             unset($blockedRooms[$keyBlocked]);
             update_option('mphb_booking_rules_custom', $blockedRooms);
-        }
+        } 
     }
 
      /**
@@ -218,7 +212,9 @@ class BlockedRoom
         foreach ($rooms as $room) {
             foreach ($blockedRooms as $key => $blockedRoom) {
                 if ($room->ID == $blockedRoom['room_id'] && strtotime($blockedRoom['date_from']) >= strtotime($start) && strtotime($blockedRoom['date_to']) <= strtotime($end)) {
-                    unset($blockedRooms[$key]);
+                    if (strlen($blockedRoom['comment']) == 0) {
+                        unset($blockedRooms[$key]);
+                    }
                 }
             }
         }
