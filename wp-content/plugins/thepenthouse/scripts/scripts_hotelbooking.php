@@ -60,7 +60,8 @@ function phone_field() {
 
         <script>
             jQuery('form.mphb_sc_checkout-form').attr('autocomplete', 'off');
-            if (jQuery("#mphb_phone").length) {            
+            if (jQuery("#mphb_phone").length) {  
+                jQuery("#mphb_phone").attr("name", '');          
                 var input = document.querySelector("#mphb_phone");
                 var phoneField = window.intlTelInput(input, {
                     onlyCountries: ["al", "ad", "at", "by", "be", "ba", "bg", "hr", "cz", "dk",
@@ -72,16 +73,8 @@ function phone_field() {
                         autoPlaceholder: 'on',
                         preferredCountries: ["nl"],
                         separateDialCode: false,
-                        hiddenInput: "full_phone",
+                        hiddenInput: "mphb_phone",
                         utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.8/js/utils.js'
-                });
-                jQuery('form.mphb_sc_checkout-form').on('submit', function (e){
-                    if (iti.isValidNumber()) {
-                        jQuery("#mphb_phone").val(phoneField.getNumber(intlTelInputUtils.numberFormat.E164).replace("+", ''));
-                        return true; 
-                    } else {
-                        return false;
-                    }
                 });
             }
         </script>
