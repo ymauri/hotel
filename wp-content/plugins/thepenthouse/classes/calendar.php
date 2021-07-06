@@ -84,7 +84,7 @@ class Calendar
      *
      * @return void
      */
-    private function populateChanges(array $reservation, int $roomId, string $status)
+    public function populateChanges(array $reservation, int $roomId, string $status)
     {
         $checkout =  date("Y-m-d", strtotime($reservation['checkOutDateLocalized'] . " -1 day"));
 

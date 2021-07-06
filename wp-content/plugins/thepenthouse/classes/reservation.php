@@ -91,22 +91,15 @@ class Reservation
                         $response = $this->guesty->updateReservation($reservationId, $data);
                     }
 
-                    if (!empty($response['result']['id'])) {
-                        if (empty($reservationId)) {
-                            add_post_meta($this->booking->getId(), 'mphb_reservation_id', $response['result']['id']);
-                        } else {
-                            update_post_meta($this->booking->getId(), 'mphb_reservation_id', $response['result']['id']);
-                        }
-                        $this->log($response['result']['id'], $this->booking->getId());
+                    if (!empty($response['result']['_id'])) {                      
+                        update_post_meta($this->booking->getId(), 'mphb_reservation_id', $response['result']['_id']);
+                        $this->log($response['result']['_id'], $this->booking->getId());
                     }
                 }
-
-                // if ($status == 'canceled') {
-                //     $this->blockedRooms->delete($listingId, $checkin, $checkout);
-                // } else {
-                //     $data['_id'] = get_post_meta($this->booking->getId(), 'mphb_reservation_id') ?? "";
-                //     $this->blockedRooms->syncOtherRooms($listingId, $item->getRoomId(), $data);
-                // }
+                
+                $data['_id'] = get_post_meta($this->booking->getId(), 'mphb_reservation_id') ?? "";
+                $calendar = new Calendar();
+                $calendar->populateChanges($data, $item->getRoomId(), $status);
             }
         }
     }
