@@ -101,7 +101,7 @@ class Configs {
                 $at->the_post();
                 $select .= ("<option value='".get_the_ID()."'>".get_the_title()."</option>");
 
-                // $isPackage = count(wp_get_post_terms(get_the_ID(), 'mphb_ra_package', true)) > 0;
+                // $isPackage = count(wp_get_post_terms(get_the_ID(), 'package', true)) > 0;
                 // if ($isPackage) {                    
                 //     $select .= ("<option value='".get_the_ID()."'>".get_the_title()."</option>");
                 // }

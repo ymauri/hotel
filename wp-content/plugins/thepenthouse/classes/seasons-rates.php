@@ -158,7 +158,7 @@ class SeasonsRates
             <ul>
                 <?php while ($roomTypes->have_posts()) {
                     $roomTypes->the_post();
-                    if (!empty(wp_get_post_terms(get_the_ID(), 'mphb_ra_package'))){?>
+                    if (!empty(wp_get_post_terms(get_the_ID(), 'package'))){?>
                         <li style="list-style: none;"><input class="accommodations-types" type="checkbox" name="roomTypes[]" checked value="<?php echo get_the_ID(); ?>"><?php echo get_the_title(); ?></li>
                 <?php }
                 } ?>
