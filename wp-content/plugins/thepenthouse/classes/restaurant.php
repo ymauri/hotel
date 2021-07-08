@@ -44,7 +44,7 @@ class Restaurant
                     $shortDate = date("(m-d)", strtotime($date));
                     $orderInfo = strtolower("order-".date("M-d-Y-hi-a", strtotime(get_the_date('Y-m-d H:i:s', $booking->ID))));
                     $roomTypeId = get_post_meta($roomId, 'mphb_room_type_id', true);
-                    $isPackage = !empty(wp_get_post_terms($roomTypeId, 'package'));
+                    $isPackage = is_package($roomTypeId);
                    
                     $services = get_post_meta($reservedRoom->ID, '_mphb_services');
 

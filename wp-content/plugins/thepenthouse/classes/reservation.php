@@ -25,7 +25,7 @@ class Reservation
             $rateId = get_post_meta( $item->getId(), '_mphb_rate_id', true );
             $listingId = get_post_meta($item->getRoomId(), 'guesty_id', true);
             $roomTypeId = get_post_meta($rateId, 'mphb_room_type_id', true);
-            $isPackage = !empty(wp_get_post_terms($roomTypeId, 'package'));
+            $isPackage = is_package($roomTypeId);
             $services = get_post_meta($item->getId(), '_mphb_services');
             $note = "";
 
@@ -57,7 +57,7 @@ class Reservation
                 }
                 $note .= "PAID: €". $paid;    
             }
-            // echo $note;die;
+
             if (!empty($listingId)) {
                 $checkin = $this->booking->getCheckInDate()->format('Y-m-d');
                 $checkout = $this->booking->getCheckOutDate()->format('Y-m-d');

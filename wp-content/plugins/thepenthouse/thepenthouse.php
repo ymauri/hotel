@@ -71,6 +71,7 @@ include(plugin_dir_path(__FILE__) . 'scripts/scripts_hotelchamp.php');
 include(plugin_dir_path(__FILE__) . 'scripts/scripts_hotelbooking.php');
 include(plugin_dir_path(__FILE__) . 'scripts/config_page.php');
 include(plugin_dir_path(__FILE__) . 'scripts/jobs.php');
+include(plugin_dir_path(__FILE__) . 'scripts/shortcodes.php');
 
 add_action('admin_enqueue_scripts', "register_css_and_js");
 function register_css_and_js()
@@ -145,4 +146,14 @@ add_filter( 'allowed_http_origins', 'add_allowed_origins' );
 function add_allowed_origins( $origins ) {
     $origins[] = 'https://thepenthouse-apartments.nl';
     return $origins;
+}
+
+function is_package($roomTypeId) {
+    $taxonomies = wp_get_post_terms($roomTypeId, 'mphb_room_type_category');
+    foreach ($taxonomies as $tax) {
+      if ($tax->slug == "packages") {
+        return true;
+      }
+    }
+    return false;
 }
