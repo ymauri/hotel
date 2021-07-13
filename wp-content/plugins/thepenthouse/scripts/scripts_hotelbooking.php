@@ -21,7 +21,7 @@ function guest_select_behaviour() {
             jQuery('.mphb-rooms-quantity').each(function() {
                 
                 let parent = jQuery(this).parent();
-                parent.find('select').first().hide().before("<b>1 </>");
+                parent.find('select').first().hide().before("<b>1 </b>");
             });
         }
         </script>
